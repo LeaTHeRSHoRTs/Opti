@@ -3,4 +3,3 @@
 
 declare var $: OptiQuery;
 declare var $$: OptiMultiQuery;
-declare var Collection: CollectionConstructor;

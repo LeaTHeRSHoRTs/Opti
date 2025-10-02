@@ -1,5 +1,5 @@
 describe("NodeList.addClass, NodeList.removeClass, NodeList.toggleClass", () => {
-  let nodeList: NodeList;
+  let nodeList: NodeListOf<Element>;
 
   beforeEach(() => {
     const div1 = document.createElement('div');
@@ -28,27 +28,6 @@ describe("NodeList.addClass, NodeList.removeClass, NodeList.toggleClass", () => 
   });
 });
 
-describe("NodeList.single", () => {
-  let nodeList: NodeList;
-
-  beforeEach(() => {
-    document.body.append(document.createElement('div'));
-    document.body.append(document.createElement('div'));
-    nodeList = document.querySelectorAll('div');
-  });
-
-  it("should return the first element", () => {
-    const firstElement = nodeList.single();
-    expect(firstElement).toBe(nodeList[0]);
-  });
-
-  it("should return null for an empty NodeList", () => {
-    nodeList = document.querySelectorAll(".notExists");
-    const firstElement = document.querySelectorAll('p').single();
-    expect(firstElement).toBe(null);
-  });
-});
-
 describe("HTMLCollection.addClass, HTMLCollection.removeClass, HTMLCollection.toggleClass", () => {
   let htmlCollection: HTMLCollectionOf<HTMLDivElement>;
 
@@ -74,25 +53,5 @@ describe("HTMLCollection.addClass, HTMLCollection.removeClass, HTMLCollection.to
     htmlCollection.removeClass('item');
     expect(htmlCollection[0].classList.contains('item')).toBeFalsy();
     expect(htmlCollection[1].classList.contains('item')).toBeFalsy();
-  });
-});
-
-describe("HTMLCollection.single", () => {
-  let htmlCollection: HTMLCollectionOf<HTMLDivElement>;
-
-  beforeEach(() => {
-    document.body.append(document.createElement('div'));
-    document.body.append(document.createElement('div'));
-    htmlCollection = document.getElementsByTagName('div');
-  });
-
-  it("should return the first element", () => {
-    const firstElement = htmlCollection.single();
-    expect(firstElement).toBe(htmlCollection[0]);
-  });
-
-  it("should return null for an empty HTMLCollection", () => {
-    const firstElement = document.getElementsByTagName("p").single();
-    expect(firstElement).toBe(null);
   });
 });

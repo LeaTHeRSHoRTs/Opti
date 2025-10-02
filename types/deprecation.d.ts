@@ -1,5 +1,5 @@
 /* eslint-disable no-var */
-interface Node {
+interface ParentNode extends Node {
   /**
    * Returns the parent element.
    *
@@ -26,11 +26,7 @@ interface Node {
    * @deprecated
    * @migrate {@link Node.$}
    */
-  querySelector<K extends keyof HTMLElementTagNameMap>(selectors: K): HTMLElementTagNameMap[K] | null;
-  querySelector<K extends keyof SVGElementTagNameMap>(selectors: K): SVGElementTagNameMap[K] | null;
-  querySelector<K extends keyof MathMLElementTagNameMap>(selectors: K): MathMLElementTagNameMap[K] | null;
-  querySelector<K extends keyof HTMLElementDeprecatedTagNameMap>(selectors: K): HTMLElementDeprecatedTagNameMap[K] | null;
-  querySelector<E extends Element = Element>(selectors: string): E | null;
+  querySelector: ParentNode["querySelector"]
 
   /**
    * Returns all element descendants of node that match selectors.
@@ -39,12 +35,7 @@ interface Node {
    * @deprecated
    * @migrate {@link Node.$$}
    */
-  querySelectorAll<K extends keyof HTMLElementTagNameMap>(selectors: K): NodeListOf<HTMLElementTagNameMap[K]>;
-  querySelectorAll<K extends keyof SVGElementTagNameMap>(selectors: K): NodeListOf<SVGElementTagNameMap[K]>;
-  querySelectorAll<K extends keyof MathMLElementTagNameMap>(selectors: K): NodeListOf<MathMLElementTagNameMap[K]>;
-  /** @deprecated */
-  querySelectorAll<K extends keyof HTMLElementDeprecatedTagNameMap>(selectors: K): NodeListOf<HTMLElementDeprecatedTagNameMap[K]>;
-  querySelectorAll<E extends Element = Element>(selectors: string): NodeListOf<E>;
+  querySelectorAll: ParentNode["querySelectorAll"]
 
   /** 
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Node/textContent) 
@@ -152,3 +143,8 @@ declare var localStorage: Storage;
  * @migrate {@link SessionStorage}
  */
 declare var sessionStorage: Storage;
+
+interface Function {
+  /** @deprecated Use {@link Function.args} instead */
+  arguments?: IArguments
+}

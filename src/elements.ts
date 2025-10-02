@@ -1,4 +1,12 @@
-namespace Opti {
+function toKebabCase(str: string): string {
+  return str
+    // Add a hyphen before uppercase letters that are preceded by lowercase letters or numbers
+    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
+    // Replace spaces or underscores with hyphens
+    .replace(/[\s_]+/g, "-")
+    // Convert everything to lowercase
+    .toLowerCase();
+}
 
 export function hasText (this: Element, text: string | RegExp): boolean {
   if (typeof text === "string") {
@@ -63,13 +71,11 @@ export function css(
   }
 };
 
-export function getParent (this: Node): Node | null {
+export function getParent(this: ChildNode): ParentNode | null {
   return this.parentElement;
 };
 
-export function getAncestor<T extends Element>(this: Element, selector: string): T | null;
-export function getAncestor(this: Node, level: number): Node | null;
-export function getAncestor<T extends Element>(this: Node, arg: string | number): T | Node | null {
+export function getAncestor<T extends Element>(this: ChildNode, arg: string | number): T | Node | null {
   // Case 1: numeric level
   if (typeof arg === "number") {
     let node: Node | null = this;
@@ -91,109 +97,8 @@ export function getAncestor<T extends Element>(this: Node, arg: string | number)
   }
   return null;
 }
-export function createChildren (this: HTMLElement, elements: HTMLElementCascade): void {
-  const element = document.createElement(elements.element);
 
-  if (elements.id) {
-    element.id = elements.id;
-  }
-
-  if (elements.className) {
-    if (Array.isArray(elements.className)) {
-      element.classList.add(...elements.className);
-    } else {
-      element.classList.add(elements.className);
-    }
-  }
-
-  // Assign additional attributes dynamically
-  for (const key in elements) {
-    if (!['element', 'id', 'className', 'children'].includes(key)) {
-      const value = elements[key as keyof HTMLElementCascade];
-      if (typeof value === 'string') {
-        element.setAttribute(key, value);
-      } else if (Array.isArray(value)) {
-        element.setAttribute(key, value.join(' ')); // Convert array to space-separated string
-      }
-    }
-  }
-
-  // Recursively create children
-  if (elements.children) {
-    if (Array.isArray(elements.children)) {
-      elements.children.forEach(child => {
-        // Recursively create child elements
-        element.createChildren(child);
-      });
-    } else {
-      // Recursively create a single child element
-      element.createChildren(elements.children);
-    }
-  }
-
-  this.appendChild(element);
-};
-
-export function tag <S extends HTMLElement, T extends HTMLTag = HTMLElementTagNameOf<S>>(
-  this: S,
-  newTag?: T
-): HTMLElementOf<T> | string {
-  if (!newTag) {
-    return this.tagName.toLowerCase() as HTMLTag;
-  }
-
-  const newElement = document.createElement(newTag) as HTMLElementOf<T>;
-
-  // Copy attributes
-  Array.from(this.attributes).forEach(attr => {
-    newElement.setAttribute(attr.name, attr.value);
-  });
-
-  // Copy dataset
-  Object.entries(this.dataset).forEach(([key, value]) => {
-    newElement.dataset[key] = value;
-  });
-
-  // Copy inline styles
-  newElement.style.cssText = this.style.cssText;
-
-  // Copy classes
-  newElement.className = this.className;
-
-  // Copy child nodes
-  while (this.firstChild) {
-    newElement.appendChild(this.firstChild);
-  }
-
-  // Transfer listeners (if you have a system for it)
-  if ((this as any)._eventListeners instanceof Map) {
-    const listeners = (this as any)._eventListeners as Map<string, EventListenerOrEventListenerObject[]>;
-    listeners.forEach((fns, type) => {
-      fns.forEach(fn => newElement.addEventListener(type, fn));
-    });
-    (newElement as any)._eventListeners = new Map(listeners);
-  }
-
-  // Optional: Copy properties (if you have custom prototype extensions)
-  for (const key in this) {
-    // Skip built-in DOM properties and functions
-    if (
-      !(key in newElement) &&
-      typeof (this as any)[key] !== "function"
-    ) {
-      try {
-        (newElement as any)[key] = (this as any)[key];
-      } catch {
-        // Some props might be readonly — safely ignore
-      }
-    }
-  }
-
-  this.replaceWith(newElement);
-  return newElement;
-};
-
-export function html (this: HTMLElement, input?: string): string {
+export function html (this: Element, input?: string): string {
   return input !== undefined ? (this.innerHTML = input) : this.innerHTML;
 };
 
@@ -217,15 +122,15 @@ export function text(this: Element, text?: string | ((text: string) => string), 
   return this.textContent ?? "";
 };
 
-export function show (this: HTMLElement) {
+export function show(this: HTMLElement) {
   this.css("visibility", "visible");
 };
 
-export function hide (this: HTMLElement) {
+export function hide(this: HTMLElement) {
   this.css("visibility", "hidden");
 };
 
-export function toggle (this: HTMLElement) {
+export function toggle(this: HTMLElement) {
   if (this.css("visibility") === "visible" || this.css("visibility") === "") {
     this.hide();
   } else {
@@ -233,20 +138,20 @@ export function toggle (this: HTMLElement) {
   }
 };
 
-export function find (this: Node, selector: string): Node | null {
+export function find(this: ParentNode, selector: string): Node | null {
   return this.querySelector(selector); // Returns a single Element or null
 };
 
-export function findAll (this: Node, selector: string): NodeListOf<Element> {
+export function findAll(this: ParentNode, selector: string): NodeListOf<Element> {
   return this.querySelectorAll(selector); // Returns a single Element or null
 };
 
-export function getChildren (this: Node): NodeListOf<ChildNode> {
+export function getChildren(this: Node): NodeListOf<ChildNode> {
   return this.childNodes;
 };
 
-export function getSiblings (this: Node, inclusive?: boolean): Node[] {
-  const siblings = Array.from(this.parentNode!.childNodes as NodeListOf<Node>);
+export function getSiblings(this: ChildNode, inclusive?: boolean): ChildNode[] {
+  const siblings = Array.from(this.parentNode!.childNodes);
   if (inclusive) {
     return siblings; // Include current node as part of siblings
   } else {
@@ -254,7 +159,7 @@ export function getSiblings (this: Node, inclusive?: boolean): Node[] {
   }
 };
 
-export function serialize (this: HTMLFormElement): string {
+export function serialize(this: HTMLFormElement): string {
   const formData = new FormData(this); // Create a FormData object from the form
 
   // Create an array to hold key-value pairs
@@ -271,10 +176,6 @@ export function serialize (this: HTMLFormElement): string {
       return encodeURIComponent(key) + '=' + encodeURIComponent(value);
     })
     .join('&'); // Join the array into a single string, separated by '&'
-};
-
-export function elementCreator (this: HTMLElement) {
-  return new HTMLElementCreator(this);
 };
 
 export function cut<T extends Element>(this: T): T {
@@ -300,4 +201,8 @@ export function cut<T extends Element>(this: T): T {
   return clone;
 }
 
+export function isVisible(this: HTMLElement) {
+  return this.css("visibility") !== "hidden"
+    ? this.css("display") !== "none"
+    : Number(this.css("opacity")) > 0;
 }

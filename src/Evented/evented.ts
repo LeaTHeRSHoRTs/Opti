@@ -26,6 +26,12 @@ namespace Opti {
 }
 
 namespace Opti.Evented {
+  class ThreadTerminatedException extends globalThis.Exception {
+    constructor(code?: number) {
+      super("ThreadTerminatedException", code?.toString());
+    }
+  }
+
   export function addEventRuled<T extends EventTarget, K extends keyof EventMapOf<T>>(
     this: T,
     type: K,
@@ -153,5 +159,88 @@ namespace Opti.Evented {
     };
 
     return controller;
+  }
+
+  export class Thread<T, U extends ((val: T) => T)[]> {
+    private _controller: AbortController;
+    private _signal: AbortSignal;
+    private _running: boolean;
+    private _functions: U;
+    private _thread: Promise<T>;
+    private _terminated: boolean;
+    private _sleep: number | false;
+
+    constructor(initialValue: T, ...fn: U) {
+      this._controller = new AbortController();
+      this._signal = this._controller.signal;
+      this._running = true;
+      this._terminated = false;
+      this._sleep = false;
+      this._functions = fn;
+
+      this._thread = new Promise((res, rej) => {
+        if (this._signal.aborted) {
+          rej();
+        } else {
+          res(this._functions[0](initialValue));
+        }
+      });
+      this._functions.shift(); // Remove the function already in the queue
+
+      for (const func of this._functions) {
+        this.#then(func);
+      }
+    }
+
+    sleep(ms: number): void {
+      this._sleep = ms;
+    }
+    stack(fn: () => any): void {
+      this.#then(fn);
+    }
+    pause(): void {
+      this._running = false;
+    }
+    resume(): void {
+      this._running = true;
+    }
+    terminate(code?: number): never {
+      this._controller.abort();
+      throw new ThreadTerminatedException(code);
+    }
+
+    get running(): boolean {
+      return this._running;
+    }
+
+    #then(func: U[number]) {
+      this._thread = this._thread.then(val => new Promise((resolve, reject) => {
+        const waitUntilRunning = () => {
+          if (this._running) {
+            if (this._signal.aborted) {
+              return reject();
+            } else if (this._sleep) {
+              setTimeout(() => {
+                this._sleep = false;
+                resolve(func(val));
+              }, this._sleep);
+            } else {
+              resolve(func(val));
+            }
+          } else {
+            setTimeout(waitUntilRunning, 50);
+          }
+        };
+
+        waitUntilRunning();
+
+        // Listen for abort signal
+        this._signal.addEventListener('abort', () => reject());
+      }));
+    }
+  }
+
+  export class StaticThread<T, U extends ((val: T) => T)[]> extends Thread<T, U> {
+    
   }
 }

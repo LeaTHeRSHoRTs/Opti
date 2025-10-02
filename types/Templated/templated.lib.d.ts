@@ -1,12 +1,7 @@
 /* eslint-disable no-var */
 
-declare module "*.thtml" {
-  const document: OptiDOM;
-  export default document;
-}
-
 declare var Templated: Templated;
-declare var TemplateComponent: TemplateComponent;
-declare var TemplateElement: TemplateElement;
-declare var TemplateSection: TemplateSection;
-declare var TemplateDocument: TemplateDocument;
+declare var TemplatedComponent: TemplatedComponent;
+declare var TemplatedElement: TemplatedElement;
+declare var TemplatedSection: TemplatedSection;
+declare var TemplatedDocument: TemplatedDocument;

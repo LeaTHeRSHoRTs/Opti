@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script includes>
-      req("date");
-      opt("datetime");
+    <script templated>
+      import date = Date.now();
+      import datetime
     </script>
     <title>{this.datetime ?? this.date}</title>
     <body>

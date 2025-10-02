@@ -94,4 +94,11 @@ interface EventTarget {
     listener: (this: U, e: EventMapOf<T>[K]) => void,
     options?: boolean | AddEventListenerOptions
   ): void
+
+  addEventController<T extends EventTarget, K extends keyof EventMapOf<T>>(
+    this: T,
+    type: K,
+    listener: (e: EventMapOf<T>[K]) => void,
+    options?: boolean | AddEventListenerOptions
+  ): EventController
 }

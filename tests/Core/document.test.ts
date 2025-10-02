@@ -46,7 +46,7 @@ describe("Document.css", () => {
 
 describe("Document.createElementTree", () => {
   it("should create an element cascade and append to the body", () => {
-    const el = document.createElementTree({ 
+    const el = document.createElements({ 
       tag: "div", 
       children: { tag: "a" }
     });
@@ -65,7 +65,7 @@ describe("Document.createElementTree", () => {
   
   it("should be able to add keyed properties", () => {
     expect(() => {
-      const el = document.createElementTree({ 
+      const el = document.createElements({ 
         tag: "div", 
         "data-href": "32",
         children: { 
@@ -78,7 +78,7 @@ describe("Document.createElementTree", () => {
 
   it("should not be able to add keyed properties if they aren't a string", () => {
     expect(() => {
-      document.createElementTree({ 
+      document.createElements({ 
         tag: "div", 
         "data-href": "32",
         children: { 

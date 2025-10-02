@@ -28,7 +28,6 @@ function orderSync(files, forDir) {
 
   const contents = [];
   files = files.sort(sortArr);
-  console.log("Files:", files);
   
   for (const file of files) {
     const content = fs.readFileSync(file, 'utf8');

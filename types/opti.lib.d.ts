@@ -4,6 +4,222 @@
 /// <reference path="./classes.d.ts" />
 
 /* eslint-disable no-var */
+
+/** 
+ * Creates an iife (Immediately invoked function expression) that triggers on run 
+ * @opti
+ * @param iife The function to run the code in for the iife
+ */
+declare function f(iife: () => void): void;
+
+/**
+ * Gets the type of the value and returns a string representation of the type of the value
+ * @opti
+ * @param val The value who's type is being tested
+ * @example
+ * type(5)               // "number"
+ * type("hello")         // "string"
+ * type(null)            // "null"
+ * type(undefined)       // "undefined"
+ * type([1,2,3])         // "array"
+ * type({})              // "object"
+ * type(new Date())      // "date"
+ * type(/abc/)           // "regexp"
+ * type(() => {})        // "function"
+ * type(new Map())       // "map"
+ * type(new Set())       // "set"
+ */
+declare function type<T>(val: T): TypeOperators<T>;
+
+/**
+ * Asserts whether `condition` is true or not and throws an {@linkcode AssertionException} if it fails
+ * @opti
+ * @throws AssertException
+ * @param condition The condition to test
+ * @example
+ * let mayVar = 32;
+ * if (Math.random() > 0.5) {
+ *   myVar = 33;
+ * }
+ * 
+ * assert(myVar === 33); // From now on, intellisense thinks that myVar: 33
+ * console.log(myVar); // Will not log if myVar is 32 before the assertion
+ */
+declare function assert(condition: boolean): asserts condition;
+
+/**
+ * Cheks whether the value given is empty, `null`, or `undefined`
+ * @opti
+ * @param value The value to check
+ * @example
+ * isEmpty(""); // true
+ * isEmpty("Hello"); // false
+ * isEmpty(NaN); // true
+ * isEmpty(0); // false
+ * isEmpty({}); // true
+ * isEmpty([]); // true
+ * isEmpty([1, 2]); // false
+ */
+declare function isEmpty(val: string): val is "";
+declare function isEmpty(val: number): val is typeof NaN;
+declare function isEmpty(val: boolean): val is false;
+declare function isEmpty(val: null | undefined): true;
+declare function isEmpty(val: [...any]): val is [];
+declare function isEmpty(val: Record<Key, unknown>): val is Record<Key, never>;
+declare function isEmpty(val: Map<any, any>): val is Map<any, never>;
+declare function isEmpty(val: Set<any>): val is Set<never>;
+declare function isEmpty(val: WeakMap<object, any>): val is WeakMap<object, any>;
+declare function isEmpty(val: WeakSet<object>): val is WeakSet<object>;
+declare function isEmpty(val: any): boolean;
+
+/**
+ * Inverse function to {@linkcode isEmpty}
+ * @opti
+ * @param value The value to check
+ * @example
+ * isEmpty("") === notEmpty("Hello") // true
+ */
+declare function notEmpty(val: string | ""): val is string;
+declare function notEmpty(val: number | 0): val is number;
+declare function notEmpty(val: boolean): val is true;
+declare function notEmpty(val: null | undefined): false;
+declare function notEmpty(val: [...any] | []): val is [any, ...any];
+declare function notEmpty(val: Record<Key, unknown>): val is Record<Key, unknown>;
+declare function notEmpty(val: Map<any, any>): val is Map<any, never>;
+declare function notEmpty(val: Set<any>): val is Set<never>;
+declare function notEmpty(val: WeakMap<object, any>): val is WeakMap<object, any>;
+declare function notEmpty(val: WeakSet<object>): val is WeakSet<object>;
+declare function notEmpty(val: any): boolean;
+
+/**
+ * Waits the specified number of ms before returning control to the then block, or the main program
+ * @opti
+ * @param ms The amout of milliseconds to wait
+ * @example
+ * console.log("I log when the program runs!")
+ * 
+ * await sleep(500);
+ * 
+ * console.log("I wait 5 seconds before executing!")
+ */
+declare function sleep(ms: number): Promise<void>;
+
+// /**
+//  * Makes a function mixin and returns that mixin for other use
+//  * @opti
+//  * @param fn The function to use for the mixin
+//  * @param location The location to put the `mixinFn`'s code
+//  * @param mixinFn The function taht will be inserted into `fn`
+//  */
+// declare function mixin<T extends Func>(fn: T, location: "HEAD", mixinFn: T): T;
+// declare function mixin<T extends Func, This = ThisParameterType<T>, Ret = ReturnType<T>>(fn: T, location: "TAIL", mixinFn: (this: This & { mixin: { value: Ret } }, ...args: Parameters<T>) => Ret): T
+
+// /**
+//  * Colorizes a string based on the colorized syntax
+//  * @opti
+//  * @example
+//  * Colorize`{color:red}Red Text!{/color:red}`
+//  */
+// declare function Colorize(strings: TemplateStringsArray, ...values: any[]): string;
+
+/**
+ * Creates a new typesafe enum full of Symbols
+ * @opti
+ * @param values The enum's values
+ * @example
+ * const Colors = Enum("RED", "ORAGNE", "YELLOW", "GREEN", "BLUE")
+ * 
+ * const color = Colors.ORANGE
+ * switch(Color) {
+ *   case Color.RED:
+ *     console.log("Red")
+ *     break;
+ *   case Color.ORANGE:
+ *     console.log("Orange")
+ *     break;
+ *   case Color.YELLOW:
+ *     console.log("Yellow")
+ *     break;
+ *   case Color.GREEN:
+ *     console.log("Green")
+ *     break;
+ *   case Color.BLUE:
+ *     console.log("Blue")
+ *     break;
+ *   default:
+ *     console.log("Unknown number")
+ *     break;
+ * }
+ */
+declare function Enum<T extends readonly string[]>(...values: T): EnumInstance<T>
+
+/**
+ * Creates a tuple of values from a spread provided
+ * @opti
+ * @param values The values to use for the tuple
+ * @example
+ * const myTuple = Tuple("X", 2, true); // [string, number, boolean]
+ */
+declare function Tuple<T extends unknown[]>(...values: T): T
+
+// /**
+//  * Info about `Opti`
+//  * @opti
+//  */
+// declare var opti: OptiObject;
+
+/**
+ * Base class for all the Opti Exceptions
+ */
+declare var Exception: ExceptionConstructor;
+
+/**
+ * Exception that cannot be caught using `instanceof Exception` or `instanceof Error`
+ */
+declare var RuntimeException: RuntimeExceptionConstructor;
+
+/**
+ * Exception for unimplemented things
+ */
+declare var NotImplementedException: SubExceptionConstructor;
+
+/**
+ * Exception for unknown causes
+ */
+declare var UnknownException: UnknownExceptionConstructor;
+
+/**
+ * Exception for illegal access
+ */
+declare var AccessException: SubExceptionConstructor;
+
+/**
+ * Error for assertion related errors
+ */
+declare var AssertionException: SubExceptionConstructor;
+
+/**
+ * Exception for starting a new debounce
+ */
+declare var DebouncedException: SubExceptionConstructor;
+
+declare var SyntaxException: SubExceptionConstructor;
+declare var TypeException: SubExceptionConstructor;
+declare var CloneException: SubExceptionConstructor;
+declare var NumberTooSmallException: SubExceptionConstructor;
+
+/**
+ * Provides resources to access and make time based objects (Without dates)
+ */
+declare var Time: TimeConstructor;
+
+/**
+ * The collection class that can make collections of any object
+ */
+declare var Collection: CollectionConstructor;
+
+declare var opti: OptiObject;
+
 interface Document {
   /** 
    * Adds, edits and returns the element's css on the document stylesheet.
@@ -52,20 +268,11 @@ interface Document {
    *   console.log("User is Leaving");
    * 
    *   // Cleanup tasks
-   *   LocalStorage.clear();
+   *   localStorage.clear();
    *   Cookie.clear();
    * })
    */
   leaving(callback: (this: Document, ev: Event) => any): void;
-
-  /**
-   * Starts an instance of the {@link HTMLElementCreator} to create an structure of elements
-   * @opti
-   * @param superEl The top level HTMLElement
-   * @param attrs Attributes for the 'superEl'
-   * 
-   */
-  elementCreator(superEl: keyof HTMLElementTagNameMap, attrs: HTMLAttrs): HTMLElementCreator;
 
   /**
    * Creates an element tree to create trees of HTML
@@ -93,7 +300,7 @@ interface Document {
    *   ]
    * });
    */
-  createElementTree<T extends HTMLElement>(node: ElementNode): T;
+  createElements<T extends HTMLElement>(node: ElementNode): T;
 }
 
 interface Window {
@@ -114,7 +321,7 @@ interface Node {
    * 
    * console.log("Target: " + target);
    */
-  parent(this: Node): Node | null;
+  parent(this: ChildNode): ParentNode | null;
 
   /**
    * Gets all the children of the node
@@ -124,7 +331,7 @@ interface Node {
    * 
    * el.forEach((child, i) => console.log("Child " + i + ": " + child));
    */
-  getChildren(this: Node): NodeListOf<ChildNode>
+  getChildren(this: ParentNode): NodeListOf<ChildNode>
 
   /**
    * Gets the siblings of the node and, if 'inclusive' is true, includes itself in the list
@@ -135,7 +342,7 @@ interface Node {
    * 
    * el.forEach((sibling, i) => console.log("Sibling " + i + ": " + sibling));
    */
-  siblings(this: Node, inclusive?: boolean): Node[]
+  siblings(this: ChildNode, inclusive?: boolean): ChildNode[]
 
   /** 
    * Gets the ancestor of the node by the amount of levels specified
@@ -148,7 +355,7 @@ interface Node {
    * 
    * console.log("Target: " + target);
    */
-  ancestor(this: Node, level: number): Node | null;
+  ancestor(this: ChildNode, level: number): ParentNode | null;
   /** 
    * Gets the element's ancestor (ancestor selected is based on the css selector) 
    * @opti
@@ -261,6 +468,19 @@ interface Element {
   txt(modifier: (text: string) => string): void;
   txt(newText: string, ...moreText: string[]): void;
   txt(): string;
+
+  /**
+   * Gets and sets the elements html
+   * @opti
+   * @notice use HTMLElement.{@link text} instead if you are not insterting raw html
+   * @param input The html to insert in place of the old html
+   * @example
+   * const el = document.$("target");
+   * const html = el.html();
+   * 
+   * el.html(html + "<a href='example.com'>Link</a>");
+   */
+  html(input?: string): string;
 }
 
 interface HTMLElement {
@@ -284,34 +504,6 @@ interface HTMLElement {
   css(): Partial<Record<keyof CSSStyleDeclaration, string>>;
 
   /**
-   * Creates children of the element
-   * @param elements The elements to use, specified by the cascade. The cascade is a {@link HTMLElementCascade}
-   * @deprecated use {@link document.elementCreator} or new {@link HTMLElementCreator}
-   * @opti
-   */
-  createChildren(elements: HTMLElementCascade): void;
-
-  /**
-   * Starts instance of the {@link HTMLElementCreator} to create an structure of elements
-   * @opti
-   * @example 
-   * const el = document.$("#target");
-   * 
-   * el.elementCreator()
-   *   .el("h1", { text: "Hello" })
-   *   .el("h2", { text: "world!", id: "small" })
-   */
-  elementCreator(this: HTMLElement): HTMLElementCreator;
-
-  /**
-   * Changing an elements tag name
-   * @opti
-   * @warning BE CAREFUL WITH THIS FUNCTION, AS IT MODIFIES TAG NAMES, WHICH ARE A MAJOR PART OF HTML.
-   * @param type the new element type
-   */
-  tag<T extends keyof HTMLElementTagNameMap>(type: T): HTMLElementOf<T>;
-
-  /**
    * Gets the elements tag name
    * @opti
    * @example
@@ -319,20 +511,7 @@ interface HTMLElement {
    * 
    * console.log(el.tag()); // Logs tag name
    */
-  tag(this: HTMLElement): keyof HTMLElementTagNameMap;
-
-  /**
-   * Gets and sets the elements html
-   * @opti
-   * @notice use HTMLElement.{@link text} instead if you are not insterting raw html
-   * @param input The html to insert in place of the old html
-   * @example
-   * const el = document.$("target");
-   * const html = el.html();
-   * 
-   * el.html(html + "<a href='example.com'>Link</a>");
-   */
-  html(input?: string): string;
+  readonly tag: HTMLTag;
 
   // /**
   //  * Creates a HTML element animation that animates into the css properties specified
@@ -377,86 +556,21 @@ interface HTMLElement {
    * el.toggle(true);
    */
   toggle(): void;
-
-  // /**
-  //  * 
-  //  * @opti
-  //  * @param layout If the layout should shift when the element has finished and during the animation
-  //  * @param duration The ammount of time the animation takes in milliseconds (default 1000)
-  //  * @example
-  //  * const el = document.$("#target");
-  //  * el.fadeIn(2000);
-  //  */
-  // fadeIn(duration?: number): void;
-
-  // /**
-  //  * 
-  //  * @opti
-  //  * @param layout If the layout should shift when the element has finished and during the animation
-  //  * @param duration The ammount of time the animation takes in milliseconds (default 1000)
-  //  * @example
-  //  * const el = document.$("#target");
-  //  * el.fadeOut(5000);
-  //  */
-  // fadeOut(duration?: number): void;
-
-  // /**
-  //  * 
-  //  * @opti
-  //  * @param layout If the layout should shift when the element has finished and during the animation
-  //  * @param duration The ammount of time the animation takes in milliseconds (default 1000)
-  //  * @example
-  //  * const el = document.$("#target");
-  //  * el.fadeToggle(1000);
-  //  */
-  // fadeToggle(duration?: number): void;
-
-  // /**
-  //  * 
-  //  * @opti
-  //  * @param layout If the layout should shift when the element has finished and during the animation
-  //  * @param duration The ammount of time the animation takes in milliseconds (default 1000)
-  //  * @param direction Where the element should slide to
-  //  * @example
-  //  * const el = document.$("#target");
-  //  * el.slideIn(Direction.UP, 1000);
-  //  */
-  // slideIn(direction: Direction, duration?: number): void;
-
-  // /**
-  //  * 
-  //  * @opti
-  //  * @param layout If the layout should shift when the element has finished and during the animation
-  //  * @param duration The ammount of time the animation takes in milliseconds (default 1000)
-  //  * @param direction Where the element should slide to
-  //  * @example
-  //  * const el = document.$("#target");
-  //  * el.slideDown(Direction.DOWN, 5000);
-  //  */
-  // slideOut(direction: Direction, duration?: number): void;
-
-  // /**
-  //  * 
-  //  * @opti
-  //  * @param layout If the layout should shift when the element has finished and during the animation
-  //  * @param duration The ammount of time the animation takes in milliseconds (default 1000)
-  //  * @param direction Where the element should slide to
-  //  * @example
-  //  * const el = document.$("#target");
-  //  * el.slideToggle(Dircetion.UP, Direction.DOWN, 2000);
-  //  */
-  // slideToggle(direction: Direction, duration?: number): void;
-  // slideToggle(direction: Direction, directionTo: Direction, duration?: number): void;
+  toggle(state: boolean): void;
 
   /**
    * Returns a boolean that represents if the elements visibility, opacity, or display is set to a hidden value
    * @opti
    */
-  readonly visible: boolean;
+  get isVisible(): boolean;
 }
 
 interface HTMLFormElement {
   serialize(): string;
+}
+
+interface HTMLInputElement {
+  get val(): string
 }
 
 interface NodeList {
@@ -509,13 +623,6 @@ interface NodeList {
    * el.toggleClass("classy")
    */
   toggleClass(elClass: string): void;
-
-  /**
-   * Returns the first value in the list
-   * @opti
-   * @note returns the same value as doing [0] on this object, but this method is preffered
-   */
-  single(): Node | null
 }
 
 interface HTMLCollection {
@@ -568,22 +675,14 @@ interface HTMLCollection {
    * el.toggleClass("classy")
    */
   toggleClass(elClass: string): void;
-
-  /**
-   * Returns the first value in the collection
-   * @opti
-   * @note returns the same value as doing [0] on this object, but this method is preffered
-   */
-  single(): Element | null;
 }
 
-interface HTMLCollectionBase {
+interface EventTarget {
   /**
-   * Returns the first value in the collection
+   * The events registered on an `EventTarget`
    * @opti
-   * @note returns the same value as doing [0] on this object, but this method is preffered
    */
-  single(): Element | null;
+  readonly events: Partial<Record<GlobalEventHandlersEventMap, EventListenerOrEventListenerObject[]>>;
 }
 
 interface DateConstructor {
@@ -614,17 +713,7 @@ interface Math {
    * @param max the maximum random number 
    */
   random(max: number): number
-
-  /** 
-   * Returns a pseudorandom number between 0 and max.
-   * @opti
-   * @param max the maximum random number 
-   */
   random(min: number, max: number): number
-}
-
-interface Object {
-  __type: string;
 }
 
 interface ObjectConstructor {
@@ -647,6 +736,7 @@ interface ObjectConstructor {
    * newObj.run(); // Running...
    * console.log(oldObj.exampleVal); // 2
    */
+  clone<T>(object: symbol, deep?: boolean): never;
   clone<T>(object: T, deep?: boolean): T;
 
   /**
@@ -675,6 +765,19 @@ interface Number {
   repeat(iterator: (i: number) => void): void;
 }
 
+interface Console {
+  /**
+   * Creates a logging group
+   * @opti
+   * @param name The name of the group to make
+   * @param logs The logs to make in the group. Arrays seperate each value
+   */
+  group(name: string, ...logs: any[][] | any[]): void;
+
+  on(): void;
+  off(): void;
+}
+
 interface Array<T> {
   /**
    * Makes all values in an array unique
@@ -688,15 +791,49 @@ interface Array<T> {
    * Seperates an array into an array of arrays, with each subarray of a defined size
    * @opti
    * @param size The size of the subarrays
-   * @example
+   * @examplef
    * const newArr = [1, 2, 3, 3, 4].chunk(2);
    * console.log(newArr); // [[1, 2], [3, 3], [4]]
    */
   chunk(this: T[], size: number): T[][]
 
-  pluck(this: T[], finder: (v: T) => boolean): T;
+  /**
+   * Takes a found value out of an array and returns it.
+   * @opti
+   * @param finder The finder function to find the value to remove
+   */
+  pluck(finder: (v: T) => boolean): T | null;
+
+  pluckLast(finder: (v: T) => boolean): T | null;
+
+  relocate(index: number, offset: number): number | null
+
+  relocateTo(index: number, location: number): number | null
   
-  replace<U>(this: T[], replaceIndex: number, newVal: U): T
+  /**
+   * Replaces a value in an array
+   * @opti
+   * @param replaceIndex The index to replace
+   * @param newVal The new value to put in place of the old removed value
+   */
+  replace<U>(this: T[], replaceIndex: number, newVal: U): T | null;
+
+  /**
+   * Sorts an array by a specific type of sorting
+   * @opti
+   * @param order The order to sort in. Options are `random`, `alpha`, `alpha-reverse`, `increasing`,`decreasing`, `earlier` and `later`
+   */
+  sort<T>(this: T[], order: "random"): T[];
+  sort(this: string[], order: "alpha" | "alpha-reverse"): string[];
+  sort(this: number[], order: "increasing" | "decreasing"): number[];
+  sort(this: Date[], order: "earlier" | "later"): Date[];
+
+  /**
+   * Tests the type of values in an array
+   * @opti
+   * @param type The type of value to check
+   */
+  get type<T>(): string[];
 }
 
 interface String {
@@ -722,142 +859,42 @@ interface String {
    */
   removeAll(finder: string | RegExp): string;
 
-  capitalize(): string;
-}
-
-interface JSON {
   /**
-   * Parses a file into JSON using the type parameters specified (Or returning any in base JS)
+   * Capitalises the first character in a string
    * @opti
-   * @param file The file to parse
-   * @param receiver The alterations to make to the outputted json
    * @example
-   * const results = JSON.parseFile<{ content: string }, { content: { id: string, class: string } }>(
-   *   "https://example.com/jsons", 
-   *   (content) => content.id + " " + content.class
-   * );
+   * const myString = "hello world";
+   * console.log(myString.capitalize()); // "Hello world"
    */
-  parseFile<R = any, T = R>(file: string, receiver?: (content: T) => R): Promise<R>;
+  capitalize(): string;
+
+  /**
+   * Finds the first substring match in a regular expression search.
+   * @param searcher An object which supports searching within a string.
+   */
+  matches(regexp: string | RegExp): boolean;
+
+  toCase(format: "camel" | "kebab" | "pascal" | "snake" | "train" | "dot"): string
 }
 
+interface Function {
+  /**
+   * Returns a string array of all of the arguments of the function (named)
+   * @opti
+   * @example
+   * function example(a, b, c) {
+   *   return a + b + c;
+   * }
+   * 
+   * console.log(example.args()); /// ["a", "b", "c"]
+   */
+  get args(): string[]
+}
 
-/** 
- * Creates an iife (Immediately invoked function expression) that triggers on run 
- * @opti
- * @param iife The function to run the code in for the iife
- */
-declare function f(iife: () => void): void;
+interface FunctionConstructor {
+  memo<T extends Func>(func: T, thisArg: Func.This<T>, ...args: Func.Arguments<T>): T
 
-/**
- * Creates a user defined event listener that triggers the callback when one of the triggers is activated
- * @opti
- * @param triggers The triggers that activate the event listener
- * @param callback The function that is caslled when one of the trigger functions are called
- * @example
- * createEventListener([window.alert, window.confirm] ([al, conf]) => {
- *   console.log("Window method called");
- *   console.log(conf); // Logs return value returned
- * });
- */
-declare function createEventListener<T extends ((...args: any[]) => any)[]>(
-  triggers: [...T],
-  callback: (...results: CallbackResult<T>) => void
-): void;
+  debounce<T extends Func>(func: T, ms: number): (this: Func.This<T>, ...args: Func.Arguments<T>) => Promise<Func.Return<T>>
 
-/**
- * Cheks whether the value given is empty, `null`, or `undefined`
- * @opti
- * @param value The value to check
- * @example
- * class ExampleClass {};
- * 
- * isEmpty(""); // true
- * isEmpty("Hello"); // false
- * isEmpty(NaN); // true
- * isEmpty(0); // false
- * isEmpty({}); // true
- * isEmpty([]); // true
- * isEmpty([1, 2]); // false
- */
-declare function isEmpty(val: string): val is "";
-declare function isEmpty(val: number): val is 0 | typeof NaN;
-declare function isEmpty(val: boolean): val is false;
-declare function isEmpty(val: null | undefined): true;
-declare function isEmpty(val: Array<any>): val is [];
-declare function isEmpty(val: Record<any, unknown>): val is Record<any, never>;
-declare function isEmpty(val: Map<any, any>): val is Map<any, never>;
-declare function isEmpty(val: Set<any>): val is Set<never>;
-declare function isEmpty(val: WeakMap<object, any>): val is WeakMap<object, any>;
-declare function isEmpty(val: WeakSet<object>): val is WeakSet<object>;
-declare function isEmpty(val: any): boolean;
-
-/**
- * Gets the type of the value and returns a string representation of the type of the value
- * @opti
- * @param val The value who's type is being tested
- * @example
- * type(5)               // "number"
- * type("hello")         // "string"
- * type(null)            // "null"
- * type(undefined)       // "undefined"
- * type([1,2,3])         // "array"
- * type({})              // "object"
- * type(new Date())      // "date"
- * type(/abc/)           // "regexp"
- * type(() => {})        // "function"
- * type(new Map())       // "map"
- * type(new Set())       // "set"
- */
-declare function type(val: any): TypeOperators;
-
-declare function assert(condition: boolean): asserts condition;
-
-declare function info(val: any): string;
-
-/**
- * Generates a unique string ID for use in identifying
- * @opti
- * @returns A string ID
- * @example 
- * const uniqueID = generateID();
- * const newID = generateID();
- * 
- * console.log(uniqueID); // gsA*jO_82&...
- * console.log(newID); // e6%84_fU2@3...
- */
-declare function generateID(): ID;
-
-/**
- * Colorizes a string based on the colorized syntax
- * @example
- * Colorize`{color:red}Red Text!{/color:red}`
- */
-declare function Colorize(strings: TemplateStringsArray, ...values: any[]): string;
-
-declare var features: {
-  buttonHrefs: OptiFeature;
-  enableAll(): void;
-  disableAll(): void
-};
-
-declare var opti: {
-  crafty: false,
-  query: false,
-  evented: false,
-  requests: false,
-  templated: false,
-  flow: false
-};
-
-declare var Exception: ExceptionConstructor;
-declare var RuntimeException: RuntimeExceptionConstructor;
-declare var NotImplementedException: SubExceptionConstructor;
-declare var UnknownException: SubExceptionConstructor;
-declare var AccessException: SubExceptionConstructor;
-declare var ColorizedSyntaxException: SubExceptionConstructor;
-declare var CustomException: CustomExceptionConstructor;
-declare var AssertException: SubExceptionConstructor;
-
-declare var Time: TimeConstructor;
-declare var Enum: EnumConstructor;
-declare var Collection: CollectionConstructor;
+  throttle<T extends Func>(func: T, ms: number): (this: Func.This<T>, ...args: Func.Arguments<T>) => Func.Return<T> | null
+}

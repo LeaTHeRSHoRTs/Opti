@@ -1,38 +1,41 @@
-type DOMVars = Record<string, unknown>
+type TemplatedImports = Record<string, unknown>
+
+type TemplatedDoc = HTMLDocument | null;
 
 interface Templated {
-  parse(file: string, vars?: DOMVars): OptiDOM;
-  parse<T extends OptiDOM>(dom: T, vars?: T["vars"]): DocumentFragment;
+  render(document: TemplatedDocument): void;
+  render(section: TemplatedSection, selector: string): void;
 }
 
-interface TemplateComponent {
-  bind(args: DOMVars): void;
-
-  preRender(callback: () => void): void
-  onRender(callback: () => void): void
-  postRender(callback: () => void): void
-
-  preUpdate(callback: () => boolean | void): void
-  onUpdate(callback: () => void): void
-  postUpdate(callback: () => void): void
-
-  preDelete(callback: () => boolean | void): void
-  onDelete(callback: () => void): void
+interface TemplatedEvent {
+  preventDefault(): void;
 }
 
-interface TemplateDocument extends TemplateComponent {
+declare abstract class TemplatedComponent {
+  document: TemplatedDocument;
+  abstract imports: TemplatedImports;
+  abstract onRender(callback: (e: TemplatedRenderEvent) => void): void
+  abstract onUpdate(callback: (e: TemplatedUpdateEvent) => void): void
+  abstract onDelete(callback: (e: TemplatedDeleteEvent) => void): void
+}
+
+interface TemplatedDocument extends TemplateComponent {
 
 }
 
-interface TemplateElement extends TemplateComponent {
+interface TemplatedElement extends TemplateComponent {
 
 }
 
-interface TemplateSection extends TemplateComponent {
+interface TemplatedSection extends TemplateComponent {
 
 }
 
 interface OptiDOM {
-  readonly vars: DOMVars
+  readonly imports: DOMVars
   bind(vars: DOMVars): this;
 }
+
+interface OptiObject {
+  templated: true,
+};

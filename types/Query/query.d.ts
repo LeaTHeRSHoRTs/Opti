@@ -49,3 +49,7 @@ interface QueryBuilder {
   is(selector: string): this
   isnt(selector: string): this
 }
+
+interface OptiObject {
+  query: true,
+};

@@ -1,0 +1,3 @@
+interface OptiObject {
+  crafty: true,
+};

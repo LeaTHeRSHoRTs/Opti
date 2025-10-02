@@ -1,40 +1,9 @@
-interface EnumConstructor {
-  new<T extends string>(...values: T[]): {
-    [key: string]: symbol;
-    [Symbol.iterator](): IterableIterator<T>
-  }
-}
+type EnumInstance<T> = {
+  readonly [K in T[number]]: symbol;
+};
 
-interface CookieConstructor {
-  new(name: string, valueIfNotExist?: string | null, days?: number, path?: string): Cookie;
-  set<T = string>(name: string, value: T, days?: number, path?: string): void;
-  get<T = string>(name: string): T | null;
-  delete(name: string, path?: string): void;
-}
-
-interface Cookie {
-  update(value: string, days?: number, path?: string): void;
-  delete(): void;
-  getValue(): string | null;
-  getName(): string;
-  getExpiry(): number;
-  getPath(): string;
-}
-
-interface OptiStorageConstructor {
-  new<T>(name: string, valueIfNotExist?: T | null): OptiStorage<T>
-
-  set<T = string>(key: string, value: T): void;
-  get<T = string>(key: string): T | null;
-  remove(key: string): void;
-  clear(): void;
-}
-
-interface OptiStorage<T> {
-  update(value: T): void
-  delete(): void;
-  getValue(): T | null;
-  getName(): string;
+interface TupleConstructor {
+  new<T extends unknown[]>(...values: T): T
 }
 
 interface TimeConstructor {
@@ -85,25 +54,6 @@ interface Time {
   isBefore(other: Time): boolean;
   isAfter(other: Time): boolean;
   equals(other: Time): boolean;
-}
-
-interface SequenceConstructor {
-  of(...functions: (((...args: any[]) => any) | Sequence)[]): Sequence;
-  chain(...functions: ((input: any) => any)[]): Sequence;
-  parallel(...functions: (() => any)[]): Sequence;
-  race(...functions: (() => any)[]): Sequence;
-  retry(retries: number, task: () => Promise<any>, delay?: number): Sequence;
-}
-
-interface Sequence {
-  execute(...args: any[]): Promise<any>;
-
-  result(): any;
-  result(callback: (result: unknown) => any): any;
-  result(callback?: (result: unknown) => any): typeof this.finalResult;
-  error(callback: (error: any) => any): this;
-
-  add(...functions: ((...args: any[]) => any)[]): this;
 }
 
 interface TypedMap<R extends Record<string | number, any> = {}> {
@@ -168,11 +118,6 @@ interface ExceptionConstructor {
   new(name: string | null, message?: string, cause?: string): Exception
 }
 
-interface CustomExceptionConstructor {
-  new(name: string, message?: string): Error & { name: typeof name }
-  readonly prototype: Exception;
-}
-
 interface RuntimeExceptionConstructor {
   new(message?: string, cause?: string): RuntimeException
 }
@@ -185,6 +130,11 @@ interface RuntimeException {
 }
 
 interface SubExceptionConstructor {
-  new(message?: string, cause?: string): Exception
+  new(message?: string, cause?: string): Exception;
+  readonly prototype: Exception;
+}
+
+interface UnknownExceptionConstructor {
+  new(message?: string): Exception;
   readonly prototype: Exception;
 }

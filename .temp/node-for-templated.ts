@@ -6,331 +6,58 @@ namespace Opti.Templated {
   }
 
   export class Templated {
-    static parse(domOrFile: OptiDOM | string, reqvar?: DOMVars): OptiDOM | DocumentFragment {
-      if (typeof domOrFile === "string") {
-        let dom: OptiDOM | null = null;
-
-        fetch(domOrFile).then((file) => {
-          if (!file.url.endsWith(".template.html")) {
-            throw new TemplatedParseException("File extension must be of type *.template.html");
-          }
-          return file.text();
-        }).then((html) => {
-          dom = Opti.Templated.OptiDOM.from(html, reqvar);
-        }).catch((e) => {
-          if (e instanceof TemplatedParseException) {
-            throw e;
-          } else {
-            console.error(e);
-          }
-        });
-
-        if (!dom) {
-          throw new globalThis.Exception("Exception", "Error parsing document");
-        }
-
-        return dom;
-      } else {
-        return domOrFile.template(reqvar ?? {});
-      }
+    static render(docOrSection: TemplatedDocument | TemplatedSection, selector?: string): void {
+      throw new globalThis.NotImplementedException();
     }
   }
 
-  export class OptiDOM {
-    private constructor(
-      private html: string,
-      private vars: DOMVars = {}
-    ) {}
-
-    static from(html: string, vars?: DOMVars) {
-      return new OptiDOM(html, vars);
+  export abstract class TemplatedComponent {
+    private _file: string = "";
+    public document: TemplatedDoc = null;
+    public readonly styles = {};
+    constructor(file: string) {
+      fetch(file)
+        .then(async contents => {
+          this._file = await contents.text();
+        }).catch(e => {
+          throw new globalThis.FetchException(e);
+        });
     }
 
-    template(reqvar: DOMVars): DocumentFragment {
-      const frag = document.createDocumentFragment();
-      frag.append(this.html);
-      return frag;
+    abstract imports: TemplatedImports;
+    abstract onRender(e: TemplatedEvent): void;
+    abstract onUpdate(e: TemplatedEvent): void;
+    abstract onDelete(e: TemplatedEvent): void;
+
+    protected getFile() {
+      return this._file;
+    }
+  }
+
+  export abstract class TemplatedDocument extends TemplatedComponent {
+    constructor(file?: string) {
+      super(file ?? window.location.pathname);
+    }
+  }
+
+  export abstract class TemplatedSection extends TemplatedComponent {
+    
+  }
+
+  export abstract class TemplatedElement extends TemplatedComponent {
+    constructor(file: string, public readonly name: string, public readonly args: Record<string, unknown>) {
+      super(file);
+    }
+
+    hasSlot(): boolean {
+      throw new globalThis.NotImplementedException();
     }
   }
 }
-
-namespace Opti.Templated {
-  export class TemplatedParseException extends globalThis.Exception {
-    constructor(message?: string, cause?: string) {
-      super("TemplatedParseException", message, cause);
-    }
-  }
-
-  export class Templated {
-    static parse(domOrFile: OptiDOM | string, reqvar?: DOMVars): OptiDOM | DocumentFragment {
-      if (typeof domOrFile === "string") {
-        let dom: OptiDOM | null = null;
-
-        fetch(domOrFile).then((file) => {
-          if (!file.url.endsWith(".template.html")) {
-            throw new TemplatedParseException("File extension must be of type *.template.html");
-          }
-          return file.text();
-        }).then((html) => {
-          dom = Opti.Templated.OptiDOM.from(html, reqvar);
-        }).catch((e) => {
-          if (e instanceof TemplatedParseException) {
-            throw e;
-          } else {
-            console.error(e);
-          }
-        });
-
-        if (!dom) {
-          throw new globalThis.Exception("Exception", "Error parsing document");
-        }
-
-        return dom;
-      } else {
-        return domOrFile.template(reqvar ?? {});
-      }
-    }
-  }
-
-  export class OptiDOM {
-    private constructor(
-      private html: string,
-      private vars: DOMVars = {}
-    ) {}
-
-    static from(html: string, vars?: DOMVars) {
-      return new OptiDOM(html, vars);
-    }
-
-    template(reqvar: DOMVars): DocumentFragment {
-      const frag = document.createDocumentFragment();
-      frag.append(this.html);
-      return frag;
-    }
-  }
-}
-
-namespace Opti.Templated {
-  export class TemplatedParseException extends globalThis.Exception {
-    constructor(message?: string, cause?: string) {
-      super("TemplatedParseException", message, cause);
-    }
-  }
-
-  export class Templated {
-    static parse(domOrFile: OptiDOM | string, reqvar?: DOMVars): OptiDOM | DocumentFragment {
-      if (typeof domOrFile === "string") {
-        let dom: OptiDOM | null = null;
-
-        fetch(domOrFile).then((file) => {
-          if (!file.url.endsWith(".template.html")) {
-            throw new TemplatedParseException("File extension must be of type *.template.html");
-          }
-          return file.text();
-        }).then((html) => {
-          dom = Opti.Templated.OptiDOM.from(html, reqvar);
-        }).catch((e) => {
-          if (e instanceof TemplatedParseException) {
-            throw e;
-          } else {
-            console.error(e);
-          }
-        });
-
-        if (!dom) {
-          throw new globalThis.Exception("Exception", "Error parsing document");
-        }
-
-        return dom;
-      } else {
-        return domOrFile.template(reqvar ?? {});
-      }
-    }
-  }
-
-  export class OptiDOM {
-    private constructor(
-      private html: string,
-      private vars: DOMVars = {}
-    ) {}
-
-    static from(html: string, vars?: DOMVars) {
-      return new OptiDOM(html, vars);
-    }
-
-    template(reqvar: DOMVars): DocumentFragment {
-      const frag = document.createDocumentFragment();
-      frag.append(this.html);
-      return frag;
-    }
-  }
-}
-
-namespace Opti.Templated {
-  export class TemplatedParseException extends globalThis.Exception {
-    constructor(message?: string, cause?: string) {
-      super("TemplatedParseException", message, cause);
-    }
-  }
-
-  export class Templated {
-    static parse(domOrFile: OptiDOM | string, reqvar?: DOMVars): OptiDOM | DocumentFragment {
-      if (typeof domOrFile === "string") {
-        let dom: OptiDOM | null = null;
-
-        fetch(domOrFile).then((file) => {
-          if (!file.url.endsWith(".template.html")) {
-            throw new TemplatedParseException("File extension must be of type *.template.html");
-          }
-          return file.text();
-        }).then((html) => {
-          dom = Opti.Templated.OptiDOM.from(html, reqvar);
-        }).catch((e) => {
-          if (e instanceof TemplatedParseException) {
-            throw e;
-          } else {
-            console.error(e);
-          }
-        });
-
-        if (!dom) {
-          throw new globalThis.Exception("Exception", "Error parsing document");
-        }
-
-        return dom;
-      } else {
-        return domOrFile.template(reqvar ?? {});
-      }
-    }
-  }
-
-  export class OptiDOM {
-    private constructor(
-      private html: string,
-      private vars: DOMVars = {}
-    ) {}
-
-    static from(html: string, vars?: DOMVars) {
-      return new OptiDOM(html, vars);
-    }
-
-    template(reqvar: DOMVars): DocumentFragment {
-      const frag = document.createDocumentFragment();
-      frag.append(this.html);
-      return frag;
-    }
-  }
-}
-
-namespace Opti.Templated {
-  export class TemplatedParseException extends globalThis.Exception {
-    constructor(message?: string, cause?: string) {
-      super("TemplatedParseException", message, cause);
-    }
-  }
-
-  export class Templated {
-    static parse(domOrFile: OptiDOM | string, reqvar?: DOMVars): OptiDOM | DocumentFragment {
-      if (typeof domOrFile === "string") {
-        let dom: OptiDOM | null = null;
-
-        fetch(domOrFile).then((file) => {
-          if (!file.url.endsWith(".template.html")) {
-            throw new TemplatedParseException("File extension must be of type *.template.html");
-          }
-          return file.text();
-        }).then((html) => {
-          dom = Opti.Templated.OptiDOM.from(html, reqvar);
-        }).catch((e) => {
-          if (e instanceof TemplatedParseException) {
-            throw e;
-          } else {
-            console.error(e);
-          }
-        });
-
-        if (!dom) {
-          throw new globalThis.Exception("Exception", "Error parsing document");
-        }
-
-        return dom;
-      } else {
-        return domOrFile.template(reqvar ?? {});
-      }
-    }
-  }
-
-  export class OptiDOM {
-    private constructor(
-      private html: string,
-      private vars: DOMVars = {}
-    ) {}
-
-    static from(html: string, vars?: DOMVars) {
-      return new OptiDOM(html, vars);
-    }
-
-    template(reqvar: DOMVars): DocumentFragment {
-      const frag = document.createDocumentFragment();
-      frag.append(this.html);
-      return frag;
-    }
-  }
-}
-
-namespace Opti.Templated {
-  export class TemplatedParseException extends globalThis.Exception {
-    constructor(message?: string, cause?: string) {
-      super("TemplatedParseException", message, cause);
-    }
-  }
-
-  export class Templated {
-    static parse(domOrFile: OptiDOM | string, reqvar?: DOMVars): OptiDOM | DocumentFragment {
-      if (typeof domOrFile === "string") {
-        let dom: OptiDOM | null = null;
-
-        fetch(domOrFile).then((file) => {
-          if (!file.url.endsWith(".template.html")) {
-            throw new TemplatedParseException("File extension must be of type *.template.html");
-          }
-          return file.text();
-        }).then((html) => {
-          dom = Opti.Templated.OptiDOM.from(html, reqvar);
-        }).catch((e) => {
-          if (e instanceof TemplatedParseException) {
-            throw e;
-          } else {
-            console.error(e);
-          }
-        });
-
-        if (!dom) {
-          throw new globalThis.Exception("Exception", "Error parsing document");
-        }
-
-        return dom;
-      } else {
-        return domOrFile.template(reqvar ?? {});
-      }
-    }
-  }
-
-  export class OptiDOM {
-    private constructor(
-      private html: string,
-      private vars: DOMVars = {}
-    ) {}
-
-    static from(html: string, vars?: DOMVars) {
-      return new OptiDOM(html, vars);
-    }
-
-    template(reqvar: DOMVars): DocumentFragment {
-      const frag = document.createDocumentFragment();
-      frag.append(this.html);
-      return frag;
-    }
-  }
-}
-
+(function() {
+  globalThis.Templated = Opti.Templated.Templated;
+  (globalThis as any).TemplatedComponent = Opti.Templated.TemplatedComponent;
+  globalThis.TemplatedSection = Opti.Templated.TemplatedSection;
+  globalThis.TemplatedElement = Opti.Templated.TemplatedElement;
+  globalThis.TemplatedDocument = Opti.Templated.TemplatedDocument;
+})();

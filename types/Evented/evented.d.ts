@@ -46,3 +46,7 @@ interface EventCollection<T extends EventTarget> {
   [key: keyof EventMapOf<T>]: EventMapOf<T>[K] | undefined
   get<K extends keyof EventMapOf<T>>(key: K): EventMapOf<T>[K] | undefined
 }
+
+interface OptiObject {
+  evented: true,
+};

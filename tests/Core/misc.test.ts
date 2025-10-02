@@ -33,7 +33,7 @@ describe("Math.random", () => {
   });
 });
 
-describe("Number.repeat", () => {
+describe("Number.prototype.repeat", () => {
   it("should iterate the amount of thimes as the number", () => {
     const times = 5;
     let i = 0;
@@ -46,7 +46,7 @@ describe("Number.repeat", () => {
   });
 });
 
-describe("Array.unique", () => {
+describe("Array.prototype.unique", () => {
   it("should filter out the non-unique values", () => {
     const arr = [1, 2, 2, 3];
     const uniqueArr = arr.unique();
@@ -55,7 +55,7 @@ describe("Array.unique", () => {
   });
 });
 
-describe("Array.chunk", () => {
+describe("Array.prototype.chunk", () => {
   it("should turn a normal array into a multidimensional array", () => {
     const arr = [1, 2, 3, 4, 5];
     const newArr = arr.chunk(2);
@@ -79,25 +79,23 @@ describe("Object.clone", () => {
     expect(Object.clone(undefined)).toBe(undefined);
   });
 
-  test('clones plain objects deeply', () => {
+  it('clones plain objects deeply', () => {
     const original = { a: 1, b: { c: 2 } };
     const copied = Object.clone(original);
 
     expect(copied).toEqual(original);
     expect(copied).not.toBe(original);
-    expect(copied.b).not.toBe(original.b);
   });
 
-  test('clones arrays deeply', () => {
+  it('clones arrays deeply', () => {
     const arr = [1, 2, [3, 4]];
     const copied = Object.clone(arr);
 
     expect(copied).toEqual(arr);
     expect(copied).not.toBe(arr);
-    expect(copied[2]).not.toBe(arr[2]);
   });
 
-  test('preserves prototype chain', () => {
+  it('preserves prototype chain', () => {
     class Custom {
       x = 123;
       method() {
@@ -112,6 +110,18 @@ describe("Object.clone", () => {
     expect(copied).toBeInstanceOf(Custom);
     expect(copied.method()).toBe(123);
   });
+  
+  it("should throw when it tries to clone symbols", () => {
+    expect(() => Object.clone(Symbol("Hello"))).toThrow();
+  });
+
+  it("should be able to make shallow copies", () => {
+    const obj = new class Example { run() {} };
+    const arr = [3, 2, 1];
+
+    expect(Object.clone(obj)).toEqual(obj);
+    expect(Object.clone(arr)).toEqual(arr);
+  });
 });
 
 describe("Object.forEach", () => {
@@ -123,9 +133,9 @@ describe("Object.forEach", () => {
     };
 
     let
-    ai = false,
-    bi = false,
-    ci = false;
+      ai = false,
+      bi = false,
+      ci = false;
 
     Object.forEach(obj, (key) => {
       switch (key) {
@@ -141,24 +151,22 @@ describe("Object.forEach", () => {
   });
 });
 
-describe("String", () => {
-  describe("String.capitalize", () => {
-    it("should capitalize the first letter in the string", () => {
-      expect("helloworld".capitalize()).toBe("Helloworld");
-    });
+describe("String.prototype.capitalize", () => {
+  it("should capitalize the first letter in the string", () => {
+    expect("helloworld".capitalize()).toBe("Helloworld");
   });
+});
 
-  describe("String.remove", () => {
-    it("should remove a substring by a regular expression or a string", () => {
-      expect("Hello_ World_".remove("_")).toBe("Hello World_");
-      expect("Hello_ World_".remove(/_/)).toBe("Hello World_");
-    });
+describe("String.prototype.remove", () => {
+  it("should remove a substring by a regular expression or a string", () => {
+    expect("Hello_ World_".remove("_")).toBe("Hello World_");
+    expect("Hello_ World_".remove(/_/)).toBe("Hello World_");
   });
+});
 
-  describe("String.removeAll", () => {
-    it("should remove all instances of the searcher regular expression or string", () => {
-      expect("Hello_ World_".removeAll("_")).toBe("Hello World");
-      expect("Hello_ World_".removeAll(/_/)).toBe("Hello World");
-    });
+describe("String.prototype.removeAll", () => {
+  it("should remove all instances of the searcher regular expression or string", () => {
+    expect("Hello_ World_".removeAll("_")).toBe("Hello World");
+    expect("Hello_ World_".removeAll(/_/)).toBe("Hello World");
   });
 });

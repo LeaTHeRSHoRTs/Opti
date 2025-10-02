@@ -1,5 +1,3 @@
-namespace Opti {
-
 export function ready (callback: (this: Document, ev: Event) => any) {
   document.addEventListener("DOMContentLoaded", callback);
 }
@@ -48,7 +46,7 @@ export function documentCss (
 ): any {
   const selector = element.trim();
   if (!selector) {
-    throw new Error("Selector cannot be empty.");
+    throw new globalThis.SyntaxException("Selector cannot be empty.");
   }
 
   let styleTag = document.querySelector("style[js-styles]") as HTMLStyleElement | null;
@@ -105,7 +103,7 @@ export function documentCss (
   }
 }
 
-export function createElementTree<T extends HTMLElement>(node: ElementNode): T {
+export function createElements<T extends HTMLElement>(node: ElementNode): T {
   const el = document.createElement(node.tag);
 
   // Add class if provided
@@ -136,7 +134,7 @@ export function createElementTree<T extends HTMLElement>(node: ElementNode): T {
     ) {
       if (typeof val === 'string') {
         el.setAttribute(key, val);
-      } else throw new Opti.CustomException("ParameterError", "Custom parameters must be of type 'string'");
+      } else throw new globalThis.TypeException("Custom parameters must be of type 'string'");
     }
   }
 
@@ -144,10 +142,10 @@ export function createElementTree<T extends HTMLElement>(node: ElementNode): T {
   if (node.children) {
     if (Array.isArray(node.children)) {
       node.children.forEach(child => {
-        el.appendChild(createElementTree(child));
+        el.appendChild(createElements(child));
       });
     } else {
-      el.appendChild(createElementTree(node.children)); // Support for a single child node
+      el.appendChild(createElements(node.children)); // Support for a single child node
     }
   }
 
@@ -161,5 +159,3 @@ export function $ (selector: string) {
 export function $$ (selector: string) {
   return document.querySelectorAll(selector);
 };
-
-}

@@ -1,9 +1,12 @@
 
 type FlowbackTest = (fn: (...args: any[]) => any, flowtests: FlowTests) => boolean
 
+namespace Flow {
+  export type Checkable = (...args: any[]) => any | Class
+}
+
 interface FlowTests {
   test(): boolean;
-  
 }
 
 interface Flow {
@@ -12,3 +15,7 @@ interface Flow {
   flowback(file: string): boolean;
   flowback(test: FlowbackTest): void;
 }
+
+interface OptiObject {
+  flow: true,
+};
