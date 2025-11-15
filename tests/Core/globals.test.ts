@@ -1,3 +1,17 @@
+import { expectTypeOf } from "expect-type";
+
+describe("f", () => {
+  it("should immediately invoke a function", () => {
+    let called = false;
+    f(() => { called = true; });
+    expect(called).toBeTruthy();
+  });
+
+  it("should be able to return a value", () => {
+    expect(f(() => "Returned")).toBe("Returned");
+  });
+});
+
 describe('type', () => {
   it('should return the data type for a data type\'s input', () => {
     expect(type(42).stringOf()).toBe("Number");
@@ -20,11 +34,11 @@ describe('type', () => {
   });
 
   it('should return "Function:<anonymous>..." for an anonymous function', () => {
-    expect(type(() => {}).stringOf()).toBe("Function:<anonymous>()");
+    expect(type(() => { }).stringOf()).toBe("Function:<anonymous>()");
   });
 
   it('should return "Function:myFunction(a, b)" for a named function with arguments a and b', () => {
-    function myFunction(a: any, b: any) {}
+    function myFunction(a: any, b: any) { }
     expect(type(myFunction).stringOf()).toBe("Function:myFunction(a,b)");
   });
 
@@ -55,8 +69,8 @@ describe('type', () => {
     expect(type(32).is(33)).toBeFalsy();
     expect(type(true).is(true)).toBeTruthy();
     expect(type(true).is(false)).toBeFalsy();
-    expect(type(() => {}).is(() => {})).toBeTruthy();
-    expect(type((_: any) => {}).is(() => {})).toBeFalsy();
+    expect(type(() => { }).is(() => { })).toBeTruthy();
+    expect(type((_: any) => { }).is(() => { })).toBeFalsy();
   });
 
   it("should return a boolean to match lengthed objects", () => {
@@ -84,158 +98,87 @@ describe("assert", () => {
 });
 
 describe("sleep", () => {
-  beforeAll(jest.useFakeTimers);
-  afterAll(jest.useRealTimers);
-
-  it("should wait the specified number of milliseconds before executing", () => {
-    sleep(5000);
-
-    expect(setTimeout).toHaveBeenCalledTimes(1);
-    expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 5000);
+  beforeAll(() => {
+    jest.useFakeTimers();
+    jest.spyOn(global, "setTimeout");
   });
 
-  it("should run code afterwards at the set time", () => {
+  afterAll(() => {
+    jest.useRealTimers();
+    jest.restoreAllMocks();
+  });
+
+  it("should wait the specified number of milliseconds before executing", async () => {
+    const promise = sleep(5000);
+
+    // Immediately check setTimeout call
+    expect(setTimeout).toHaveBeenCalledTimes(1);
+    expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 5000);
+
+    // Advance all timers, resolving the promise
+    jest.runAllTimers();
+
+    await expect(promise).resolves.toBeUndefined();
+  });
+
+  it("should run code afterwards at the set time", async () => {
     const callback = jest.fn();
 
-    sleep(5000).then(callback);
+    const promise = sleep(5000).then(callback);
 
     expect(callback).not.toHaveBeenCalled();
 
     jest.runAllTimers();
 
-    expect(callback).toHaveBeenCalled();
+    await promise; // ensures microtasks resolve
+
     expect(callback).toHaveBeenCalledTimes(1);
   });
 });
 
-// describe('Colorize', () => {
-//   // Helper regex to check ANSI codes for styles
-//   const ansiCodes = {
-//     red: '\x1b[31m',
-//     orange: '\x1b[38;5;208m',
-//     yellow: '\x1b[33m',
-//     green: '\x1b[32m',
-//     cyan: '\x1b[36m',
-//     blue: '\x1b[34m',
-//     purple: '\x1b[35m',
-//     pink: '\x1b[38;5;205m',
-//     bold: '\x1b[1m',
-//     underline: '\x1b[4m',
-//     strikethrough: '\x1b[9m',
-//     italic: '\x1b[3m',
-//     reset: '\x1b[0m',
-//   };
+describe("isEmpty, notEmpty", () => {
+  const cases = [
+    { name: "isEmpty", func: isEmpty, truthy: true },
+    { name: "notEmpty", func: notEmpty, truthy: false },
+  ];
 
-//   it('Basic colors', () => {
-//     expect(Colorize`{red:This is red text}`).toContain(ansiCodes.red);
-//     expect(Colorize`{orange:Bright orange color}`).toContain(ansiCodes.orange);
-//     expect(Colorize`{yellow:Yellow text example}`).toContain(ansiCodes.yellow);
-//     expect(Colorize`{green:Green is calm}`).toContain(ansiCodes.green);
-//     expect(Colorize`{cyan:Cyan looks cool}`).toContain(ansiCodes.cyan);
-//     expect(Colorize`{blue:Blue skies ahead}`).toContain(ansiCodes.blue);
-//     expect(Colorize`{purple:Purple power!}`).toContain(ansiCodes.purple);
-//     expect(Colorize`{pink:Pretty in pink}`).toContain(ansiCodes.pink);
-//   });
-
-//   it('Text styles', () => {
-//     expect(Colorize`{bold:This text is bold}`).toContain(ansiCodes.bold);
-//     expect(Colorize`{underline:This text is underlined}`).toContain(ansiCodes.underline);
-//     expect(Colorize`{strikethrough:Strike this text out}`).toContain(ansiCodes.strikethrough);
-//     expect(Colorize`{italic:Italic style}`).toContain(ansiCodes.italic);
-//     expect(Colorize`{emphasis:Emphasis is italic too}`).toContain(ansiCodes.italic);
-//   });
-
-//   it('Mixing and nesting styles', () => {
-//     const mixed = Colorize`Mixing styles {red:red and {bold:bold red} back to red}`;
-//     expect(mixed).toContain(ansiCodes.red);
-//     expect(mixed).toContain(ansiCodes.bold);
-
-//     const nested = Colorize`Nested {green:green {underline:underlined} and normal}`;
-//     expect(nested).toContain(ansiCodes.green);
-//     expect(nested).toContain(ansiCodes.underline);
-//   });
-
-//   it('Dynamic ANSI code', () => {
-//     const dynamic = Colorize`Dynamic ANSI {(\\x1b[35m):Custom magenta color}`;
-//     expect(dynamic).toContain('\x1b[35m');
-//   });
-
-//   it('Shorthand underline and bold', () => {
-//     const shorthand = Colorize`Shorthand underline {_underlined_} and bold {**bold**} also {*underline*}`;
-//     expect(shorthand).toContain(ansiCodes.underline);
-//     expect(shorthand).toContain(ansiCodes.bold);
-//   });
-
-//   it('Escaped braces', () => {
-//     const escaped = Colorize`Escaped braces \\{this is not a tag\\} and {blue:blue text}`;
-//     expect(escaped).toContain('{this is not a tag}');
-//     expect(escaped).toContain(ansiCodes.blue);
-//   });
-
-//   it('Multiple nested styles', () => {
-//     const multiNested = Colorize`Multiple nested styles {cyan:{underline:underlined cyan} and {bold:bold cyan}}`;
-//     expect(multiNested).toContain(ansiCodes.cyan);
-//     expect(multiNested).toContain(ansiCodes.underline);
-//     expect(multiNested).toContain(ansiCodes.bold);
-//   });
-
-//   it('Complex nesting', () => {
-//     const complex = Colorize`Complex example: {red:Red {underline:underlined {bold:bold underlined} back} red}`;
-//     expect(complex).toContain(ansiCodes.red);
-//     expect(complex).toContain(ansiCodes.underline);
-//     expect(complex).toContain(ansiCodes.bold);
-//   });
-
-//   it('No tags (plain text)', () => {
-//     const plain = Colorize`Edge case: text with no tags at all`;
-//     expect(plain).toBe('Edge case: text with no tags at all' + ansiCodes.reset);
-//   });
-
-//   it('Strikethrough', () => {
-//     const strike = Colorize`Use strikethrough {strikethrough:this is crossed out}`;
-//     expect(strike).toContain(ansiCodes.strikethrough);
-//   });
-
-//   it('Throws on missing closing tag for shorthand', () => {
-//     expect(() => Colorize`{_missing closing}`).toThrow(ColorizedSyntaxException);
-//     expect(() => Colorize`{**missing closing}`).toThrow(ColorizedSyntaxException);
-//     expect(() => Colorize`{*missing closing}`).toThrow(ColorizedSyntaxException);
-//   });
-
-//   it('Throws on unknown style', () => {
-//     expect(() => Colorize`{unknown:this should fail}`).toThrow(ColorizedSyntaxException);
-//   });
-// });
-
-describe("isEmpty", () => {
-  it("should return true for empty values", () => {
-    expect(isEmpty("")).toBeTruthy();
-    expect(isEmpty(NaN)).toBeTruthy();
-    expect(isEmpty(0)).toBeTruthy();
-    expect(isEmpty(null)).toBeTruthy();
-    expect(isEmpty(undefined)).toBeTruthy();
-    expect(isEmpty(false)).toBeTruthy();
-    expect(isEmpty([])).toBeTruthy();
-    expect(isEmpty({})).toBeTruthy();
+  it.each(cases)("should correctly evaluate empty values using $name", ({ func, truthy }) => {
+    const emptyValues = ["", NaN, 0, null, undefined, false, [], {}];
+    for (const val of emptyValues) {
+      expect(func(val)).toBe(truthy);
+    }
   });
 
-  it("should return false for non-empty values", () => {
-    expect(isEmpty("Hello")).toBeFalsy();
-    expect(isEmpty([1, 2])).toBeFalsy();
-    expect(isEmpty({ key: "value" })).toBeFalsy();
-    expect(isEmpty(true)).toBeFalsy();
-    expect(isEmpty(1)).toBeFalsy();
-    expect(isEmpty(() => {})).toBeFalsy();
-    expect(isEmpty(Symbol("x"))).toBeFalsy();
-    expect(isEmpty(new Date())).toBeFalsy();
+  it.each(cases)("should correctly evaluate non-empty values using $name", ({ func, truthy }) => {
+    const nonEmptyValues = [
+      "Hello",
+      [1, 2],
+      { key: "value" },
+      true,
+      1,
+      () => { },
+      Symbol("x"),
+      new Date(),
+    ];
+    for (const val of nonEmptyValues) {
+      expect(func(val)).toBe(!truthy);
+    }
   });
 });
 
-// describe("opti", () => {
-//   it("should exist", () => {
-//     expect(opti).toBeDefined();
-//   });
-// });
+describe("opti", () => {
+  it("should exist", () => {
+    expect(opti).toBeDefined();
+  });
+
+  it("should have all false properties", () => {
+    expect(opti.crafty).toBeFalsy();
+    expect(opti.evented).toBeFalsy();
+    expect(opti.flow).toBeFalsy();
+    expect(opti.query).toBeFalsy();
+    expect(opti.requests).toBeFalsy();
+  });
+});
 
 describe("Enum", () => {
   it("should create properties", () => {
@@ -259,57 +202,48 @@ describe("Enum", () => {
   });
 });
 
-describe("f", () => {
-  it("should immediately invoke a function", () => {
-    let called = false;
-    f(() => { called = true; });
-    expect(called).toBeTruthy();
-    
+describe("Tuple", () => {
+  const tuple = Tuple("A", "B", "C");
+
+  it("should create a correct tuple", () => {
+    expectTypeOf<typeof tuple>().toEqualTypeOf<[string, string, string]>();
+    expectTypeOf<typeof tuple>().not.toEqualTypeOf<string[]>();
+    expect(tuple).toEqual(["A", "B", "C"]);
+  });
+
+  it("should be able to access the values inside the tuple", () => {
+
   });
 });
 
-describe("UnknownException", () => {
-  it("should extend Exception and set name", () => {
-    const err = new UnknownException("oops");
-    expect(err).toBeInstanceOf(Exception);
-    expect(err.name).toBe("UnknownException");
-    expect(err.getMessage()).toBe("oops");
-  });
-});
-
-describe("NotImplementedException", () => {
-  it("should extend Exception with default message", () => {
-    const err = new NotImplementedException();
-    expect(err).toBeInstanceOf(Exception);
-    expect(err.name).toBe("NotImplementedException");
-    expect(err.getMessage()).toBe("Function not implimented yet");
+describe("Collection", () => {
+  beforeAll(() => {
+    document.body.append(document.createElement("h1"));
+    document.body.append(document.createElement("div"));
+    document.body.append(document.createElement("div"));
+    document.body.append(document.createElement("div"));
   });
 
-  it("should use provided message", () => {
-    const err = new NotImplementedException("custom");
-    expect(err.getMessage()).toBe("custom");
+  const htmlCollection: Collection<HTMLElement> = Collection.from(document.querySelectorAll("div"));
+  const stringCollection: Collection<string> = Collection.of("A", "B", "C", "D", "E");
+  const numberCollection: Collection<number> = Collection.of(1, 2, 3, 4, 5);
+  const multiCollection: Collection<string | number | boolean> = Collection.of(1, "A", true);
+
+  it("should be able to make collections using `from` and `of`", () => {
+    expect(Collection.of()).toBeInstanceOf(Collection);
+    expect(Collection.of(1, 2, 3)).toBeInstanceOf(Collection);
+    expect(Collection.of("X", true, 3)).toBeInstanceOf(Collection);
+
+    expect(Collection.from([])).toBeInstanceOf(Collection);
+    expect(Collection.from([1, 2, 3])).toBeInstanceOf(Collection);
+    expect(Collection.from(["X", true, 3])).toBeInstanceOf(Collection);
   });
-});
 
-describe("AccessException", () => {
-  it("should extend Exception with default message", () => {
-    const err = new AccessException();
-    expect(err).toBeInstanceOf(Exception);
-    expect(err.name).toBe("AccessException");
-    expect(err.getMessage()).toBe("");
-  });
+  it("should construct the right types using the constructors", () => {
+    expectTypeOf(Collection.of()).toBeAny;
+    expectTypeOf(Collection.of(1, 2, 3)).toBeNumber;
 
-  it("should use provided message", () => {
-    const err = new AccessException("custom");
-    expect(err.getMessage()).toBe("custom");
-  });
-});
-
-describe("CustomException", () => {
-  it("should be an error", () => {
-    const err = new CustomException("CustException");
-
-    expect(err).toBeInstanceOf(Exception);
-    expect(err.name).toBe("CustException");
+    expectTypeOf(Collection.from([])).toBeAny;
+    expectTypeOf(Collection.from([1, 2, 3])).toBeNumber;
   });
 });

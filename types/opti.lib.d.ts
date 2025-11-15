@@ -10,24 +10,24 @@
  * @opti
  * @param iife The function to run the code in for the iife
  */
-declare function f(iife: () => void): void;
+declare function f<T>(iife: () => T): T;
 
 /**
  * Gets the type of the value and returns a string representation of the type of the value
  * @opti
  * @param val The value who's type is being tested
  * @example
- * type(5)               // "number"
- * type("hello")         // "string"
- * type(null)            // "null"
- * type(undefined)       // "undefined"
- * type([1,2,3])         // "array"
- * type({})              // "object"
- * type(new Date())      // "date"
- * type(/abc/)           // "regexp"
- * type(() => {})        // "function"
- * type(new Map())       // "map"
- * type(new Set())       // "set"
+ * type(5).stringOf()           // "number"
+ * type("hello").stringOf()     // "string"
+ * type(null).stringOf()        // "null"
+ * type(undefined).stringOf()   // "undefined"
+ * type([1,2,3]).stringOf()     // "array"
+ * type({}).stringOf()          // "object"
+ * type(new Date()).stringOf()  // "date"
+ * type(/abc/).stringOf()       // "regexp"
+ * type(() => {}).stringOf()    // "function"
+ * type(new Map()).stringOf()   // "map"
+ * type(new Set()).stringOf()   // "set"
  */
 declare function type<T>(val: T): TypeOperators<T>;
 
@@ -201,24 +201,36 @@ declare var AssertionException: SubExceptionConstructor;
 /**
  * Exception for starting a new debounce
  */
-declare var DebouncedException: SubExceptionConstructor;
-
-declare var SyntaxException: SubExceptionConstructor;
-declare var TypeException: SubExceptionConstructor;
-declare var CloneException: SubExceptionConstructor;
-declare var NumberTooSmallException: SubExceptionConstructor;
-
-/**
- * Provides resources to access and make time based objects (Without dates)
- */
-declare var Time: TimeConstructor;
+declare var DebouncedException: DebouncedExceptionConstructor;
+declare var SyntaxException: SyntaxExceptionConstructor;
+declare var TypeException: TypeExceptionConstructor;
+declare var CloneException: CloneExceptionConstructor;
+declare var NumberTooSmallException: NumberTooSmallExceptionConstructor;
+declare var AbstractInitializationException: AbstractInitializationExceptionConstructor;
+declare var AbstractMethodInvokedException: AbstractMethodInvokedExceptionConstructor;
 
 /**
  * The collection class that can make collections of any object
  */
 declare var Collection: CollectionConstructor;
 
+declare var Future: FutureConstructor;
+
 declare var opti: OptiObject;
+
+/** @decorator */
+declare var Abstract: MethodDecorator & ClassDecorator;
+
+/** @decorator */
+declare function Final(
+  target: any,
+): ClassDecorators;
+/** @decorator */
+declare function Final(
+  target: any,
+  propertyKey: string,
+  descriptor: PropertyDescriptor
+): void;
 
 interface Document {
   /** 
@@ -570,30 +582,10 @@ interface HTMLFormElement {
 }
 
 interface HTMLInputElement {
-  get val(): string
+  val: ValueAccessor
 }
 
 interface NodeList {
-  /** 
-   * Adds the same event listener to every element in the list
-   * @opti
-   * @param type The type of listener to attach
-   * @param listener The callback to the event
-   * @param options Options of the event listener
-   * @example
-   * document.$$("div.panel")
-   *   .addEventListeners("click", () => {
-   *     this.fadeOut(3000);
-   *     this.removeClass("panel");
-   *   });
-   */
-  addEventListener<T extends EventTarget>(
-    this: Iterable<T>,
-    type: keyof EventMapOf<T>,
-    listener: (this: T, e: EventMapOf<T>[keyof EventMapOf<T>]) => any,
-    options?: boolean | AddEventListenerOptions
-  ): void
-
   /**
    * Adds a class to the elements
    * @param elClass The class to add
@@ -626,26 +618,6 @@ interface NodeList {
 }
 
 interface HTMLCollection {
-  /** 
-   * Adds the same event listener to every element in the list
-   * @opti
-   * @param type The type of listener to attach
-   * @param listener The callback to the event
-   * @param options Options of the event listener
-   * @example
-   * document.$$("div.panel")
-   *   .addEventListeners("click", () => {
-   *     this.fadeOut(3000);
-   *     this.removeClass("panel");
-   *   });
-   */
-  addEventListener<T extends EventTarget, K extends keyof EventMapOf<T>>(
-    this: Iterable<T>,
-    type: K,
-    listener: (this: T, e: EventMapOf<T>[keyof EventMapOf<T>]) => any,
-    options?: boolean | AddEventListenerOptions
-  ): void
-
   /**
    * Adds a class to the elements
    * @param elClass The class to add
@@ -682,7 +654,7 @@ interface EventTarget {
    * The events registered on an `EventTarget`
    * @opti
    */
-  readonly events: Partial<Record<GlobalEventHandlersEventMap, EventListenerOrEventListenerObject[]>>;
+  readonly events: Record<string, Func[]>;
 }
 
 interface DateConstructor {
@@ -748,7 +720,7 @@ interface ObjectConstructor {
    *  console.log(`Key: ${key}, Value: ${value}`);
    * });
    */
-  forEach<T>(object: T, iterator: (key: keyof T, value: T[keyof T]) => any): void;
+  forEach<T extends object>(object: T, iterator: (key: keyof T, value: T[keyof T]) => any): void;
 }
 
 interface Number {
@@ -809,6 +781,8 @@ interface Array<T> {
   relocate(index: number, offset: number): number | null
 
   relocateTo(index: number, location: number): number | null
+
+  insert(this: T[], index: number, ...values: T[]): T[];
   
   /**
    * Replaces a value in an array
@@ -886,15 +860,15 @@ interface Function {
    *   return a + b + c;
    * }
    * 
-   * console.log(example.args()); /// ["a", "b", "c"]
+   * console.log(example.getArgs()); /// ["a", "b", "c"]
    */
-  get args(): string[]
+  getArgs(): string[]
 }
 
 interface FunctionConstructor {
-  memo<T extends Func>(func: T, thisArg: Func.This<T>, ...args: Func.Arguments<T>): T
+  memo<T extends Func>(func: T): T
 
-  debounce<T extends Func>(func: T, ms: number): (this: Func.This<T>, ...args: Func.Arguments<T>) => Promise<Func.Return<T>>
+  debounce<T extends Func>(func: T, ms: number): (this: Func.This<T>, ...args: Func.Arguments<T>) => Future<Func.Return<T>, DebouncedException>
 
   throttle<T extends Func>(func: T, ms: number): (this: Func.This<T>, ...args: Func.Arguments<T>) => Func.Return<T> | null
 }

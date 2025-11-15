@@ -2,7 +2,6 @@
 
 declare var Evented: EventedConstructor;
 declare var Thread: ThreadConstructor;
-declare var StaticThread: StaticThreadConstructor;
 
 interface EventTarget {
   /** 
@@ -101,4 +100,48 @@ interface EventTarget {
     listener: (e: EventMapOf<T>[K]) => void,
     options?: boolean | AddEventListenerOptions
   ): EventController
+}
+
+interface NodeList {
+  /** 
+   * Adds the same event listener to every element in the list
+   * @opti
+   * @param type The type of listener to attach
+   * @param listener The callback to the event
+   * @param options Options of the event listener
+   * @example
+   * document.$$("div.panel")
+   *   .addEventListeners("click", () => {
+   *     this.fadeOut(3000);
+   *     this.removeClass("panel");
+   *   });
+   */
+  addEventListener<T extends EventTarget>(
+    this: Iterable<T>,
+    type: keyof EventMapOf<T>,
+    listener: (this: T, e: EventMapOf<T>[keyof EventMapOf<T>]) => any,
+    options?: boolean | AddEventListenerOptions
+  ): void
+}
+
+interface HTMLCollection {
+  /** 
+   * Adds the same event listener to every element in the list
+   * @opti
+   * @param type The type of listener to attach
+   * @param listener The callback to the event
+   * @param options Options of the event listener
+   * @example
+   * document.$$("div.panel")
+   *   .addEventListeners("click", () => {
+   *     this.fadeOut(3000);
+   *     this.removeClass("panel");
+   *   });
+   */
+  addEventListener<T extends EventTarget, K extends keyof EventMapOf<T>>(
+    this: Iterable<T>,
+    type: K,
+    listener: (this: T, e: EventMapOf<T>[keyof EventMapOf<T>]) => any,
+    options?: boolean | AddEventListenerOptions
+  ): void
 }

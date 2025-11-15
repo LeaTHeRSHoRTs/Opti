@@ -64,11 +64,11 @@ describe("EventTarget.addEventListeners", () => {
   });
 });
 
-describe("EventTarget.addEventController", () => {
-  it("should attach an event listener to the EventTarget", () => {
+// describe("EventTarget.addEventController", () => {
+//   it("should attach an event listener to the EventTarget", () => {
 
-  });
-});
+//   });
+// });
 
 describe("NodeList.addEventListener", () => {
   let nodeList: NodeList;

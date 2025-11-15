@@ -3,7 +3,7 @@ type EnumInstance<T> = {
 };
 
 interface TupleConstructor {
-  new<T extends unknown[]>(...values: T): T
+  new <T extends unknown[]>(...values: T): T
 }
 
 interface TimeConstructor {
@@ -83,15 +83,39 @@ interface TypedMap<R extends Record<string | number, any> = {}> {
   forEach(callback: <K extends keyof R>(value: R[K], key: K) => void): void;
 }
 
-interface CollectionConstructor {
-  new<T>(collection: T[]): Collection<T>
-  from<T>(arrayLike: ArrayLike<T>): Collection<T>
+interface FutureConstructor extends PromiseConstructor {
+  new <T, R extends Error | Exception = Error>(executor: (resolve: (value: T) => void, reject: (err?: R) => void) => void): Future<T, R>;
 }
 
-interface Collection<T> {
-  readonly length: number;
+interface Future<T, R extends Error | Exception = Error> extends Promise<T> {
+  /**
+   * Attaches callbacks for the resolution and/or rejection of the Future.
+   */
+  then<TResult1 = T, TResult2 = never>(
+    onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null,
+    onrejected?: ((reason: R) => TResult2 | PromiseLike<TResult2>) | undefined | null
+  ): Future<TResult1 | TResult2, R>;
 
-  [index: number]: T;
+  /**
+   * Attaches a callback for only the rejection of the Future.
+   */
+  catch<TResult = never>(
+    onrejected?: ((reason: R) => TResult | PromiseLike<TResult>) | undefined | null
+  ): Future<T | TResult, R>;
+
+  /**
+   * Attaches a callback that is invoked when the Future is settled (resolved or rejected).
+   */
+  finally(onfinally?: (() => void) | undefined | null): Future<T, R>;
+};
+
+interface CollectionConstructor {
+  from<T>(arrayLike: ArrayLike<T>): Collection<T>;
+  of<T extends unknown[]>(...values: T): Collection<T[number]>;
+  of(...values: unknown): Collection<unknown>
+}
+
+interface Collection<T> extends ArrayLike<T> {
   item(inedx: number): T | null;
   each(callbackfn: (value: T, key: number) => void, thisArg?: any): void;
 
@@ -132,9 +156,45 @@ interface RuntimeException {
 interface SubExceptionConstructor {
   new(message?: string, cause?: string): Exception;
   readonly prototype: Exception;
+
 }
 
 interface UnknownExceptionConstructor {
   new(message?: string): Exception;
   readonly prototype: Exception;
+}
+
+interface DebouncedException extends Exception {}
+interface DebouncedExceptionConstructor extends SubExceptionConstructor {
+  new(message?: string, cause?: string): DebouncedException;
+}
+
+interface SyntaxException extends Exception {}
+interface SyntaxExceptionConstructor extends SubExceptionConstructor {
+  new(message?: string, cause?: string): SyntaxException;
+}
+
+interface TypeException extends Exception {}
+interface TypeExceptionConstructor extends SubExceptionConstructor {
+  new(message?: string, cause?: string): TypeException;
+}
+
+interface CloneException extends Exception {}
+interface CloneExceptionConstructor extends SubExceptionConstructor {
+  new(message?: string, cause?: string): CloneException;
+}
+
+interface NumberTooSmallException extends Exception {}
+interface NumberTooSmallExceptionConstructor extends SubExceptionConstructor {
+  new(message?: string, cause?: string): NumberTooSmallException;
+}
+
+interface AbstractInitializationException extends Exception {}
+interface AbstractInitializationExceptionConstructor extends SubExceptionConstructor {
+  new(message?: string, cause?: string): AbstractInitializationException;
+}
+
+interface AbstractMethodInvokedException extends Exception {}
+interface AbstractMethodInvokedExceptionConstructor extends SubExceptionConstructor {
+  new(message?: string, cause?: string): AbstractMethodInvokedException;
 }

@@ -21,7 +21,7 @@ interface EventedConstructor {
 }
 
 interface ThreadConstructor {
-  new(): Thread
+  new<T, U extends ((val: T) => T)[]>(initialValue: T, ...fn: U): Thread
 }
 
 interface StaticThreadConstructor {
@@ -33,18 +33,7 @@ interface Thread {
   stack(fn: () => any): void;
   pause(): void;
   resume(): void;
-  stop(code?: number): never;
   get running(): boolean;
-}
-
-interface StaticThread extends Thread {
-  start(...args: any[]): void;
-  results<T = unknown>(): T;
-}
-
-interface EventCollection<T extends EventTarget> {
-  [key: keyof EventMapOf<T>]: EventMapOf<T>[K] | undefined
-  get<K extends keyof EventMapOf<T>>(key: K): EventMapOf<T>[K] | undefined
 }
 
 interface OptiObject {

@@ -2,8 +2,10 @@
 type char = 
   | ' ' | '!' | '"' | '#' | '$' | '%' | '&' | "'" | '(' | ')' | '*' | '+' | ',' | '-' | '.' | '/' | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
   | ':' | ';' | '<' | '=' | '>' | '?' | '@' | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' 
-  | 'T' | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z' | '[' | '\\' | ']' | '^' | '_' | '`' | 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm'
-  | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z' | '{' | '|' | '}' | '~';
+  | 'T' | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z' | '[' | ']' | '^' | '_' | '`' | 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm'
+  | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z' | '{' | '|' | '}' | '~' | '\\';
+
+// type char = string & { length: 1 }
 
 /** Shortcut for `Record<string, T>` */
 type StringRecord<T> = Record<string, T>;
@@ -25,6 +27,10 @@ type placeholder = any;
 
 /** Reperesents a key in a key-value object */
 type Key = keyof any;
+
+type Defined<T extends object, U extends keyof T | undefined = undefined> = U extends undefined 
+  ? { [P in keyof T]-?: T[P] }
+  : { [K in U]-?: T[K] } & Omit<T, U>;
 
 /** Flattens array types like `T[][]` and others */
 type Flatten<T extends readonly unknown[]> =
@@ -54,9 +60,18 @@ type GetterKeys<T> = {
 
 type SetterKeys<T> = {
   [K in keyof T]-?: T[K] extends Function ? never : (
-    { -readonly [P in K]: T[P] } extends { [P in K]: T[P] } ? K : never
+    { -readonly [P in K]: T[K] } extends { [P in K]: T[P] } ? K : never
   )
 }[keyof T];
+
+type WritableKeys<T> = {
+  [K in keyof T]-?: 
+    { -readonly [P in K]: T[K] } extends { [P in K]: T[K] } ? K : never
+}[keyof T];
+
+type WritableOnly<T> = Pick<T, WritableKeys<T>>;
+
+type Only<T, U> = { [K in keyof T as Extract<T[K], U> extends never ? never : K]: T[K] }
 
 type AccessorKeys<T> = GetterKeys<T> | SetterKeys<T>;
 
@@ -86,7 +101,7 @@ type TypeOperators<T> = T extends Func
 type UUIDConstructor = new() => readonly string & { readonly __brand: unique symbol };
 
 /** Repesents a html tag in string form */
-type HTMLTag = keyof HTMLElementTagNameMap | keyof HTMLElementDeprecatedTagNameMap;
+type HTMLTag = keyof HTMLElementTagNameMap;
 
 type PropertiesOf<T> = {
   [K in keyof T]: T[K] extends Function ? never : K;
@@ -97,7 +112,6 @@ type PropertiesOf<T> = {
  */
 type HTMLElementOf<T extends string> =
   T extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[T] :
-  T extends keyof HTMLElementDeprecatedTagNameMap ? HTMLElementDeprecatedTagNameMap[T] :
   HTMLElement;
 
 type SVGElementOf<T extends keyof SVGElementTagNameMap> =
@@ -130,6 +144,10 @@ type MathMLElementTagNameOf<T extends MathMLElement> = {
 type CallbackResult<T extends ((...args: any[]) => any) | readonly ((...args: any[]) => any)[]> =
   T extends ((...args: any[]) => any) ? ReturnType<T> :
   T extends readonly [...infer R] ? R extends ((...args: any[]) => any)[] ? { [K in keyof R]: ReturnType<R[K]> } : never : never;
+type EventList<T> =
+  T extends { events?: any }
+    ? Record<string, Func[]> // stop if "events" already exists
+    : Partial<Record<keyof EventMapOf<T>, Func[]>>;
 
 /** Gest the event map for the specified object */
 type EventMapOf<T> =
@@ -211,7 +229,7 @@ type EventMapOf<T> =
   T extends AbstractWorker ? AbstractWorkerEventMap :
   never; // fallback
 
-/* New Classes */
+
 /**
  * @opti
  */
@@ -243,11 +261,17 @@ type ElementNode = {
   | undefined;
 }
 
+interface ValueAccessor {
+  asString(): string;
+  asNumber(): number | null;
+  asBoolean(): boolean | null
+  asDate(): Date | null
+}
+
 interface OptiObject {
   crafty: false,
   query: false,
   evented: false,
   requests: false,
-  templated: false,
   flow: false
 };

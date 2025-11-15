@@ -1,94 +1,3 @@
-
-
-export class HTMLElementCreator {
-  private superEl: DocumentFragment;
-  private currContainer: HTMLElement;
-  private parentStack: HTMLElement[] = [];
-
-  constructor(tag: HTMLElement | keyof HTMLElementTagNameMap, attrsOrPosition: HTMLAttrs = {}) {
-    this.superEl = document.createDocumentFragment();
-
-    if (tag instanceof HTMLElement) {
-      this.currContainer = tag;
-      this.superEl.append(tag);
-    } else {
-      const el = document.createElement(tag);
-      this.makeElement(el as HTMLElement, attrsOrPosition);
-      this.currContainer = el as HTMLElement;
-      this.superEl.append(el);
-    }
-  }
-
-  private makeElement(el: HTMLElement, attrs: HTMLAttrs) {
-    Object.entries(attrs).forEach(([key, value]) => {
-      if (key === "text") {
-        el.textContent = value as string;
-      } else if (key === "html") {
-        el.innerHTML = value as string;
-      } else if (key === "class") {
-        if (typeof value === "string") {
-          el.classList.add(value);
-        } else if (Array.isArray(value)) {
-          el.classList.add(...value.filter(c => typeof c === 'string' && c.trim()));
-        }
-      } else if (key === "style") {
-        let styles = "";
-        Object.entries(value as object).forEach(([styleKey, styleValue]) => {
-          styles += `${(styleKey)}: ${styleValue}; `;
-        });
-        el.setAttribute("style", styles.trim());
-      } else if (typeof value === "boolean") {
-        if (value) el.setAttribute(key, "");
-        else el.removeAttribute(key);
-      } else if (value !== undefined && value !== null) {
-        el.setAttribute(key, value as string);
-      }
-    });
-  }
-
-  public el(tag: keyof HTMLElementTagNameMap, attrs: HTMLAttrs = {}): HTMLElementCreator {
-    const child = document.createElement(tag);
-    this.makeElement(child as HTMLElement, attrs);
-    this.currContainer.appendChild(child);
-    return this;
-  }
-
-  public container(tag: keyof HTMLElementTagNameMap, attrs: HTMLAttrs = {}): HTMLElementCreator {
-    const wrapper = document.createElement(tag);
-    this.makeElement(wrapper as HTMLElement, attrs);
-    this.parentStack.push(this.currContainer);
-    this.currContainer.appendChild(wrapper);
-    this.currContainer = wrapper as HTMLElement;
-    return this;
-  }
-
-  public up(): HTMLElementCreator {
-    const prev = this.parentStack.pop();
-    if (prev) {
-      this.currContainer = prev;
-    }
-    return this;
-  }
-
-  public append(to: HTMLElement | string) {
-    const target = typeof to === "string" ? document.querySelector(to) : to;
-    if (target instanceof HTMLElement) {
-      target.append(this.superEl);
-    }
-  }
-
-  public prepend(to: HTMLElement | string) {
-    const target = typeof to === "string" ? document.querySelector(to) : to;
-    if (target instanceof HTMLElement) {
-      target.prepend(this.superEl);
-    }
-  }
-
-  public get element(): HTMLElement {
-    return this.currContainer;
-  }
-}
-
 /** @potential */
 export class Time {
   private hours: number;
@@ -321,20 +230,25 @@ export function Enum<T extends readonly string[]>(...values: T) {
   return obj;
 }
 
-export class Collection<T> {
-  readonly length: number;
+export class Collection<T> implements ArrayLike<T> {
   private items: T[];
+  readonly [key: number]: T;
 
-  constructor(items: T[]) {
-    this.items = items;
-    this.length = items.length;
+  private constructor(items?: T[]) {
+    this.items = items ?? [];
+  }
+
+  get length(): number {
+    return this.items.length;
   }
 
   public static from<T>(arrayLike: ArrayLike<T>) {
-    return new Collection(Array.from(arrayLike));
+    return new Collection<T>(Array.from(arrayLike));
   }
 
-  [key: number]: T;
+  public static of<T extends unknown[]>(...values: T) {
+    return new Collection<T[number]>(values);
+  }
 
   item(index: number): T | null {
     return this.items[index] ?? null;

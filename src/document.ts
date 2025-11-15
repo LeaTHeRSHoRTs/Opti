@@ -40,7 +40,7 @@ export function leaving (callback: (this: Document, ev: Event) => any): void {
 //   });
 // }
 
-export function documentCss (
+export function documentCss(
   element: string,
   object?: Partial<Record<keyof CSSStyleDeclaration, string | number>>
 ): any {
@@ -49,6 +49,7 @@ export function documentCss (
     throw new globalThis.SyntaxException("Selector cannot be empty.");
   }
 
+  //@ts-ignore
   let styleTag = document.querySelector("style[js-styles]") as HTMLStyleElement | null;
 
   if (!styleTag) {

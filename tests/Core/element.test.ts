@@ -2,6 +2,7 @@ describe("Element.hasText", () => {
   let element: Element;
 
   beforeEach(() => {
+    //@ts-ignore
     element = document.createElement('div');
   });
 
@@ -31,6 +32,19 @@ describe("Element.txt", () => {
   it("should get text content", () => {
     element.textContent = "Hello";
     expect(element.txt()).toBe("Hello");
+  });
+});
+
+describe("Element.html", () => {
+  let element: Element;
+
+  beforeEach(() => {
+    element = document.createElement('div');
+  });
+
+  it("should set inner HTML content", () => {
+    element.html('<p>Hello</p>');
+    expect(element.innerHTML).toBe('<p>Hello</p>');
   });
 });
 
@@ -103,32 +117,6 @@ describe("HTMLElement.css", () => {
   it("should apply CSS styles to the element", () => {
     element.css({ color: 'red' });
     expect(element.style.color).toBe('red');
-  });
-});
-
-describe("HTMLElement.tag", () => {
-  let element: HTMLElement;
-
-  beforeEach(() => {
-    element = document.createElement('div');
-  });
-
-  it("should return the tag name of the element", () => {
-    const tagName = element.tag();
-    expect(tagName).toBe('div');
-  });
-});
-
-describe("HTMLElement.html", () => {
-  let element: HTMLElement;
-
-  beforeEach(() => {
-    element = document.createElement('div');
-  });
-
-  it("should set inner HTML content", () => {
-    element.html('<p>Hello</p>');
-    expect(element.innerHTML).toBe('<p>Hello</p>');
   });
 });
 
@@ -266,5 +254,22 @@ describe("HTMLFormElement.serialize", () => {
 
     el.append(input);
     expect(el.serialize()).toBe("user%20name=bro%20ski");
+  });
+});
+
+describe("HTMLInputElement.val", () => {
+  const el: HTMLInputElement = document.createElement("input");
+
+  it("should return an empty value for empty input elements", () => {
+    expect(el.val.asString()).toBe("");
+  });
+
+  it("should return a value when the input element has content", () => {
+    el.value = "Hello";
+
+    expect(el.val.asString()).toBe("Hello");
+    expect(el.val.asNumber()).toBeNaN();
+    expect(el.val.asBoolean()).toBeNull();
+    expect(el.val.asDate()).toBeNull();
   });
 });

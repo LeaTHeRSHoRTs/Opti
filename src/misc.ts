@@ -1,10 +1,9 @@
 declare interface EventTarget {
-  _events: Partial<Record<keyof EventMapOf<any>, number>>
+  _events: Partial<Record<keyof EventMapOf<this>, EventListener[]>>
 }
 
 //* Function
 
-//! Utility
 export function args(this: Func): string[] {
   return this.toString()
   .replace(/\s*=\s*.*?(,|\))/g, "$1") 
@@ -33,37 +32,46 @@ export function throttle<T extends Func>(func: T, ms: number): (this: Func.This<
   };
 }
 
-export function debounce<T extends Func>(func: T, ms: number): (this: Func.This<T>, ...args: Func.Arguments<T>) => Promise<Func.Return<T>> {
-  let timer: number;
-  let globRej: ((reason?: any) => void) | null = null;
-  
-  return function(this: Func.This<T>, ...args: Func.Arguments<T>) {
-    if (globRej) {
-      globRej(new DebouncedException());
+export function debounce<T extends Func>(
+  func: T,
+  ms: number
+): (this: Func.This<T>, ...args: Func.Arguments<T>) => Future<Func.Return<T>, DebouncedException> {
+  let timer: ReturnType<typeof setTimeout> | null = null;
+  let globRej: ((err?: DebouncedException) => void) | null = null;
+
+  return function (this: Func.This<T>, ...args: Func.Arguments<T>) {
+    if (globRej && timer) {
+      const rej = globRej;
+      globRej = null;
+      rej(new DebouncedException());
     }
 
     const self = this;
 
-    clearTimeout(timer);
-    return new Promise<Func.Return<T>>((res, rej) => {
+    // Clear existing timer
+    if (timer) clearTimeout(timer);
+
+    return new Future<Func.Return<T>, DebouncedException>((res, rej) => {
       globRej = rej;
+
       timer = setTimeout(() => {
         globRej = null;
+        timer = null; // clear timer reference
         res(func.apply(self, args));
       }, ms);
     });
   };
 }
 
-export function memo<T extends Func>(func: T, thisArg: Func.This<T>, ...args: Func.Arguments<T>): T {
-  const res = func.call(thisArg, ...args);
+export function memo<T extends Func>(fn: T): T {
+  const cache = new Map<string, ReturnType<T>>();
 
-  return function(this: Func.This<T>, ...innerArgs: Func.Arguments<T>) {
-    if (thisArg === this && JSON.stringify(args) ===  JSON.stringify(innerArgs)) {
-      return res;
-    } else {
-      return func.call(thisArg, ...args);
-    }
+  return function (this: Func.This<T>, ...args: Func.Arguments<T>): Func.Return<T> {
+    const key = JSON.stringify(args); // unique per argument set
+    if (cache.has(key)) return cache.get(key)!; // return cached result
+    const result = fn.apply(this, args);       // call original function
+    cache.set(key, result);                    // store in cache
+    return result;
   } as T;
 }
 
@@ -155,14 +163,21 @@ export function unique<T>(this: T[]): T[] {
 
 export function pluck<T>(this: T[], finder: (v: T) => boolean): T | null {
   const res = this.findIndex(finder);
-  this.splice(res);
 
   if (res === -1) return null;
-  return this[res];
+
+  const [item] = this.splice(res, 1);
+  return item;
 }
 
 export function pluckLast<T>(this: T[], finder: (v: T) => boolean): T | null {
-  return [...this.reverse()].pluck(finder);
+  // find index of last matching element
+  const index = this.map(finder).lastIndexOf(true);
+  if (index === -1) return null;
+
+  // remove and return it
+  const [item] = this.splice(index, 1);
+  return item;
 }
 
 export function relocate<T>(this: T[], index: number, offset: number): number | null {
@@ -269,6 +284,12 @@ export function chunk<T>(this: T[], chunkSize: number): T[][] {
   return newArr;
 };
 
+export function insert<U>(this: unknown[], index: number, ...values: U[]) {
+  const arr = [...this];
+  arr.splice(index, 0, ...values);
+  return arr;
+}
+
 //* Strings
 
 export function remove(this: string, finder: string | RegExp): string {
@@ -284,18 +305,21 @@ export function capitalize(this: string): string {
   return i === -1 ? this : this.slice(0, i) + this.charAt(i).toUpperCase() + this.slice(i + 1);
 };
 
-export function matches(regexp: string | RegExp) { 
-  return String.prototype.search(regexp) !== -1; 
+export function matches(this: String, regexp: string | RegExp) { 
+  return this.search(regexp) !== -1; 
 };
 
 export function toCase(this: string, format: "camel" | "kebab" | "pascal" | "snake" | "train" | "dot"): string {
+  const regex = /(\s+)(\S)/g;
+  const charRegex = /\s+/g;
+
   switch(format) {
-    case "kebab":  return this.replace(/(\S)(\s)(\S)/g, (_, prev, space, next) => prev + "-" + next);
-    case "snake":  return this.replace(/(\S)(\s)(\S)/g, (_, prev, space, next) => prev + "_" + next);
-    case "dot":    return this.replace(/(\S)(\s)(\S)/g, (_, prev, space, next) => prev + "." + next);
-    case "camel":  return this.replace(/(\S)(\s)(\S)/g, (_, prev, space, next) => prev + next.toUpperCase());
-    case "pascal": return this.replace(/(\S)(\s)(\S)/g, (_, prev, space, next) => prev + next.toUpperCase()).replace(/^\s*(\S)/, (_, first) => first.toUpperCase());
-    case "train":  return this.replace(/(\S)(\s)(\S)/g, (_, prev, space, next) => prev + next.toUpperCase()).replace(/^\s*(\S)/, (_, first) => first.toUpperCase());
+    case "kebab":  return this.replace(charRegex, "-");
+    case "snake":  return this.replace(charRegex, "_");
+    case "dot":    return this.replace(charRegex, ".");
+    case "camel":  return this.replace(regex, (_, _s, next) => next.toUpperCase());
+    case "pascal": return this.replace(regex, (_, _s, next) => next.toUpperCase()).replace(/^\s*(\S)/, (_, first) => first.toUpperCase());
+    case "train":  return this.replace(regex, (_, _s, next) => next.toUpperCase()).replace(/^\s*(\S)/, (_, first) => first.toUpperCase());
   }
 }
 
@@ -326,11 +350,15 @@ export function group(name?: string, ...logs: any[][]): void {
 
 export const consoleProxy = new Proxy(console, {
   get(target, prop, receiver) {
-    if ((console as any).hidden === true) {
-      return null;
+    if (!(prop === "on" || prop === "off")) {
+      if ((target as any).hidden) return null;
     }
+
     const val = Reflect.get(target, prop, receiver);
-    return typeof val === "function" ? val.bind(target) : val;
+    if (typeof val === "function") {
+      return (...args: any[]) => val.bind(target, ...args);
+    }
+    return val;
   }
 });
 
@@ -386,9 +414,11 @@ export const addEventListener = mixin(
   function<T extends EventTarget>(this: EventTarget, type: keyof EventMapOf<T>, callback: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {
     if (!(this instanceof EventTarget)) return;
 
-    // Initialize internal storage
-    const store = (this._events ??= {}) as Partial<Record<keyof EventMapOf<T>, number>>;
-    store[type] = (store[type] ?? 0) + 1;
+    this._events[type] ??= [];
+    if ("handleEvent" in callback) {
+      this._events[type].push(callback.handleEvent);
+    } else {
+      this._events[type].push(callback);
+    }
   }
 );
-

@@ -1,8 +1,0 @@
-{
-  "foo": {
-    "bar": 1,
-    "but": true,
-    "elm": [1, 2, 3, 4]
-  },
-  "long": "string"
-}

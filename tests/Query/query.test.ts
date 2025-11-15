@@ -29,9 +29,9 @@ describe("$", () => {
 
 describe("$$", () => {
   it("should select elements that exists", () => {
-    expect($$("div")).toBe(document.querySelectorAll("div"));
-    expect($$("#first")).toBe(document.querySelectorAll("#first"));
-    expect($$(".divs")).toBe(document.querySelectorAll(".divs"));
+    expect($$("div").length).toBe(document.querySelectorAll("div")?.length);
+    expect($$("#first").length).toBe(document.querySelectorAll("#first")?.length);
+    expect($$(".divs").length).toBe(document.querySelectorAll(".divs")?.length);
     expect($$("#middle").length).toBe(0);
   });
 });

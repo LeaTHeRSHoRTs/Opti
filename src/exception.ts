@@ -6,9 +6,10 @@ export class Exception extends Error {
 
   constructor(name: string | null, message: string = "", cause: string = "") {
     super();
+    this._name = name ?? "Exception";
+    if (this.constructor.name === Exception.name) throw new AbstractInitializationException("Exception cannot be initialized");
     this._message = message;
     this._cause = cause;
-    this._name = name ?? "Exception";
     this._internalStack = new Error().stack ?? "";
   }
 
@@ -82,3 +83,6 @@ export const AssertionException = makeException("AssertionException");
 /** @future */
 export const FetchException = makeException("FetchException");
 export const DebouncedException = makeException("DebouncedException");
+export const AbstractMethodInvokedException = makeException("AbstractMethodInvokedException");
+
+export const AbstractInitializationException = makeException("AbstractInitializationException");

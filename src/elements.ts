@@ -8,7 +8,7 @@ function toKebabCase(str: string): string {
     .toLowerCase();
 }
 
-export function hasText (this: Element, text: string | RegExp): boolean {
+export function hasText(this: Element, text: string | RegExp): boolean {
   if (typeof text === "string") {
     return this.txt().includes(text);
   } else {
@@ -16,19 +16,19 @@ export function hasText (this: Element, text: string | RegExp): boolean {
   }
 }
 
-export function addClass (this: Element, elClass: string): void {
+export function addClass(this: Element, elClass: string): void {
   this.classList.add(elClass);
 }
 
-export function removeClass (this: Element, elClass: string): void {
+export function removeClass(this: Element, elClass: string): void {
   this.classList.remove(elClass);
 }
 
-export function toggleClass (this: Element, elClass: string): void {
+export function toggleClass(this: Element, elClass: string): void {
   this.classList.toggle(elClass);
 }
 
-export function hasClass (this: Element, elClass: string): boolean {
+export function hasClass(this: Element, elClass: string): boolean {
   return this.classList.contains(elClass);
 }
 
@@ -98,7 +98,7 @@ export function getAncestor<T extends Element>(this: ChildNode, arg: string | nu
   return null;
 }
 
-export function html (this: Element, input?: string): string {
+export function html(this: Element, input?: string): string {
   return input !== undefined ? (this.innerHTML = input) : this.innerHTML;
 };
 
@@ -138,12 +138,12 @@ export function toggle(this: HTMLElement) {
   }
 };
 
-export function find(this: ParentNode, selector: string): Node | null {
-  return this.querySelector(selector); // Returns a single Element or null
+export function $(this: ParentNode, selector: string): Element | null {
+  return this.querySelector<Element>(selector); // Returns a single Element or null
 };
 
-export function findAll(this: ParentNode, selector: string): NodeListOf<Element> {
-  return this.querySelectorAll(selector); // Returns a single Element or null
+export function $$(this: ParentNode, selector: string): NodeListOf<Element> {
+  return this.querySelectorAll<Element>(selector); // Returns a single Element or null
 };
 
 export function getChildren(this: Node): NodeListOf<ChildNode> {
@@ -192,7 +192,7 @@ export function cut<T extends Element>(this: T): T {
   }
 
   // Optionally copy inline styles (not always needed if using setAttribute above)
-   if (this instanceof HTMLElement && clone instanceof HTMLElement) {
+  if (this instanceof HTMLElement && clone instanceof HTMLElement) {
     clone.style.cssText = this.style.cssText;
   }
 
@@ -206,3 +206,71 @@ export function isVisible(this: HTMLElement) {
     ? this.css("display") !== "none"
     : Number(this.css("opacity")) > 0;
 }
+
+function as(this: HTMLInputElement, type: "number"): number | null;
+function as(this: HTMLInputElement, type: "string"): string | null;
+function as(this: HTMLInputElement, type: "boolean"): boolean | null;
+function as(this: HTMLInputElement, type: "date"): Date | null;
+function as(this: HTMLInputElement, type: string): string | number | boolean | Date | null {
+  const value = this.value.trim();
+
+  switch (type) {
+    case "string":
+      return value;
+
+    case "number":
+      const num = Number(value);
+      return !isNaN(num) && value !== "" ? num : null;
+
+    case "boolean":
+      if (value.toLowerCase() === "true") return true;
+      if (value.toLowerCase() === "false") return false;
+
+    case "date":
+      const date = new Date(value);
+      if (!isNaN(date.getTime())) return date;
+
+    default:
+      return null;
+  }
+}
+
+function parseTime(value: string) {
+  const [h, m, s] = value.split(":");
+  const [sec, ms] = (s ?? "0").split(".");
+  const date = new Date();
+  date.setHours(+h, +m, +sec, +ms || 0);
+  return date;
+}
+
+export function val(self: HTMLInputElement): ValueAccessor {
+  return {
+    asBoolean(): boolean | null {
+      switch (self.type) {
+        case "checkbox":
+        case "radio":
+          return self.checked;
+
+        // Other input types: only return boolean if value itself is explicitly "true" or "false"
+        default:
+          if (self.value === "true") return true;
+          if (self.value === "false") return false;
+
+          // For anything else (text, number, etc.), it doesn’t represent a boolean meaningfully
+          return null;
+      }
+    },
+    asNumber() {
+      const num = self.valueAsNumber;
+      return Number.isNaN(num) ? null : num;
+    },
+    asDate() {
+      let date = self.valueAsDate;
+      if (!date && self.type === "time") date = parseTime(self.value);
+      return date;
+    },
+    asString() {
+      return self.value ?? "";
+    }
+  };
+};

@@ -114,6 +114,38 @@ export function type<T>(val: T): TypeOperators<T> {
   if (val === undefined) return extendedString<T>(val, "undefined");
 
   if (typeof val === "function") {
+    // const combos: any[][] = [];
+    // const primitives = [
+    //   undefined,
+    //   null,
+    //   true,
+    //   false,
+    //   -1,
+    //   0,
+    //   1,
+    //   Infinity,
+    //   NaN,
+    //   "",
+    //   "text",
+    //   Symbol("sym")
+    // ];
+    // const err: any[] = [];
+    // const arity = val.length;
+
+    // for (let i = 0; i < arity; i++) {
+    //   combos.push(primitives);
+    // }
+
+    // for (const combo of combos) {
+    //   try {
+    //     val(...combo);
+    //     continue;
+    //   } catch (e) {
+    //     if (e instanceof TypeError) err.push(combo);
+    //     else throw e;
+    //   }
+    // }
+
     return extendedString(val, `Function:${val.name || "<anonymous>"}(${Opti.args.apply(val as Func).join(",")})`);
   }
 
@@ -150,8 +182,8 @@ export function assert(condition: boolean, reason?: string): asserts condition {
 
 export function sleep(ms: number): Promise<void> {
   return new Promise((res, rej) => {
+    if (ms <= 0) return rej("Timeout value is too short (must be greater than 0)");
     setTimeout(res, ms);
-    rej();
   });
 }
 

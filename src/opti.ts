@@ -5,6 +5,7 @@ import * as Exceptions from "./exception";
 import * as Globals from "./globals";
 import * as Lists from "./lists";
 import * as Misc from "./misc";
+import * as Decorators from "./decorators";
 
 function get<T>(
   object: T,
@@ -24,9 +25,12 @@ function get<T>(
     query: false,
     evented: false,
     requests: false,
-    templated: false,
     flow: false
   };
+
+  //! Others may depend on these
+  globalThis.Collection = Classes.Collection;
+  globalThis.Future = Promise;
 
   globalThis.Exception = Exceptions.Exception;
   globalThis.SyntaxException = Exceptions.SyntaxException;
@@ -38,9 +42,18 @@ function get<T>(
   globalThis.AccessException = Exceptions.AccessException;
   globalThis.UnknownException = Exceptions.UnknownException;
   globalThis.DebouncedException = Exceptions.DebouncedException;
-  globalThis.RuntimeException = Exceptions.RuntimeException; 
+  globalThis.AbstractMethodInvokedException = Exceptions.AbstractMethodInvokedException;
+  globalThis.AbstractInitializationException = Exceptions.AbstractInitializationException;
+  globalThis.RuntimeException = Exceptions.RuntimeException;
 
-  globalThis.f = (iife: () => void) => iife();
+  globalThis.Abstract = Decorators.Abstract;
+  globalThis.Final = Decorators.Final;
+
+  Object.defineProperty(globalThis, "f", {
+    value: <T>(iife: () => T) => iife(),
+    writable: false,
+    configurable: false,
+  });
   globalThis.type = Globals.type;
   globalThis.assert = Globals.assert;
   globalThis.sleep = Globals.sleep;
@@ -50,8 +63,6 @@ function get<T>(
   globalThis.Enum = Classes.Enum;
   globalThis.Tuple = Classes.Tuple;
 
-  globalThis.Collection = Classes.Collection; 
-
   get(Window.prototype, "width", () => window.innerWidth || document.body.clientWidth );
   get(Window.prototype, "height", () => window.innerHeight || document.body.clientHeight );
 
@@ -60,8 +71,8 @@ function get<T>(
   Document.prototype.css = Doc.documentCss;
   Document.prototype.createElements = Doc.createElements;
 
-  Node.prototype.$ = Elements.find;
-  Node.prototype.$$ = Elements.findAll;
+  Node.prototype.$ = Elements.$;
+  Node.prototype.$$ = Elements.$$;
   Node.prototype.parent = Elements.getParent;
   Node.prototype.ancestor = Elements.getAncestor;
   Node.prototype.getChildren = Elements.getChildren;
@@ -81,16 +92,14 @@ function get<T>(
   HTMLElement.prototype.toggle = Elements.toggle;
   get(HTMLElement.prototype, "isVisible", Elements.isVisible);
 
-  get(HTMLInputElement.prototype, "val", function(this: HTMLInputElement) { return this.value; });
+  Object.defineProperty(HTMLInputElement.prototype, "val", function(this: HTMLInputElement) { return Elements.val(this); });
 
   HTMLFormElement.prototype.serialize = Elements.serialize;
 
-  NodeList.prototype.addEventListener = Lists.addEventListenerEnum;
   NodeList.prototype.addClass = Lists.addClassList;
   NodeList.prototype.removeClass = Lists.removeClassList;
   NodeList.prototype.toggleClass = Lists.toggleClassList;
 
-  HTMLCollection.prototype.addEventListener = Lists.addEventListenerEnum;
   HTMLCollection.prototype.addClass = Lists.addClassList;
   HTMLCollection.prototype.removeClass = Lists.removeClassList;
   HTMLCollection.prototype.toggleClass = Lists.toggleClassList;
@@ -110,7 +119,7 @@ function get<T>(
   Function.debounce = Misc.debounce;
   Function.throttle = Misc.throttle;
   Function.memo = Misc.memo;
-  get(Function.prototype, "args", Misc.args);
+  Function.prototype.getArgs = Misc.args;
 
   Array.prototype.unique = Misc.unique;
   Array.prototype.chunk = Misc.chunk;
@@ -120,6 +129,7 @@ function get<T>(
   Array.prototype.relocateTo = Misc.relocateTo;
   Array.prototype.replace = Misc.replace;
   Array.prototype.sort = Misc.sortBy;
+  Array.prototype.insert = Misc.insert;
   get(Array.prototype, "type", Misc.arrayType);
 
   Math.random = Misc.random;

@@ -44,7 +44,7 @@ describe("Document.css", () => {
   });
 });
 
-describe("Document.createElementTree", () => {
+describe("Document.createElements", () => {
   it("should create an element cascade and append to the body", () => {
     const el = document.createElements({ 
       tag: "div", 
