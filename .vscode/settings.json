@@ -1,5 +1,13 @@
 {
   "typescript.tsdk": "./node_modules/typescript/lib",
   "jest.runMode": "on-demand",
-  "jest.jestCommandLine": "npm run test --"
+  "jest.jestCommandLine": "npm run test --",
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/coverage": true
+  }
 }

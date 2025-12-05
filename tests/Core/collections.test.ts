@@ -1,3 +1,5 @@
+import "../../dist/opti";
+
 describe("NodeList.addClass, NodeList.removeClass, NodeList.toggleClass", () => {
   let nodeList: NodeListOf<Element>;
 

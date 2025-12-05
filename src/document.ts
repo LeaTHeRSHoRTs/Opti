@@ -3,7 +3,7 @@ export function ready (callback: (this: Document, ev: Event) => any) {
 }
 
 export function leaving (callback: (this: Document, ev: Event) => any): void {
-  document.addEventListener("unload", (e) => callback.call(document, e));
+  document.addEventListener("beforeunload", (e) => callback.call(document, e));
 }
 
 // export function bindShortcut (

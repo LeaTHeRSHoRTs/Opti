@@ -1,15 +1,14 @@
 export class Exception extends Error {
-  private _name: string;
+  protected _name: string = "Exception";
   private _message: string;
   private _cause: string;
   private _internalStack: string;
 
-  constructor(name: string | null, message: string = "", cause: string = "") {
+  constructor(message?: string, cause?: string) {
     super();
-    this._name = name ?? "Exception";
-    if (this.constructor.name === Exception.name) throw new AbstractInitializationException("Exception cannot be initialized");
-    this._message = message;
-    this._cause = cause;
+    this._message = message ?? "";
+    this._cause = cause ?? "";
+
     this._internalStack = new Error().stack ?? "";
   }
 
@@ -66,10 +65,8 @@ export class RuntimeException {
 
 function makeException(name: string): SubExceptionConstructor {
   return class extends Exception {
-    constructor(message?: string, cause?: string) {
-      super(name, message, cause);
-    }
-  };
+    _name = name;
+  } as unknown as SubExceptionConstructor;
 }
 
 export const SyntaxException = makeException("SyntaxException");
@@ -82,7 +79,10 @@ export const AccessException = makeException("AccessException");
 export const AssertionException = makeException("AssertionException");
 /** @future */
 export const FetchException = makeException("FetchException");
+export const SortException = makeException("SortException");
 export const DebouncedException = makeException("DebouncedException");
 export const AbstractMethodInvokedException = makeException("AbstractMethodInvokedException");
-
 export const AbstractInitializationException = makeException("AbstractInitializationException");
+export const CollectionOutOfBoundsException = makeException("CollectionOutOfBoundsException");
+
+export const MalformedQueryException = makeException("MalformedQueryException");

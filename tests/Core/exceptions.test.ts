@@ -1,55 +1,101 @@
-function fail() {
-  expect(false).toBe(true);
-}
-
-function succeed() {
-  expect(true).toBe(true);
-}
+import "../../dist/opti";
 
 describe("Exception", () => {
-  it("should not be instantisable", () => {
+  it("should throw", () => {
     expect(() => {
-      new Exception("ErrorException");
+      throw new Exception("ErrorException");
     }).toThrow();
   });
 
-  it.each([{
+  const exceptions: { name: string, instance: SubExceptionConstructor }[] = [{
+    name: "Exception",
+    instance: Exception
+  }, {
     name: "SyntaxException",
-    instance: new SyntaxException
+    instance: SyntaxException
   }, {
     name: "TypeException",
-    instance: new TypeException
+    instance: TypeException
   }, {
     name: "CloneException",
-    instance: new CloneException
+    instance: CloneException
   }, {
     name: "NumberTooSmallException",
-    instance: new NumberTooSmallException
+    instance: NumberTooSmallException
   }, {
     name: "AssertionException",
-    instance: new AssertionException
+    instance: AssertionException
   }, {
     name: "NotImplementedException",
-    instance: new NotImplementedException
+    instance: NotImplementedException
   }, {
     name: "AccessException",
-    instance: new AccessException
+    instance: AccessException
   }, {
     name: "UnknownException",
-    instance: new UnknownException
+    instance: UnknownException
   }, {
     name: "DebouncedException",
-    instance: new DebouncedException
+    instance: DebouncedException
   }, {
     name: "AbstractMethodInvokedException",
-    instance: new AbstractMethodInvokedException
+    instance: AbstractMethodInvokedException
   }, {
     name: "AbstractInitializationException",
-    instance: new AbstractInitializationException
-  }])("$name: should perform the same behavior", ({ name, instance }) => {
-    expect(instance).toBeInstanceOf(Exception);
-    expect(instance.name).toBe(name);
-    expect(instance.getMessage()).toBe("");
+    instance: AbstractInitializationException
+  }, {
+    name: "MalformedQueryException",
+    instance: MalformedQueryException
+  }];
+
+  describe.each(exceptions)("$name", ({ name, instance }) => {
+    const normalInstance = new instance;
+    const instanceWithMessage = new instance("myMessage");
+    const instanceWithCause = new instance(undefined, "throwing");
+    const instanceWithAll = new instance("myMessage", "throwing");
+
+    it("should be a subclass of Exception", () => {
+      expect(normalInstance).toBeInstanceOf(Exception);
+    });
+
+    it("should have the right name", () => {
+      expect(normalInstance.name).toBe(name);
+    });
+
+    it("should have the right message", () => {
+      expect(normalInstance.getMessage()).toBe("");
+      expect(instanceWithMessage.getMessage()).toBe("myMessage");
+    });
+
+    it("should be have the right cause", () => {
+      expect(instanceWithCause.getCause()).toBe("throwing");
+    });
+
+    it("should be have the right message and cause", () => {
+      expect(instanceWithAll.getMessage()).toBe("myMessage");
+      expect(instanceWithAll.getCause()).toBe("throwing");
+    });
+
+    it("should be throwable again using the throw method", () => {
+      expect(() => {
+        normalInstance.throw();
+      }).toThrow(instance);
+    });
+
+    it("should give the right stack trace", () => {
+      const origionalStack = Error.prepareStackTrace;
+      Error.prepareStackTrace = () => "MOCK_STACK";
+
+      try {
+        throw new instance;
+      } catch(e) {
+        if (e instanceof instance) {
+          expect(e.getStackTrace()).toBe("MOCK_STACK");
+        }
+      }
+
+      Error.prepareStackTrace = origionalStack;
+    });
   });
 });
 
@@ -65,12 +111,10 @@ describe("RuntimeException", () => {
     try {
       throw new RuntimeException();
     } catch (e) {
-      if (e instanceof Error) {
+      if (e instanceof Error || e instanceof Exception) {
         fail();
-      } else if (e instanceof Exception) {
+      } else if (!(e instanceof RuntimeException)) {
         fail();
-      } else if (e instanceof RuntimeException) {
-        succeed();
       }
     }
   });

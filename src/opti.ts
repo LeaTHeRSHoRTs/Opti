@@ -44,6 +44,9 @@ function get<T>(
   globalThis.DebouncedException = Exceptions.DebouncedException;
   globalThis.AbstractMethodInvokedException = Exceptions.AbstractMethodInvokedException;
   globalThis.AbstractInitializationException = Exceptions.AbstractInitializationException;
+  globalThis.SortException = Exceptions.SortException;
+  globalThis.CollectionOutOfBoundsException = Exceptions.CollectionOutOfBoundsException;
+  globalThis.MalformedQueryException = Exceptions.MalformedQueryException;
   globalThis.RuntimeException = Exceptions.RuntimeException;
 
   globalThis.Abstract = Decorators.Abstract;
@@ -54,7 +57,7 @@ function get<T>(
     writable: false,
     configurable: false,
   });
-  globalThis.type = Globals.type;
+  globalThis.typed = Globals.typed;
   globalThis.assert = Globals.assert;
   globalThis.sleep = Globals.sleep;
   globalThis.isEmpty = Globals.isEmpty;
@@ -92,7 +95,10 @@ function get<T>(
   HTMLElement.prototype.toggle = Elements.toggle;
   get(HTMLElement.prototype, "isVisible", Elements.isVisible);
 
-  Object.defineProperty(HTMLInputElement.prototype, "val", function(this: HTMLInputElement) { return Elements.val(this); });
+  Object.defineProperty(HTMLInputElement.prototype, "val", {
+    get(this: HTMLInputElement) { return Elements.val(this); },
+    configurable: true
+  });
 
   HTMLFormElement.prototype.serialize = Elements.serialize;
 
@@ -106,11 +112,10 @@ function get<T>(
 
   EventTarget.prototype.addEventListener = Misc.addEventListener;
   (EventTarget.prototype as any)._events = {};
-  get(EventTarget.prototype, "events", function(this: EventTarget) { return (this as any)["_events"] as EventTarget["events"]; });
+  EventTarget.prototype.getEvents = Misc.getEvents;
 
   String.prototype.remove = Misc.remove;
   String.prototype.matches = Misc.matches;
-  String.prototype.removeAll = Misc.removeAll;
   String.prototype.capitalize = Misc.capitalize;
   String.prototype.toCase = Misc.toCase;
 
@@ -128,6 +133,7 @@ function get<T>(
   Array.prototype.relocate = Misc.relocate;
   Array.prototype.relocateTo = Misc.relocateTo;
   Array.prototype.replace = Misc.replace;
+  Array.prototype.replaceLast = Misc.replaceLast;
   Array.prototype.sort = Misc.sortBy;
   Array.prototype.insert = Misc.insert;
   get(Array.prototype, "type", Misc.arrayType);
@@ -139,9 +145,4 @@ function get<T>(
 
   Date.at = Misc.atDate;
   Date.fromTime = Misc.fromTime;
-
-  console = Misc.consoleProxy;
-  console.group = Misc.group;
-  console.on = Misc.consoleOn;
-  console.off = Misc.consoleOff;
 })();

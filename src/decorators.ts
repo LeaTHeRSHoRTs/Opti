@@ -1,39 +1,51 @@
+function isClass(x: any): x is Class {
+  return typeof x === "function";
+}
+
 export function Abstract(
-  target: any,
+  target: Class | object,
   propertyKey?: string | symbol,
   descriptor?: PropertyDescriptor
 ): any {
-  if (typeof propertyKey === "undefined") {
-    // Class decorator
-    const originalConstructor = target;
-    const newConstructor: any = (...args: any[]) => {
-      if (new.target === originalConstructor) {
-        throw new AbstractInitializationException(
-          `Abstract class ${originalConstructor.name} cannot be instantiated directly`
-        );
+
+  // --- CLASS DECORATOR ---
+  if (propertyKey === undefined) {
+    if (!isClass(target)) {
+      throw new Exception("@Abstract must be used on a class or function");
+    }
+
+    const Original = target;
+
+    const Wrapper = class extends Original {
+      constructor(...args: any[]) {
+        if (new.target === Original) {
+          throw new AbstractInitializationException(
+            `Abstract class ${Original.name} cannot be instantiated directly`
+          );
+        }
+        super(...args);
       }
-      return new originalConstructor(...args);
     };
-    // Copy prototype so instanceof works
-    newConstructor.prototype = originalConstructor.prototype;
-    return newConstructor; // IMPORTANT: must return the new constructor
+
+    Object.defineProperty(Wrapper, "name", { value: Original.name });
+
+    return Wrapper;
   }
 
+  // --- METHOD DECORATOR ---
   if (!descriptor || typeof descriptor.value !== "function") {
     throw new Error("@Abstract can only be applied to methods");
   }
 
-  const original = descriptor.value;
-  descriptor.value = function (this: any, ...args: any[]) {
-    const caller = this.constructor.name;
-    const origin = target.constructor.name;
+  const originalMethod = descriptor.value;
 
-    if (caller === origin) {
+  descriptor.value = function (this: any, ...args: any[]) {
+    if (this.constructor === target.constructor) {
       throw new AbstractMethodInvokedException(
-        `Abstract method ${propertyKey.toString()} must be overridden before calling`
+        `Abstract method ${String(propertyKey)} must be overridden`
       );
     }
-    return original.apply(this, args);
+    return originalMethod.apply(this, args);
   };
 
   return descriptor;
@@ -51,7 +63,7 @@ export function Final(target: Function, propertyKey?: string, descriptor?: Prope
 
   function FinalizedConstructor(...args: any[]) {
     if (new.target !== original) {
-      throw new Error(`${original.name} is a final class and cannot be extended`);
+      throw new Exception(`${original.name} is a final class and cannot be extended`);
     }
     return Reflect.construct(original, args, new.target);
   }

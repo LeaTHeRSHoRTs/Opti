@@ -1,13 +1,3 @@
-function toKebabCase(str: string): string {
-  return str
-    // Add a hyphen before uppercase letters that are preceded by lowercase letters or numbers
-    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
-    // Replace spaces or underscores with hyphens
-    .replace(/[\s_]+/g, "-")
-    // Convert everything to lowercase
-    .toLowerCase();
-}
-
 export function hasText(this: Element, text: string | RegExp): boolean {
   if (typeof text === "string") {
     return this.txt().includes(text);
@@ -32,40 +22,79 @@ export function hasClass(this: Element, elClass: string): boolean {
   return this.classList.contains(elClass);
 }
 
+function parseUnit(unit: string): string | number {
+  if (/^0[^.]?/.test(unit)) return 0;
+  if (!isNaN(Number(unit))) return Number(unit);
+  return unit;
+}
+
+function dashToCamel(str: string): string {
+  return str.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+}
+
+// camelCase ("backgroundColor") → dash-case ("background-color")
+function camelToDash(str: string): string {
+  return str.replace(/[A-Z]/g, m => '-' + m.toLowerCase());
+}
+
+export function css(this: HTMLElement): CSSObject;
+export function css(this: HTMLElement, key: CSSPropertyName): string | number;
+export function css(this: HTMLElement, key: CSSPropertyName, value: string | number): void;
+export function css(this: HTMLElement, key: CSSObject): void;
+export function css(computed: true): CSSObject;
 export function css(
   this: HTMLElement,
-  key?: keyof CSSStyleDeclaration | Partial<Record<keyof CSSStyleDeclaration, string | number>>,
+  key?: CSSPropertyName | CSSObject | true,
   value?: string | number
-): any {
+): CSSObject | string | number | void {
   const css = this.style;
 
-  if (!key) {
+  if (!key || key === true) {
     // Return all styles
-    const result: Partial<Record<keyof CSSStyleDeclaration, string>> = {};
+    const result: CSSObject = {};
     for (let i = 0; i < css.length; i++) {
-      const prop = css[i];
-      if (prop) {
-        result[prop as keyof CSSStyleDeclaration] = css.getPropertyValue(prop).trim();
-      }
+      const prop: CSSStyleDeclaration[number] = css[i];
+
+      if (!prop) continue;
+
+      const camelProp = dashToCamel(prop);
+      const style = css.getPropertyValue(prop).trim();
+
+      result[camelProp as keyof CSSStyleDeclaration] = parseUnit(style);
     }
+
+    if (key === true) {
+      const computed = getComputedStyle(this);
+      const computedObj: CSSObject = {};
+
+      for (let i = 0; i < computed.length; i++) {
+        const prop = computed[i];
+        if (!prop) continue;
+        const camelProp = dashToCamel(prop);
+        const style = computed.getPropertyValue(prop).trim();
+        computedObj[camelProp as keyof CSSStyleDeclaration] = parseUnit(style);
+      }
+      
+      return { ...result, ...computedObj };
+    }
+
     return result;
   }
 
   if (typeof key === "string") {
     if (value === undefined) {
-      // Get one value
-      return css.getPropertyValue(key).trim();
+      return parseUnit(css.getPropertyValue(camelToDash(key)).trim());
     } else {
       // Set one value
       if (key in css) {
-        css.setProperty(toKebabCase(key), value.toString());
+        css.setProperty(camelToDash(key), value.toString());
       }
     }
   } else {
     // Set multiple
     for (const [prop, val] of Object.entries(key)) {
       if (val !== null && val !== undefined) {
-        css.setProperty(toKebabCase(prop), val.toString());
+        css.setProperty(camelToDash(prop), val.toString());
       }
     }
   }
@@ -139,6 +168,7 @@ export function toggle(this: HTMLElement) {
 };
 
 export function $(this: ParentNode, selector: string): Element | null {
+  if (selector.includes(",")) throw new MalformedQueryException("Invalid query: commas are not allowed in query selectors that can only select 1 element");
   return this.querySelector<Element>(selector); // Returns a single Element or null
 };
 

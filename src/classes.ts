@@ -204,9 +204,9 @@ export function Enum<T extends readonly string[]>(...values: T) {
     const key = String(val);
 
     if (!/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(key)) {
-      throw new globalThis.SyntaxException("Enum values must be defined and may only be the characters A-Z, a-z, 0-9, _ and $");
+      throw new SyntaxException("Enum values must be defined and may only be the characters A-Z, a-z, 0-9, _ and $");
     } else if (Object.prototype.hasOwnProperty.call(obj, key)) {
-      throw new globalThis.SyntaxException("Enum members may only be unique");
+      throw new SyntaxException("Enum members may only be unique");
     }
 
     Object.defineProperty(obj, key, {
@@ -250,8 +250,15 @@ export class Collection<T> implements ArrayLike<T> {
     return new Collection<T[number]>(values);
   }
 
-  item(index: number): T | null {
-    return this.items[index] ?? null;
+  /**
+   * @throws {CollectionOutOfBoundsException} The index does not exist
+   */
+  item(index: number): T {
+    const item = this.items[index];
+
+    if (!item) throw new CollectionOutOfBoundsException("index " + index + " does not exist on this collection");
+
+    return this.items[index];
   }
 
   each(callback: (value: T, key: number) => void, thisArg?: any) {
@@ -272,5 +279,13 @@ export class Collection<T> implements ArrayLike<T> {
 
   *values() {
     yield* this.items.values();
+  }
+
+  toArray(): T[] {
+    return this.items;
+  }
+
+  toReadonlyArray(): readonly T[] {
+    return this.items;
   }
 }

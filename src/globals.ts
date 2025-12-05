@@ -1,7 +1,11 @@
 import * as Opti from "./misc";
 
-function extendedString<T>(val: T, str: string): TypeOperators<T> {
-  let obj: TypeOperators<T> = Object.create({
+function typeObject<T>(val: T, str: string): TypeGuard<T> {
+  let v: T = val;
+  let obj: TypeGuard<T> = Object.create({
+    get value() {
+      return v;
+    },
     stringOf() { return str; },
     is(other: unknown): boolean {
       switch (typeof other) {
@@ -13,7 +17,7 @@ function extendedString<T>(val: T, str: string): TypeOperators<T> {
         case "bigint":
         case "boolean":
         case "symbol":
-          return val === other;
+          return v === other;
         case "function":
           const regex = /<([\w$_0-9]+)>\(([\w$_0-9,\s]*)\)/;
           const match = str.match(regex);
@@ -25,10 +29,10 @@ function extendedString<T>(val: T, str: string): TypeOperators<T> {
           }
           throw new globalThis.TypeException(`Internal type matching error: Incorrect format for type string ${str}`);
         case "undefined":
-          return val === undefined;
+          return v === undefined;
         case "object":
           if (other === null) {
-            return val === null;
+            return v === null;
           }
           const ctorName = (other as any).constructor?.name;
           if (ctorName && str.includes(ctorName)) return true;
@@ -40,8 +44,36 @@ function extendedString<T>(val: T, str: string): TypeOperators<T> {
           return false;
       }
     },
-    isType(typestr: string) {
+    isInstanceOf(clazz: Class) {
+      if (v === null || v === undefined) return false;
+      return Object(v) instanceof clazz;
+    },
+    isDefined() {
+      return v !== undefined && v !== null;
+    },
+    isFalsy() {
+      return !v;
+    },
+    isTruthy() {
+      return !!v;
+    },
+    isNull() {
+      return v === null;
+    },
+    isUndefined() {
+      return v === undefined;
+    },
+    alwaysDefined(orElse: T) {
+      v ??= orElse;
+    },
+    alwaysTruthy(truthy: Truthy<T>) {
+      v = truthy;
+    },
+    isTypeString(typestr: string) {
       return typestr === str;
+    },
+    isTypeOf(type: Primitive) {
+      return typeof v === type;
     }
   });
 
@@ -54,7 +86,7 @@ function extendedString<T>(val: T, str: string): TypeOperators<T> {
     return Object.prototype.hasOwnProperty.call(val, prop);
   }
 
-  if (typeof val === "string" || hasOwn(val, "size") || hasOwn(val, "length")) {
+  if (typeof v === "string" || hasOwn(v, "size") || hasOwn(v, "length")) {
     obj = Object.assign(obj, {
       isShorter(lengthOrObject: number | Sized): boolean {
         const len = typeof lengthOrObject === "number"
@@ -63,10 +95,10 @@ function extendedString<T>(val: T, str: string): TypeOperators<T> {
             ? lengthOrObject.size
             : lengthOrObject.length);
 
-        if (hasOwn(val, "size") && typeof val.size === "number") {
-          return val.size < len;
-        } else if (typeof val === "string" || (hasOwn(val, "length") && typeof val.length === "number")) {
-          return val.length < len;
+        if (hasOwn(v, "size") && typeof v.size === "number") {
+          return v.size < len;
+        } else if (typeof v === "string" || (hasOwn(v, "length") && typeof v.length === "number")) {
+          return v.length < len;
         }
 
         return false;
@@ -79,39 +111,57 @@ function extendedString<T>(val: T, str: string): TypeOperators<T> {
             ? lengthOrObject.size
             : lengthOrObject.length);
 
-        if (hasOwn(val, "size") && typeof val.size === "number") {
-          return val.size > len;
-        } else if (hasOwn(val, "length") && typeof val.length === "number") {
-          return val.length > len;
+        if (hasOwn(v, "size") && typeof v.size === "number") {
+          return v.size > len;
+        } else if (hasOwn(v, "length") && typeof v.length === "number") {
+          return v.length > len;
         }
 
         return false;
       },
 
       isLength(length: number): boolean {
-        if (hasOwn(val, "size") && typeof val.size === "number") {
-          return val.size === length;
-        } else if (hasOwn(val, "length") && typeof val.length === "number") {
-          return val.length === length;
+        if (hasOwn(v, "size") && typeof v.size === "number") {
+          return v.size === length;
+        } else if (hasOwn(v, "length") && typeof v.length === "number") {
+          return v.length === length;
         }
         return false;
       }
     });
   }
 
-  if (typeof val === "function") {
+  if (Array.isArray(v)) {
+    obj = Object.assign(obj, {
+      containsValues(): boolean {
+        console.log("len", (v as any).length);
+        return (v as unknown[]).length > 0;
+      },
+      alwaysContainsValues(values: [any, ...any[]]): void {
+        if ((v as unknown[]).length === 0) {
+          (v as unknown[]).push(...values);
+        }
+      }
+    });
+  }
+
+  if (typeof v === "function") {
+    const functionName = (v as Func).name; 
+
     obj = Object.assign(obj, {
       isName(name: string): boolean {
-        return val.name === name;
+        if (functionName === "") return name === "anonymous";
+        return functionName === name;
       }
     });
   }
 
   return obj;
 }
-export function type<T>(val: T): TypeOperators<T> {
-  if (val === null) return extendedString<T>(val, "null");
-  if (val === undefined) return extendedString<T>(val, "undefined");
+
+export function typed<T>(val: T): TypeGuard<T> {
+  if (val === null) return typeObject<T>(val, "null");
+  if (val === undefined) return typeObject<T>(val, "undefined");
 
   if (typeof val === "function") {
     // const combos: any[][] = [];
@@ -146,28 +196,41 @@ export function type<T>(val: T): TypeOperators<T> {
     //   }
     // }
 
-    return extendedString(val, `Function:${val.name || "<anonymous>"}(${Opti.args.apply(val as Func).join(",")})`);
+    return typeObject(val, `Function:${val.name || "<anonymous>"}(${Opti.args.apply(val as Func).join(",")})`);
   }
 
-  let typeName = Opti.capitalize.call(Object.prototype.toString.call(val).slice(8, -1));
+  let typeName = Object.prototype.toString.call(val).slice(8, -1);
+  typeName = typeName[0].toUpperCase() + typeName.slice(1);
 
-  const ctor = val.constructor?.name;
-  if (ctor && ctor !== typeName) {
+  console.log("Type", typeName);
+
+  const ctor = val.constructor.name;
+  if (ctor && ctor === "Object") {
     typeName = ctor;
   }
 
-  const len = (val as any).length;
-  if (typeof len === "number" && Number.isFinite(len)) {
-    typeName += `(${len})`;
-  } else if (val instanceof Map || val instanceof Set) {
-    typeName += `(${val.size})`;
-  } else if (val instanceof Date && !isNaN(val.getTime())) {
-    typeName += `:${val.toISOString().split("T")[0]}`;
-  } else if (typeName === "Object") {
-    typeName += `(${Object.keys(val).length})`;
+  console.log("Type", typeName);
+
+  switch (typeof val) {
+    case "string":
+      typeName += `(${val.length})`;
+      break;
+    case "object":
+      if (val instanceof Map || val instanceof Set) {
+        typeName += `(${val.size})`;
+      } else if (val instanceof Date && !isNaN(val.getTime())) {
+        typeName += `:${val.toISOString().split("T")[0]}`;
+      } else if ("length" in val && Number.isFinite(val.length)) {
+        typeName += `(${val.length})`;
+      } else if (typeName === "Object") {
+        typeName += `(${Object.keys(val).length})`;
+      }
+      break;
+    case "symbol":
+      typeName += `(${val.description})`;
   }
 
-  return extendedString<T>(val, typeName);
+  return typeObject<T>(val, typeName);
 };
 
 export function info(val: any): string {

@@ -3,35 +3,7 @@
 /** @typedef {import("ts-jest").ConfigSet} TSJestConfig */
 
 const path = require('path');
-const url = require('url');
-
-/**
- * Config for each jest enviroment
- * @param {string} dir 
- * @param {string|null} setup 
- * @returns {JestConfig}
- */
-const jest = (env = "root", setup = null) => {
-  return {
-    displayName: env,
-    rootDir: path.resolve(__dirname, "../tests", env === "root" ? "" : env),
-    testEnvironment: "jsdom",
-    setupFiles: [
-      path.resolve(__dirname, "jest.setup.cjs")
-    ].filter(Boolean),
-    preset: 'ts-jest',
-    moduleFileExtensions: ['ts', 'js'],
-    testRegex: '\\.test\\.(ts|js)$',
-    transform: {
-      '^.+\\.ts$': ['ts-jest', {
-        tsconfig: "./tsconfig.json"
-      }],
-    },
-    globals: {
-      JEST_SETUP_FILE: setup
-    }
-  };
-};
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 /**
  * Config for each webpack collection
@@ -49,6 +21,9 @@ const webpack = (keyParam) => {
 
   return {
     mode: "production",
+    cache: {
+      type: 'filesystem'
+    },
     name: key,
     entry: path.resolve(__dirname, "..", "src", dir, key + ".ts"),
     output: {
@@ -66,21 +41,30 @@ const webpack = (keyParam) => {
       concatenateModules: true
     },
     resolve: {
-      extensions: [".ts", ".tsx", ".js"]
+      extensions: [".ts", ".tsx", ".js"],
     },
     module: {
       rules: [{
         test: /\.tsx?$/,
-        loader: 'ts-loader',
+        use: [
+          { 
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: true,
+            }
+          },
+        ],
         exclude: /node_modules/,
-        options: {
-          transpileOnly: false
-        }
       }]
-    }
+    },
+    plugins: [
+      new ForkTsCheckerWebpackPlugin()
+    ]
   };
 };
 
+const MODULE_ROOT = path.resolve(__dirname, "..");
+
 module.exports = {
-  jest, webpack
+  webpack, MODULE_ROOT
 };

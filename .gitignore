@@ -7,3 +7,4 @@ tsconfig.json
 /dist
 .eslintignore
 package-lock.json
+_future.*

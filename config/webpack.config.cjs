@@ -8,3 +8,5 @@ module.exports = [
   config.webpack("requests"),
   config.webpack("flow"),
 ];
+
+module.exports.parallelism = 2;

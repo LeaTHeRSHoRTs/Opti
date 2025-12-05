@@ -1,7 +1,5 @@
-export class MalformedQueryException extends globalThis.Exception {
-  constructor(message?: string, cause?: string) {
-    super("MalformedQueryException", message, cause);
-  }
+export class MalformedQueryException extends Exception {
+  name = "MalformedQueryException";
 }
 
 type QueryCustom = Partial<{

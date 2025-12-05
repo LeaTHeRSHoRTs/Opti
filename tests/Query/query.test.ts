@@ -1,3 +1,6 @@
+import "../../dist/opti";
+import "../../dist/query";
+
 beforeAll(() => {
   const elements = [
     document.createElement("div"),

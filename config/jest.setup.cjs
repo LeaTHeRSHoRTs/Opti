@@ -1,20 +1,11 @@
 (() => {
-  const path = require("path");
-  const optiPath = path.resolve(__dirname, "../dist/opti.js");
-  try {
-    require(optiPath);
-  } catch (e) {
-    console.error(optiPath, "did not load");
-  }
+  const { expect } = require('@jest/globals');
 
-  const setup = globalThis.JEST_SETUP_FILE;
-
-  if (setup) {
-    try {
-      const modulePath = path.resolve(__dirname, "../dist", setup);
-      require(modulePath);
-    } catch (e) {
-      console.error(`Could not locate file ${setup}: ${e}`);
+  expect.extend({
+    /** @param {"undefined" | "object" | "boolean" | "number" | "string" | "function" | "symbol" | "bigint"} type */
+    toBeType(received, type) {
+      const pass = typeof received === type;
+      return { pass, message: () => `expected ${received}${pass ? "" : " not"} to be instance or primitive of ${type}` };
     }
-  }
+  });
 })();

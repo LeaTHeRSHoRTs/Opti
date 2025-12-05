@@ -111,8 +111,9 @@ interface Future<T, R extends Error | Exception = Error> extends Promise<T> {
 
 interface CollectionConstructor {
   from<T>(arrayLike: ArrayLike<T>): Collection<T>;
+
   of<T extends unknown[]>(...values: T): Collection<T[number]>;
-  of(...values: unknown): Collection<unknown>
+  of(): Collection<any>
 }
 
 interface Collection<T> extends ArrayLike<T> {
@@ -139,7 +140,7 @@ interface Exception {
 
 interface ExceptionConstructor {
   prototype: Exception;
-  new(name: string | null, message?: string, cause?: string): Exception
+  new(message?: string, cause?: string): Exception
 }
 
 interface RuntimeExceptionConstructor {
@@ -156,7 +157,6 @@ interface RuntimeException {
 interface SubExceptionConstructor {
   new(message?: string, cause?: string): Exception;
   readonly prototype: Exception;
-
 }
 
 interface UnknownExceptionConstructor {
@@ -197,4 +197,21 @@ interface AbstractInitializationExceptionConstructor extends SubExceptionConstru
 interface AbstractMethodInvokedException extends Exception {}
 interface AbstractMethodInvokedExceptionConstructor extends SubExceptionConstructor {
   new(message?: string, cause?: string): AbstractMethodInvokedException;
+}
+
+interface SortException extends Exception {}
+interface SortExceptionConstructor extends SubExceptionConstructor {
+  new(message?: string, cause?: string): SortException;
+}
+
+interface CollectionOutOfBoundsException extends Exception {};
+
+interface CollectionOutOfBoundsExceptionConstructor extends SubExceptionConstructor {
+  new(message?: string, cause?: string): CollectionOutOfBoundsException;
+}
+
+interface MalformedQueryException extends Exception {};
+
+interface MalformedQueryExceptionConstructor extends SubExceptionConstructor {
+  new(message?: string, cause?: string): MalformedQueryException;
 }

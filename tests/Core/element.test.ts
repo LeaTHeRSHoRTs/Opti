@@ -1,8 +1,9 @@
+import "../../dist/opti";
+
 describe("Element.hasText", () => {
   let element: Element;
 
   beforeEach(() => {
-    //@ts-ignore
     element = document.createElement('div');
   });
 
@@ -114,9 +115,61 @@ describe("HTMLElement.css", () => {
     element = document.createElement('div');
   });
 
-  it("should apply CSS styles to the element", () => {
+  it("should be able to apply CSS styles to the element", () => {
     element.css({ color: 'red' });
     expect(element.style.color).toBe('red');
+
+    element.css("color", "green");
+    expect(element.style.color).toBe("green");
+  });
+
+  it("should be able to get all the styles from an element", () => {
+    element.style.color = "red";
+    element.style.backgroundColor = "green";
+    element.style.fontWeight = "300";
+
+    expect(element.css()).toStrictEqual<CSSObject>({
+      color: "red",
+      backgroundColor: "green",
+      fontWeight: 300
+    });
+  });
+
+  it("should be able to return single values", () => {
+    element.style.color = "red";
+    element.style.backgroundColor = "green";
+    element.style.fontWeight = "300";
+
+    expect(element.css("color")).toBe("red");
+    expect(element.css("backgroundColor")).toBe("green");
+    expect(element.css("fontWeight")).toBe(300);
+  });
+
+  it("should be able to handle values that could be 0 accordingly", () => {
+    element.style.fontWeight = "0";
+    element.style.width = "0px";
+
+    expect(element.css("fontWeight")).toBe(0);
+    expect(element.css("width")).toBe(0);
+  });
+
+  it("should be able to handle invalid cases", () => {
+    element.css("accentColor", "nothing");
+    element.css("fontWeight", "extremely bold");
+
+    expect(element.style.accentColor).toBe("");
+    expect(element.style.fontWeight).toBe("");
+  });
+
+  it("should be able to return computed styles as well", () => {
+    element.style.color = "red";
+    element.style.width = "100px";
+
+    const styles = element.css(true);
+
+    expect(styles.color).toBe("red");
+    expect(styles.width).toBe("100px");
+    expect(styles.display).toBe("block");
   });
 });
 
@@ -153,6 +206,7 @@ describe("HTMLElement.toggle", () => {
 
   beforeEach(() => {
     element = document.createElement('div');
+    element.style.visibility = 'visible';
   });
 
   it("should toggle the visibility of the element", () => {
@@ -268,7 +322,7 @@ describe("HTMLInputElement.val", () => {
     el.value = "Hello";
 
     expect(el.val.asString()).toBe("Hello");
-    expect(el.val.asNumber()).toBeNaN();
+    expect(el.val.asNumber()).toBeNull();
     expect(el.val.asBoolean()).toBeNull();
     expect(el.val.asDate()).toBeNull();
   });

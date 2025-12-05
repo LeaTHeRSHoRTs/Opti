@@ -1,9 +1,14 @@
+import "../../dist/opti";
+
 describe("Array.unique", () => {
   it("should filter out the non-unique values", () => {
     const arr = [1, 2, 2, 3];
-    const uniqueArr = arr.unique();
+    expect(arr.unique()).toStrictEqual([1, 2, 3]);
+  });
 
-    expect(uniqueArr).toStrictEqual([1, 2, 3]);
+  it("should be able to handle arrays of multiple types", () => {
+    const arr = [1, 2, true, true, 1, 3, "a", "b", false, 3, "a"];
+    expect(arr.unique()).toEqual([1, 2, true, 3, "a", "b", false]);
   });
 });
 
@@ -35,6 +40,12 @@ describe("Array.pluck", () => {
     expect(val).toBe(true);
     expect(arr).not.toContain(true);
   });
+
+  it("should gracefully handle errors when the value isn't avaliable", () => {
+    const val = arr.pluck(v => typeof v === "function" && v === true);
+    expect(val).toBeNull();
+    expect(arr).toContain(true);
+  });
 });
 
 describe("Array.pluckLast", () => {
@@ -54,27 +65,112 @@ describe("Array.pluckLast", () => {
 describe("Array.insert", () => {
   it("should be able to insert elements into an array at index", () => {
     const arr = [1, 2, 3, 5];
-    arr.insert(2, 4);
+    arr.insert(3, 4);
     expect(arr).toStrictEqual([1, 2, 3, 4, 5]);
+  });
+
+  it("should be able to push multiple values", () => {
+    const arr = [1, 2, 3, 7];
+    arr.insert(3, 4, 5, 6);
+    expect(arr).toStrictEqual([1, 2, 3, 4, 5, 6, 7]);
   });
 });
 
 describe("Array.relocate", () => {
-  const arr = ["A", "B", "D", "C"];
-  arr.relocate(3, -1);
-  expect(arr).toStrictEqual(["A", "B", "C", "D"]);
+  it("should be able to relocate a value by an offset", () => {
+    const arr = ["A", "B", "D", "C"];
+    arr.relocate(3, -1);
+    expect(arr).toStrictEqual(["A", "B", "C", "D"]);
+  });
 });
 
 describe("Array.relocateTo", () => {
-  const arr = ["A", "B", "D", "C"];
-  arr.relocateTo(3, 2);
-  expect(arr).toStrictEqual(["A", "B", "C", "D"]);
+  it("should be able to relocate a value to an index", () => {
+    const arr = ["A", "B", "D", "C"];
+    arr.relocateTo(3, 2);
+    expect(arr).toStrictEqual(["A", "B", "C", "D"]);
+  });
 });
 
 describe("Array.replace", () => {
+  it("should be able to replace the first value that succeed the searcher function", () => {
+    const arr1 = [1, 2, 3, 100, 5];
+    const arr2 = ["A", "B", "C", "Y", "E"];
+    const arr3: object[] = [{ a: 1, b: 2 }, { y: 100, z: 101 }];
 
+    const value1 = arr1.replace(v => v > 5, 4);
+    const value2 = arr2.replace(v => v.includes("Y"), "D");
+    const value3 = arr3.replace(v => ("y" in v) && ("z" in v), { c: 3, d: 4 });
+
+    expect(value1).toBe(100);
+    expect(value2).toBe("Y");
+    expect(value3).toStrictEqual({ y: 100, z: 101 });
+
+    expect(arr1).toStrictEqual([1, 2, 3, 4, 5]);
+    expect(arr2).toStrictEqual(["A", "B", "C", "D", "E"]);
+    expect(arr3).toStrictEqual([{ a: 1, b: 2 }, { c: 3, d: 4 }]);
+  });
+
+  it("should be able to replace based on the index of the item to replace", () => {
+    const arr1 = [1, 2, 3, 100, 5];
+    const arr2 = ["A", "B", "C", "Y", "E"];
+    const arr3: object[] = [{ a: 1, b: 2 }, { y: 100, z: 101 }];
+
+    const value1 = arr1.replace(3, 4);
+    const value2 = arr2.replace(3, "D");
+    const value3 = arr3.replace(1, { c: 3, d: 4 });
+
+    expect(value1).toBe(100);
+    expect(value2).toBe("Y");
+    expect(value3).toStrictEqual({ y: 100, z: 101 });
+
+    expect(arr1).toStrictEqual([1, 2, 3, 4, 5]);
+    expect(arr2).toStrictEqual(["A", "B", "C", "D", "E"]);
+    expect(arr3).toStrictEqual([{ a: 1, b: 2 }, { c: 3, d: 4 }]);
+  });
 });
 
 describe("Array.replaceLast", () => {
+  it("should be able to replace the last value that succeed the searcher function", () => {
+    const arr1 = [1, 2, 3, 100, 5, 100];
+    const arr2 = ["A", "B", "C", "Y", "E", "Y"];
+    const arr3: object[] = [{ a: 1, b: 2 }, { y: 100, z: 101 }, { y: 100, z: 101 }];
 
+    const value1 = arr1.replaceLast(v => v === 100, 4);
+    const value2 = arr2.replaceLast(v => v === "Y", "D");
+    const value3 = arr3.replaceLast(v => "y" in v && "z" in v, { c: 3, d: 4 });
+
+    expect(value1).toBe(100);
+    expect(value2).toBe("Y");
+    expect(value3).toStrictEqual({ y: 100, z: 101 });
+
+    expect(arr1).toStrictEqual([1, 2, 3, 100, 5, 4]);
+    expect(arr2).toStrictEqual(["A", "B", "C", "Y", "E", "D"]);
+    expect(arr3).toStrictEqual([{ a: 1, b: 2 }, { y: 100, z: 101 }, { c: 3, d: 4 }]);
+  });
+});
+
+describe("Array.sort", () => {
+  it("should be able to sort numbers my numerical order", () => {
+    expect([1, 7, 2, 3, 5, 4, 6].sort('increasing')).toStrictEqual([1, 2, 3, 4, 5, 6, 7]);
+    expect([1, 7, 2, 3, 5, 4, 6].sort('decreasing')).toStrictEqual([7, 6, 5, 4, 3, 2, 1]);
+  });
+
+  it("should be able to sort alphabetically", () => {
+    expect(["E", "B", "A", "C", "D"].sort('alpha')).toStrictEqual(["A", "B", "C", "D", "E"]);
+    expect(["E", "B", "A", "C", "D"].sort('alpha-reverse')).toStrictEqual(["E", "D", "C", "B", "A"]);
+  });
+
+  it("should be able to sort dates", () => {
+    const now = new Date();
+    const earlier = new Date(0);
+    const later = new Date(Date.now() + 100);
+    expect([now, earlier, later].sort('earlier')).toStrictEqual([earlier, now, later]);
+    expect([now, earlier, later].sort('later')).toStrictEqual([later, now, earlier]);
+  });
+
+  it("should be able to sort normally still", () => {
+    expect(["A", "C", "B", "D", "E"].sort()).toStrictEqual(["A", "B", "C", "D", "E"]);
+    expect([1, 4, 5, 3, 2].sort((a, b) => a - b)).toStrictEqual([1, 2, 3, 4, 5]);
+  });
 });

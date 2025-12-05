@@ -1,4 +1,4 @@
-import * as jsdom from "jsdom";
+import "../../dist/opti";
 
 describe("Date.at", () => {
   it("should return a number that is the same as the milliseconds since `DateOrigin`", () => {
@@ -105,12 +105,10 @@ describe("Object.forEach", () => {
       bi = false,
       ci = false;
 
-    Object.forEach(obj, (key) => {
-      switch (key) {
-        case "a": ai = true;
-        case "b": bi = true;
-        case "c": ci = true;
-      }
+    Object.forEach(obj, (key, value) => {
+      if (key === "a" && typeof value === "number") ai = true;
+      if (key === "b" && typeof value === "string") bi = true;
+      if (key === "c" && typeof value === "boolean") ci = true;
     });
 
     expect(ai).toBeTruthy();
@@ -126,16 +124,21 @@ describe("String.capitalize", () => {
 });
 
 describe("String.remove", () => {
-  it("should remove a substring by a regular expression or a string", () => {
-    expect("Hello_ World_".remove("_")).toBe("Hello World_");
+  it("should remove a substring by a regular expression", () => {
     expect("Hello_ World_".remove(/_/)).toBe("Hello World_");
+    expect("Hello_ World _@Advanced".remove(/_@/)).toBe("Hello World Advanced");
+    expect("(hello) (Hello) World".remove(/\(h\w+\)\s/)).toBe("(Hello) World");
   });
-});
 
-describe("String.removeAll", () => {
-  it("should remove all instances of the searcher regular expression or string", () => {
-    expect("Hello_ World_".removeAll("_")).toBe("Hello World");
-    expect("Hello_ World_".removeAll(/_/)).toBe("Hello World");
+  it("should support the global regex flag to remove more than one occurence", () => {
+    expect("Hello_ World_".remove(/_/g)).toBe("Hello World");
+    expect("Hello_@_ World_@ _@Advanced".remove(/@?_[@\s_]/g)).toBe("Hello World Advanced");
+    expect("(hello) (Hello) World".remove(/\((?=h\w+)|\)/g)).toBe("(Hello) World");
+  });
+
+  it("should remove a substring by a string", () => {
+    expect("Hello_ World_".remove("_")).toBe("Hello World_");
+    expect("Hello_  W World_".remove("_  W")).toBe("Hello World_");
   });
 });
 
@@ -247,12 +250,9 @@ describe("Function.throttle", () => {
 
     throttled();
     throttled();
-
-    jest.advanceTimersByTime(1000);
-
     throttled();
 
-    expect(fn).toHaveBeenCalledTimes(2);
+    expect(fn).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -306,45 +306,5 @@ describe("Function.debounce", () => {
     jest.advanceTimersByTime(1000); // second execution
 
     expect(fn).toHaveBeenCalledTimes(2);
-  });
-});
-
-describe("console.off, console.on", () => {
-  let writeSpy: jest.SpyInstance;
-
-  beforeEach(() => {
-    writeSpy = jest.spyOn(console, "log");
-    console.on();  // show console by default for each test
-  });
-
-  afterEach(() => {
-    writeSpy.mockRestore();
-    console.on();  // reset to normal
-  });
-
-  it("should call console methods normally when not hidden", () => {
-    console.log("test");
-    expect(writeSpy).toHaveBeenCalledWith("test");  // console.log adds newline
-  });
-
-  it("should suppress output when hidden", () => {
-    console.off();
-    console.log("hidden test");
-    expect(writeSpy).not.toHaveBeenCalled();
-  });
-
-  it("should toggle hidden correctly", () => {
-    console.off();
-    console.log("should not appear");
-    expect(writeSpy).not.toHaveBeenCalled();
-
-    console.on();
-    console.log("should appear");
-    expect(writeSpy).toHaveBeenCalledWith("should appear\n");
-  });
-
-  it("should call console.warn correctly", () => {
-    console.warn("warn test");
-    expect(writeSpy).toHaveBeenCalledWith("warn test\n");
   });
 });

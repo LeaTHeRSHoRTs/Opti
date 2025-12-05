@@ -1,3 +1,5 @@
+import "../../dist/opti";
+
 describe("Node.parent", () => {
   it("should return the direct parent element", () => {
     const parent = document.createElement("div");
@@ -133,6 +135,34 @@ describe("Node.$", () => {
 
     expect(root.$("section")).toBeNull();
   });
+
+  it("should support complex selectors", () => {
+    const inner = document.createElement("p");
+    const outside = document.createElement("div");
+
+    outside.appendChild(inner);
+    document.body.appendChild(outside);
+
+    inner.className = "x";
+    inner.id = "outsider";
+    inner.setAttribute("data-test", "testing");
+
+    expect(outside.$(".x#outsider[data-test=testing]")).toBe(inner);
+    expect(outside.$(".x#outsider[data-test=wrong]")).toBeNull();
+  });
+
+  it("should error out and tell users that commas are not allowed", () => {
+    try {
+      document.$("div, p");
+      // Fail if no error was thrown
+      fail("MalformedQueryException was not thrown");
+    } catch (e: any) {
+      expect(e).toBeInstanceOf(MalformedQueryException);
+      expect(e.getMessage()).toContain(
+        "Invalid query: commas are not allowed in query selectors that can only select 1 element"
+      );
+    }
+  });
 });
 
 describe("Node.$$", () => {
@@ -157,5 +187,27 @@ describe("Node.$$", () => {
 
     const found = root.$$("footer");
     expect(found).toHaveLength(0);
+  });
+
+  it("should support more advanced selectors", () => {
+    const root = document.createElement("div");
+    const em1 = document.createElement("em");
+    const em2 = document.createElement("em");
+
+    em1.id = "child1";
+    em1.className = "target";
+    em1.setAttribute("data-test", "testing");
+    em2.id = "child2";
+    em2.className = "target";
+    em2.setAttribute("data-test", "testing");
+
+    root.appendChild(em1);
+    root.appendChild(em2);
+    document.body.appendChild(root);
+
+    const found = root.$$(".target#child1[data-test=testing], .target#child2[data-test=testing]");
+    expect(found).toContain(em1);
+    expect(found).toContain(em2);
+    expect(found.length).toBe(2);
   });
 });

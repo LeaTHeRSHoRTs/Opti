@@ -1,5 +1,10 @@
-interface Document {
-  nonWorkingFunction(): void
+import "../../dist/opti";
+import "../../dist/flow";
+
+declare global {
+  interface Document {
+    nonWorkingFunction(): void
+  }
 }
 
 describe("Flow.flows", () => {

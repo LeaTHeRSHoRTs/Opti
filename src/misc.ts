@@ -6,17 +6,17 @@ declare interface EventTarget {
 
 export function args(this: Func): string[] {
   return this.toString()
-  .replace(/\s*=\s*.*?(,|\))/g, "$1") 
-  .match(/\(([^)]*)\)/)?.[1]
-  .split(",")
-  .map(p => p.trim())
-  .filter(Boolean) || [];
+    .replace(/\s*=\s*.*?(,|\))/g, "$1")
+    .match(/\(([^)]*)\)/)?.[1]
+    .split(",")
+    .map(p => p.trim())
+    .filter(Boolean) || [];
 }
 
 export function throttle<T extends Func>(func: T, ms: number): (this: Func.This<T>, ...args: Func.Arguments<T>) => Func.Return<T> | null {
   let throttled: boolean = false;
   const cache: Func.Arguments<T>[] = [];
-  return function(this: Func.This<T>, ...args: Func.Arguments<T>) {
+  return function (this: Func.This<T>, ...args: Func.Arguments<T>) {
     if (!throttled) {
       const self = this;
       throttled = true;
@@ -81,7 +81,7 @@ export function atDate(year: number, monthIndex: number, date?: number, hours?: 
   return new Date(year, monthIndex, date, hours, minutes, seconds, ms).getTime();
 }
 
-export function fromTime (this: DateConstructor, time: Time, year: number, monthIndex: number, date?: number | undefined): Date {
+export function fromTime(this: DateConstructor, time: Time, year: number, monthIndex: number, date?: number | undefined): Date {
   return new Date(year, monthIndex, date, time.getHours(), time.getMinutes(), time.getSeconds(), time.getMilliseconds());
 }
 
@@ -99,7 +99,7 @@ export function clone<T>(object: T, deep: boolean = true): T {
     }
     return { ...object } as unknown as T;
   }
-  
+
   if (
     object === null ||
     object === undefined ||
@@ -119,7 +119,7 @@ export function clone<T>(object: T, deep: boolean = true): T {
 
   // Handle Maps
   if (object instanceof Map) {
-    return new Map([...object].map(([k, v]) => [k, clone(v, true)]))as T;
+    return new Map([...object].map(([k, v]) => [k, clone(v, true)])) as T;
   }
 
   // Handle Sets
@@ -199,7 +199,7 @@ export function relocateTo<T>(this: T[], index: number, location: number): numbe
 type AnyConstructor<T = any> = new (...args: any[]) => T;
 
 export function arrayType(this: any[]) {
-  return this.map(v => globalThis.type(v).stringOf());
+  return this.map(v => globalThis.typed(v).stringOf());
 }
 
 function arrType<T extends AnyConstructor | StringConstructor | NumberConstructor | BooleanConstructor | SymbolConstructor>(
@@ -208,58 +208,76 @@ function arrType<T extends AnyConstructor | StringConstructor | NumberConstructo
 ): array is Unboxed<T>[] {
   return array.every(v =>
     type === String ? typeof v === "string" :
-    type === Number ? typeof v === "number" :
-    type === Boolean ? typeof v === "boolean" :
-    type === Symbol ? typeof v === "symbol" :
-    v instanceof type
+      type === Number ? typeof v === "number" :
+        type === Boolean ? typeof v === "boolean" :
+          type === Symbol ? typeof v === "symbol" :
+            v instanceof type
   );
 }
 
-export function sortBy<T>(this: T[], compareFn?: (a: T, b: T) => number): T[];
-export function sortBy<T>(this: T[], order: "random"): T[];
-export function sortBy<T extends string>(this: T[], order: "alpha" | "alpha-reverse"): T[];
-export function sortBy<T extends number>(this: T[], order: "increasing" | "decreasing"): T[];
-export function sortBy<T extends Date>(this: T[], order: "earlier" | "later"): T[];
-export function sortBy<T>(this: T[], order?: string | ((a: T, b: T) => number)): T[] {
+const origionalSort: <T>(this: T[], compareFn?: ((a: any, b: any) => number) | undefined) => any[] = Array.prototype.sort;
+export function sortBy<T>(this: T[], order?: SortMode<T> | ((a: T, b: T) => number)): T[] {
   if (typeof order === "function") {
-    return this.sort(order);
+    return origionalSort.call(this, order);
   } else if (order === undefined) {
-    return this.sort();
+    return origionalSort.call(this);
   }
 
   if (this.length === 0) return [];
 
-  if (order === "random") {
-    return this.sort(() => {
-      return origionalRandom() - 0.5;
-    });
-  }
-
+  const copy = [...this];
   if (arrType(this, Date)) {
     switch (order) {
-      case "earlier": return [...this].sort((a, b) => a.getTime() - b.getTime());
-      case "later": return [...this].sort((b, a) => b.getTime() - a.getTime());
+      case "earlier": return origionalSort.call(copy, (a, b) => a.getTime() - b.getTime());
+      case "later": return origionalSort.call(copy, (a, b) => b.getTime() - a.getTime());
     }
   } else if (arrType(this, String)) {
     switch (order) {
-      case "alpha": return [...this].sort();
-      case "alpha-reverse": return [...this].sort().reverse();
+      case "alpha": return origionalSort.call(copy);
+      case "alpha-reverse": return origionalSort.call(copy).reverse();
     }
   } else if (arrType(this, Number)) {
     switch (order) {
-      case "earlier": return [...this].sort((a, b) => a - b);
-      case "later": return [...this].sort((b, a) => b - a);
+      case "increasing": return origionalSort.call(copy, (a, b) => a - b);
+      case "decreasing": return origionalSort.call(copy, (a, b) => b - a);
     }
   }
 
-  return [...this].sort();
+  return origionalSort.call(this);
 }
 
-export function replace<T>(this: T[], index: number, newVal: T): T | null {
-  const oldVal = this[index];
-  this[index] = newVal;
+export function shuffle<T>(this: T[]): T[] {
+  return this.sort(() => {
+    return origionalRandom() - 0.5;
+  });
+}
 
-  return oldVal ?? null;
+export function replace<T>(this: T[], index: number | ((value: T) => boolean), newVal: T): T | null {
+  if (typeof index === "number") {
+    const oldVal = this[index];
+    this[index] = newVal;
+
+    return oldVal ?? null;
+  } else {
+    const i = this.findIndex(index);
+    if (i === -1) return null;
+
+    const oldVal = this[i];
+    this[i] = newVal;
+
+    return oldVal;
+  }
+}
+
+export function replaceLast<T>(this: T[], finder: (value: T) => boolean, newVal: T): T | null {
+  for (let i = this.length - 1; i >= 0; i--) {
+    if (finder(this[i])) {
+      const oldVal = this[i];
+      this[i] = newVal;
+      return oldVal ?? null;
+    }
+  }
+  return null;
 }
 
 export function chunk<T>(this: T[], chunkSize: number): T[][] {
@@ -285,9 +303,7 @@ export function chunk<T>(this: T[], chunkSize: number): T[][] {
 };
 
 export function insert<U>(this: unknown[], index: number, ...values: U[]) {
-  const arr = [...this];
-  arr.splice(index, 0, ...values);
-  return arr;
+  this.splice(index, 0, ...values);
 }
 
 //* Strings
@@ -296,30 +312,26 @@ export function remove(this: string, finder: string | RegExp): string {
   return this.replace(finder, "");
 };
 
-export function removeAll(this: string, finder: string | RegExp): string {
-  return this.remove(new RegExp(finder, "g" + (finder instanceof RegExp ? finder.flags : "")));
-};
-
 export function capitalize(this: string): string {
   const i = this.search(/\S/);
   return i === -1 ? this : this.slice(0, i) + this.charAt(i).toUpperCase() + this.slice(i + 1);
 };
 
-export function matches(this: String, regexp: string | RegExp) { 
-  return this.search(regexp) !== -1; 
+export function matches(this: String, regexp: string | RegExp) {
+  return this.search(regexp) !== -1;
 };
 
-export function toCase(this: string, format: "camel" | "kebab" | "pascal" | "snake" | "train" | "dot"): string {
-  const regex = /(\s+)(\S)/g;
-  const charRegex = /\s+/g;
+export function toCase(this: string, format: CaseConventions): string {
+  const regex = /([\s_-]+)(\S)/g;
+  const charRegex = /[\s]+/g;
 
-  switch(format) {
-    case "kebab":  return this.replace(charRegex, "-");
-    case "snake":  return this.replace(charRegex, "_");
-    case "dot":    return this.replace(charRegex, ".");
-    case "camel":  return this.replace(regex, (_, _s, next) => next.toUpperCase());
+  switch (format) {
+    case "kebab": return this.replace(charRegex, "-");
+    case "snake": return this.replace(charRegex, "_");
+    case "dot": return this.replace(charRegex, ".");
+    case "camel": return this.replace(regex, (_, _s, next) => next.toUpperCase());
     case "pascal": return this.replace(regex, (_, _s, next) => next.toUpperCase()).replace(/^\s*(\S)/, (_, first) => first.toUpperCase());
-    case "train":  return this.replace(regex, (_, _s, next) => next.toUpperCase()).replace(/^\s*(\S)/, (_, first) => first.toUpperCase());
+    case "train": return this.replace(regex, (_, _s, next) => next.toUpperCase()).replace(/^\s*(\S)/, (_, first) => first.toUpperCase());
   }
 }
 
@@ -333,42 +345,6 @@ export const random = (minOrMax?: number, max?: number) => {
     return origionalRandom() * minOrMax;
   } else return origionalRandom();
 };
-
-//* Console
-
-const origionalGroup = console.group;
-export function group(name?: string, ...logs: any[][]): void {
-  origionalGroup(name);
-
-  if (logs.length > 0) {
-    for (const val in logs) {
-      console.log(val);
-    }
-    console.groupEnd();
-  }
-}
-
-export const consoleProxy = new Proxy(console, {
-  get(target, prop, receiver) {
-    if (!(prop === "on" || prop === "off")) {
-      if ((target as any).hidden) return null;
-    }
-
-    const val = Reflect.get(target, prop, receiver);
-    if (typeof val === "function") {
-      return (...args: any[]) => val.bind(target, ...args);
-    }
-    return val;
-  }
-});
-
-export function consoleOn() {
-  (console as any).hidden = true;
-}
-
-export function consoleOff() {
-  (console as any).hidden = false;
-}
 
 //* Others
 
@@ -407,11 +383,15 @@ export function mixin<T extends Func, This = ThisParameterType<T>, Ret = ReturnT
   }
 }
 
+export function getEvents<T extends EventTarget>(this: T, key: keyof EventMapOf<T>): Func[] {
+  return this._events[key] ?? [];
+}
+
 const originalAddEventListener = EventTarget.prototype.addEventListener;
 export const addEventListener = mixin(
   originalAddEventListener,
   "HEAD",
-  function<T extends EventTarget>(this: EventTarget, type: keyof EventMapOf<T>, callback: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {
+  function <T extends EventTarget>(this: EventTarget, type: keyof EventMapOf<T>, callback: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {
     if (!(this instanceof EventTarget)) return;
 
     this._events[type] ??= [];

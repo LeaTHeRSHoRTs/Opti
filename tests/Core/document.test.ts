@@ -1,35 +1,42 @@
+import "../../dist/opti";
+
 beforeEach(() => {
   document.body.innerHTML = "";
 });
 
 describe("Document.ready", () => {
-  it("should run when the document is loaded", () => {
-    window.dispatchEvent(new Event("load"));
-
-    new Promise((resolve) => {
+  it("should run on DOMContentLoaded", async () => {
+    const promise = new Promise<void>((resolve) => {
       document.ready(() => {
         expect(true).toBeTruthy();
-        resolve(void 0);
+        resolve();
       });
     });
+
+    document.dispatchEvent(new Event("DOMContentLoaded"));
+
+    await promise;
   });
 });
 
 describe("Document.leaving", () => {
-  it("should run when the user attempts to leave the document", () => {
-    window.dispatchEvent(new Event("unload"));
-
-    new Promise(resolve => {
+  it("should run when the user attempts to leave", async () => {
+    const promise = new Promise<void>((resolve) => {
       document.leaving(() => {
         expect(true).toBeTruthy();
-        resolve(void 0);
+        resolve();
       });
     });
+
+    // Simulate leaving the document
+    window.dispatchEvent(new Event("beforeunload"));
+
+    await promise;
   });
 });
 
 describe("Document.css", () => {
-  it("should set the css for an element class", () => {
+  it("should set the css for an element", () => {
     const div = document.createElement("div");
     div.className = "target";
     document.body.appendChild(div);
@@ -38,9 +45,27 @@ describe("Document.css", () => {
       color: "red"
     });
 
-    const styles = document.css("div.target");
-    expect(styles).toHaveProperty("color");
-    expect(styles.color).toBe("red");
+    const sheet = document.styleSheets[0];
+    const rule = Array.from(sheet.cssRules).find(r => 
+      r instanceof CSSStyleRule && r.selectorText === "div.target"
+    ) as CSSStyleRule | undefined;
+
+    expect(rule).toBeDefined();
+    expect(rule?.style.color).toBe("red");
+  });
+
+  it("should be able to get the css for an element", () => {
+    const div = document.createElement("div");
+    div.className = "target";
+    document.body.appendChild(div);
+
+    const styleSheet = document.createElement("style");
+    document.head.appendChild(styleSheet);
+
+    styleSheet.sheet?.insertRule("div.target { color: red; font-size: 20px }");
+
+    expect(document.css("div.target")).toHaveProperty("color");
+    expect(document.css("div.target").color).toBe("red");
   });
 });
 
@@ -65,7 +90,7 @@ describe("Document.createElements", () => {
   
   it("should be able to add keyed properties", () => {
     expect(() => {
-      const el = document.createElements({ 
+      document.createElements({ 
         tag: "div", 
         "data-href": "32",
         children: { 
@@ -90,4 +115,8 @@ describe("Document.createElements", () => {
       });
     }).toThrow();
   });
+});
+
+afterAll(() => {
+  document.body.innerHTML = "";
 });

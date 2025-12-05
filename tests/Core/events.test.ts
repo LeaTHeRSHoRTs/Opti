@@ -1,3 +1,5 @@
+import "../../dist/opti";
+
 describe("EventTarget.addEventListener", () => {
   it("should still normally work", () => {
     const element = document.createElement("div");
@@ -24,32 +26,39 @@ describe("EventTarget.addEventListener", () => {
   });
 });
 
-describe("EventTarget.events", () => {
+describe("EventTarget.#.events", () => {
   let element: HTMLDivElement;
+
+  const clickFn1 = () => console.log("first click event");
+  const clickFn2 = () => console.log("second click event");
+  const blurFn = () => console.log("blur event");
+  const focusFn = () => console.log("focus event");
 
   beforeEach(() => {
     element = document.createElement("div");
-    // Reset per-instance _events before each test
     (element as any)._events = {};
+
+    element.addEventListener("click", clickFn1);
+    element.addEventListener("click", clickFn2);
+    element.addEventListener("blur", blurFn);
+    element.addEventListener("focus", focusFn);
+  });
+
+  afterEach(() => {
+    element.removeEventListener("click", clickFn1);
+    element.removeEventListener("click", clickFn2);
+    element.removeEventListener("blur", blurFn);
+    element.removeEventListener("focus", focusFn);
   });
 
   it("should be defined", () => {
-    expect(element.events).toBeDefined();
+    expect(element.getEvents).toBeDefined();
   });
 
-  it("should contain a list of events and the function accompanying them", () => {
-    element.addEventListener("click", () => console.log("first click event"));
-    element.addEventListener("click", () => console.log("second click event"));
-    element.addEventListener("blur", () => console.log("blur event"));
-    element.addEventListener("focus", () => console.log("focus event"));
-
-    expect(element.events.click).toHaveLength(2);
-    expect(element.events.blur).toHaveLength(1);
-    expect(element.events.focus).toHaveLength(1);
-
-    expect(element.events.click?.[0]).toBeInstanceOf(Function);
-    expect(element.events.click?.[1]).toBeInstanceOf(Function);
-    expect(element.events.blur?.[0]).toBeInstanceOf(Function);
-    expect(element.events.focus?.[0]).toBeInstanceOf(Function);
+  it("should contain a list of events with the right lengths", () => {
+    expect(element.getEvents("click")).toHaveLength(2);
+    expect(element.getEvents("blur")).toHaveLength(1);
+    expect(element.getEvents("focus")).toHaveLength(1);
+    expect(element.getEvents("dblclick")).toHaveLength(0);
   });
 });

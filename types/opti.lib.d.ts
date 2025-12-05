@@ -29,7 +29,7 @@ declare function f<T>(iife: () => T): T;
  * type(new Map()).stringOf()   // "map"
  * type(new Set()).stringOf()   // "set"
  */
-declare function type<T>(val: T): TypeOperators<T>;
+declare function typed<T>(val: T): TypeGuard<T>;
 
 /**
  * Asserts whether `condition` is true or not and throws an {@linkcode AssertionException} if it fails
@@ -46,9 +46,12 @@ declare function type<T>(val: T): TypeOperators<T>;
  * console.log(myVar); // Will not log if myVar is 32 before the assertion
  */
 declare function assert(condition: boolean): asserts condition;
+declare function assert<T>(value: any): asserts value is T;
 
 /**
  * Cheks whether the value given is empty, `null`, or `undefined`
+ * 
+ * See {@linkcode notEmpty} for inverse function
  * @opti
  * @param value The value to check
  * @example
@@ -168,6 +171,8 @@ declare function Tuple<T extends unknown[]>(...values: T): T
 //  */
 // declare var opti: OptiObject;
 
+declare var NEVER: never;
+
 /**
  * Base class for all the Opti Exceptions
  */
@@ -208,6 +213,9 @@ declare var CloneException: CloneExceptionConstructor;
 declare var NumberTooSmallException: NumberTooSmallExceptionConstructor;
 declare var AbstractInitializationException: AbstractInitializationExceptionConstructor;
 declare var AbstractMethodInvokedException: AbstractMethodInvokedExceptionConstructor;
+declare var SortException: SortExceptionConstructor;
+declare var CollectionOutOfBoundsException: CollectionOutOfBoundsExceptionConstructor;
+declare var MalformedQueryException: MalformedQueryExceptionConstructor;
 
 /**
  * The collection class that can make collections of any object
@@ -497,7 +505,7 @@ interface Element {
 
 interface HTMLElement {
   /** 
-   * Adds inline css to the element 
+   * Adds inline css to the element. Using the boolean value `true` as the first argument returns the element's computed styles as well
    * @opti
    * @example
    * const el = document.$("#target");
@@ -510,10 +518,11 @@ interface HTMLElement {
    * 
    * console.log(el.css());
    */
-  css(key: keyof CSSStyleDeclaration, value: string | number): void;
-  css(key: keyof CSSStyleDeclaration): string;
-  css(key: Partial<Record<keyof CSSStyleDeclaration, string | number>>): void;
-  css(): Partial<Record<keyof CSSStyleDeclaration, string>>;
+  css(key: CSSPropertyName, value: string | number): void;
+  css(key: CSSPropertyName): string | number
+  css(key: CSSObject): void;
+  css(computed: true): CSSObject;
+  css(): CSSObject;
 
   /**
    * Gets the elements tag name
@@ -654,7 +663,7 @@ interface EventTarget {
    * The events registered on an `EventTarget`
    * @opti
    */
-  readonly events: Record<string, Func[]>;
+  getEvents<K extends keyof EventMapOf<this>>(event: K): Func[];
 }
 
 interface DateConstructor {
@@ -737,19 +746,6 @@ interface Number {
   repeat(iterator: (i: number) => void): void;
 }
 
-interface Console {
-  /**
-   * Creates a logging group
-   * @opti
-   * @param name The name of the group to make
-   * @param logs The logs to make in the group. Arrays seperate each value
-   */
-  group(name: string, ...logs: any[][] | any[]): void;
-
-  on(): void;
-  off(): void;
-}
-
 interface Array<T> {
   /**
    * Makes all values in an array unique
@@ -782,25 +778,42 @@ interface Array<T> {
 
   relocateTo(index: number, location: number): number | null
 
-  insert(this: T[], index: number, ...values: T[]): T[];
+  /**
+   * An array-altering method that inserts item(s) as the specified index
+   * @opti
+   * @param index The index to insert the item(s) at
+   * @param values The values to insert
+   * @example
+   * const arr = [1, 2, 3, 5];
+   * 
+   * arr.insert(2, 4); // arr is now [1, 2, 3, 4, 5]
+   */
+  insert(this: T[], index: number, ...values: T[]): void;
   
   /**
-   * Replaces a value in an array
+   * Replaces a value in an array and returns the new value
    * @opti
    * @param replaceIndex The index to replace
+   * @param finder The function that searches for the right value to replace
    * @param newVal The new value to put in place of the old removed value
    */
-  replace<U>(this: T[], replaceIndex: number, newVal: U): T | null;
+  replace(this: T[], replaceIndex: number, newVal: T): T | null;
+  replace(this: T[], finder: (val: T) => boolean, newVal: T): T | null;
+
+  /**
+   * Replaces the last value in an array and returns the new value
+   * @opti
+   * @param finder The function that searches for the right value to replace
+   * @param newVal The new value to put in place of the old removed value
+   */
+  replaceLast(this: T[], finder: (val: T) => boolean, newVal: T): T | null;
 
   /**
    * Sorts an array by a specific type of sorting
    * @opti
    * @param order The order to sort in. Options are `random`, `alpha`, `alpha-reverse`, `increasing`,`decreasing`, `earlier` and `later`
    */
-  sort<T>(this: T[], order: "random"): T[];
-  sort(this: string[], order: "alpha" | "alpha-reverse"): string[];
-  sort(this: number[], order: "increasing" | "decreasing"): number[];
-  sort(this: Date[], order: "earlier" | "later"): Date[];
+  sort(mode?: SortMode<T>): T[];
 
   /**
    * Tests the type of values in an array
@@ -823,15 +836,15 @@ interface String {
   remove(finder: string | RegExp): string;
 
   /**
-   * Removes text in a string, using a regular expression or search string.
+   * Removes the captured text in a string, using a regular expression or search string.
    * @opti
    * @param finder The serching string or regular expression
    * @example 
    * const oldString = "Hello! World!";
-   * const newString = oldString.removeAll("!") // Hello World
-   * const evenNewerString = newString.removeAll(/[HW]/) // elloorld
+   * const newString = oldString.remove(/(!)/) // Hello World
+   * const evenNewerString = newString.remove(/(\s)\w+/) // HelloWorld
    */
-  removeAll(finder: string | RegExp): string;
+  removeCaptured(finder: RegExp): string;
 
   /**
    * Capitalises the first character in a string
@@ -848,7 +861,7 @@ interface String {
    */
   matches(regexp: string | RegExp): boolean;
 
-  toCase(format: "camel" | "kebab" | "pascal" | "snake" | "train" | "dot"): string
+  toCase(format: CaseConventions): string
 }
 
 interface Function {
