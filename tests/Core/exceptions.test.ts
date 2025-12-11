@@ -1,4 +1,4 @@
-import "../../dist/opti";
+import "../../src/opti";
 
 describe("Exception", () => {
   it("should throw", () => {

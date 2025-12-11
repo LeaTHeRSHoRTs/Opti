@@ -6,7 +6,7 @@ import * as Evented from "./events";
 
   HTMLCollection.prototype.addEventListener = Evented.addEventListenerEnum;
   NodeList.prototype.addEventListener = Evented.addEventListenerEnum;
-  EventTarget.prototype.addBoundListener = Evented.addEventRuled;
+  EventTarget.prototype.addConditionalListener = Evented.addConditionalListener;
   EventTarget.prototype.addEventListeners = Evented.addEventListeners;
   EventTarget.prototype.delegateEventListener = Evented.delegateEventListener;
   EventTarget.prototype.addEventController = Evented.addEventController;

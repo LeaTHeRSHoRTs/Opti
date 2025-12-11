@@ -1,12 +1,13 @@
 import * as Opti from "./misc";
 
-function typeObject<T>(val: T, str: string): TypeGuard<T> {
+function typeObject<T>(val: T, str: string, basicStr: string = str): TypeGuard<T> {
   let v: T = val;
   let obj: TypeGuard<T> = Object.create({
     get value() {
       return v;
     },
     stringOf() { return str; },
+    stringOfBasic() { return basicStr; },
     is(other: unknown): boolean {
       switch (typeof other) {
         case "string":
@@ -27,7 +28,7 @@ function typeObject<T>(val: T, str: string): TypeGuard<T> {
 
             return name === (other.name || "anonymous") && args === Opti.args.apply(other as Func).join(",");
           }
-          throw new globalThis.TypeException(`Internal type matching error: Incorrect format for type string ${str}`);
+          throw new TypeException(`Internal type matching error: Incorrect format for type string ${str}`);
         case "undefined":
           return v === undefined;
         case "object":
@@ -133,9 +134,10 @@ function typeObject<T>(val: T, str: string): TypeGuard<T> {
 
   if (Array.isArray(v)) {
     obj = Object.assign(obj, {
-      containsValues(): boolean {
-        console.log("len", (v as any).length);
-        return (v as unknown[]).length > 0;
+      containsValues(countNullish: boolean = false): boolean {
+        let arr: any[] = v as any[];
+        if (!countNullish) arr = arr.filter(val => val !== null && val !== undefined);
+        return arr.length > 0;
       },
       alwaysContainsValues(values: [any, ...any[]]): void {
         if ((v as unknown[]).length === 0) {
@@ -202,14 +204,13 @@ export function typed<T>(val: T): TypeGuard<T> {
   let typeName = Object.prototype.toString.call(val).slice(8, -1);
   typeName = typeName[0].toUpperCase() + typeName.slice(1);
 
-  console.log("Type", typeName);
-
   const ctor = val.constructor.name;
   if (ctor && ctor === "Object") {
     typeName = ctor;
   }
 
-  console.log("Type", typeName);
+  const valtype = typeof val;
+  const basicTypeName = valtype === "object" ? valtype : typeName;
 
   switch (typeof val) {
     case "string":
@@ -230,7 +231,7 @@ export function typed<T>(val: T): TypeGuard<T> {
       typeName += `(${val.description})`;
   }
 
-  return typeObject<T>(val, typeName);
+  return typeObject<T>(val, typeName, basicTypeName);
 };
 
 export function info(val: any): string {
@@ -243,114 +244,11 @@ export function assert(condition: boolean, reason?: string): asserts condition {
   }
 }
 
-export function sleep(ms: number): Promise<void> {
-  return new Promise((res, rej) => {
-    if (ms <= 0) return rej("Timeout value is too short (must be greater than 0)");
+export function sleep(ms: number): Future<void, NumberTooSmallException> {
+  return new Future((res, rej) => {
+    if (ms <= 0) return rej(new NumberTooSmallException("Invalid timeout value (must be greater than 0)"));
     setTimeout(res, ms);
   });
-}
-
-// Mapping of style keywords to ANSI escape codes for terminal formatting
-const styles: Record<string, string> = {
-  red: "\x1b[31m",
-  orange: "\x1b[38;5;208m", // extended ANSI orange
-  yellow: "\x1b[33m",
-  green: "\x1b[32m",
-  cyan: "\x1b[36m",
-  blue: "\x1b[34m",
-  purple: "\x1b[35m",
-  pink: "\x1b[38;5;205m", // extended ANSI pink
-  underline: "\x1b[4m",
-  bold: "\x1b[1m",
-  strikethrough: "\x1b[9m",
-  italic: "\x1b[3m",
-  emphasis: "\x1b[3m", // alias for italic
-  reset: "\x1b[0m",
-};
-
-/** @potential */
-export function Colorize(strings: TemplateStringsArray, ...values: any[]) {
-  // Combine all parts of the template string with interpolated values
-  let input = strings.reduce((acc, str, i) => acc + str + (values[i] ?? ""), "");
-
-  // Replace shorthand syntax for bold and underline
-  // Replace {_..._} and {*...*} with {underline:...}, and {**...**} with {bold:...}
-  input = input
-    .replace(/\{_([^{}]+)_\}/g, (_, content) => `{underline:${content}}`)
-    .replace(/\{\*\*([^{}]+)\*\*\}/g, (_, content) => `{bold:${content}}`)
-    .replace(/\{\*([^{}]+)\*\}/g, (_, content) => `{underline:${content}}`)
-    .replace(/\\x1b/g, '\x1b');
-
-  // Replace escaped braces \{ and \} with placeholders so they are not parsed as tags
-  input = input.replace(/\\\{/g, "__ESCAPED_OPEN_BRACE__").replace(/\\\}/g, "__ESCAPED_CLOSE_BRACE__");
-
-  let output = ""; // Final output string with ANSI codes
-  const stack: string[] = []; // Stack to track open styles for proper nesting
-  let i = 0; // Current index in input
-
-  while (i < input.length) {
-    // Match the start of a style tag like {red: or {(dynamic ANSI code):
-    const openMatch = input.slice(i).match(/^\{([a-zA-Z]+|\([^)]+\)):/);
-
-    if (openMatch) {
-      let tag = openMatch[1];
-
-      if (tag.startsWith("(") && tag.endsWith(")")) {
-        // Dynamic ANSI escape code inside parentheses
-        tag = tag.slice(1, -1); // remove surrounding parentheses
-        stack.push("__dynamic__");
-        output += tag; // Insert raw ANSI code directly
-      } else {
-        if (!styles[tag]) {
-          throw new globalThis.Exception(`Unknown style: ${tag}`);
-        }
-        stack.push(tag);
-        output += styles[tag];
-      }
-      i += openMatch[0].length; // Move index past the opening tag
-      continue;
-    }
-
-    // Match closing tag '}'
-    if (input[i] === "}") {
-      if (!stack.length) {
-        // No corresponding opening tag
-        throw new globalThis.Exception(`Unexpected closing tag at index ${i}`);
-      }
-      stack.pop(); // Close the last opened tag
-      output += styles.reset; // Reset styles
-      // Re-apply all remaining styles still on the stack
-      for (const tag of stack) {
-        // Reapply dynamic codes as-is, else mapped styles
-        output += tag === "__dynamic__" ? "" : styles[tag];
-      }
-      i++; // Move past closing brace
-      continue;
-    }
-
-    // Append normal character to output, but restore escaped braces if needed
-    if (input.startsWith("__ESCAPED_OPEN_BRACE__", i)) {
-      output += "{";
-      i += "__ESCAPED_OPEN_BRACE__".length;
-      continue;
-    }
-    if (input.startsWith("__ESCAPED_CLOSE_BRACE__", i)) {
-      output += "}";
-      i += "__ESCAPED_CLOSE_BRACE__".length;
-      continue;
-    }
-
-    output += input[i++];
-  }
-
-  // If stack is not empty, we have unclosed tags
-  if (stack.length) {
-    const lastUnclosed = stack[stack.length - 1];
-    throw new globalThis.Exception(`Missing closing tag for: ${lastUnclosed}`);
-  }
-
-  // Ensure final reset for safety
-  return output + styles.reset;
 }
 
 export function isEmpty(val: string): val is "";
@@ -401,48 +299,6 @@ export function notEmpty(val: WeakMap<object, any>): val is WeakMap<object, any>
 export function notEmpty(val: WeakSet<object>): val is WeakSet<object>;
 export function notEmpty(val: any): boolean {
   return !isEmpty(val);
-}
-
-/** @potential */
-export function createEventListener<T extends ((...args: any[]) => any)[]>(
-  triggers: T,
-  callback: (...results: CallbackResult<T>) => void
-): void {
-  const originals = triggers.map(fn => fn);
-
-  triggers.forEach((originalFn, i) => {
-    function wrapper(this: any, ...args: any[]) {
-      const result = originals[i].apply(this, args);
-      callback(...triggers.map((_, j) =>
-        j === i ? result : undefined
-      ) as any);
-      return result;
-    };
-
-    // Replace global function by matching the actual function object
-    if (typeof window !== "undefined") {
-      for (const key in window) {
-        if ((window as any)[key] === originalFn) {
-          (window as any)[key] = wrapper;
-          return; // stop after replacement
-        }
-      }
-    }
-
-    console.warn("Cannot replace function:", originalFn);
-  });
-}
-
-/** @potential */
-export function UUID() {
-  const UUIDChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%&*_-";
-  let result = "";
-  for (let i = 0; i < 16; i++) {
-    result += UUIDChars.charAt(Math.floor(Math.random() * UUIDChars.length));
-  }
-
-  // Type assertion to add the brand
-  return class { constructor() { return Object.freeze(result); } };
 }
 
 // eslint-disable-next-line prefer-const

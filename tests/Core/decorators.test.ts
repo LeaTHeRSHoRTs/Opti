@@ -1,4 +1,4 @@
-import "../../dist/opti";
+import "../../src/opti";
 
 describe("Abstract", () => {
   it("Should be able to be applied", () => {

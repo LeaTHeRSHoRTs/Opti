@@ -2,6 +2,7 @@
 /// <reference path="./deprecation.d.ts" />
 /// <reference path="./alterations.d.ts" />
 /// <reference path="./classes.d.ts" />
+/// <reference path="./interfaces.d.ts" />
 
 /* eslint-disable no-var */
 
@@ -105,7 +106,7 @@ declare function notEmpty(val: any): boolean;
  * 
  * console.log("I wait 5 seconds before executing!")
  */
-declare function sleep(ms: number): Promise<void>;
+declare function sleep(ms: number): Future<void, NumberTooSmallException>;
 
 // /**
 //  * Makes a function mixin and returns that mixin for other use
@@ -165,13 +166,12 @@ declare function Enum<T extends readonly string[]>(...values: T): EnumInstance<T
  */
 declare function Tuple<T extends unknown[]>(...values: T): T
 
-// /**
-//  * Info about `Opti`
-//  * @opti
-//  */
-// declare var opti: OptiObject;
+/**
+ * Info about `Opti`
+ * @opti
+ */
+declare var opti: OptiObject;
 
-declare var NEVER: never;
 
 /**
  * Base class for all the Opti Exceptions
@@ -223,8 +223,6 @@ declare var MalformedQueryException: MalformedQueryExceptionConstructor;
 declare var Collection: CollectionConstructor;
 
 declare var Future: FutureConstructor;
-
-declare var opti: OptiObject;
 
 /** @decorator */
 declare var Abstract: MethodDecorator & ClassDecorator;
@@ -323,13 +321,6 @@ interface Document {
   createElements<T extends HTMLElement>(node: ElementNode): T;
 }
 
-interface Window {
-  /** Width of the browser window */
-  readonly width: number;
-  /** Height of the browser window */
-  readonly height: number;
-}
-
 interface Node {
   /** 
    * Gets the parent of the node
@@ -417,6 +408,8 @@ interface Node {
   /** @deprecated */
   $$<K extends keyof HTMLElementDeprecatedTagNameMap>(selectors: K): NodeListOf<HTMLElementDeprecatedTagNameMap[K]>;
   $$<E extends Element = HTMLElement>(selectors: string): NodeListOf<E>;
+
+  cut(): this;
 }
 
 interface Element {
@@ -501,6 +494,9 @@ interface Element {
    * el.html(html + "<a href='example.com'>Link</a>");
    */
   html(input?: string): string;
+
+  copy(children?: boolean, events?: boolean): this;
+  copy(options: CopyOptions): this;
 }
 
 interface HTMLElement {
@@ -663,7 +659,8 @@ interface EventTarget {
    * The events registered on an `EventTarget`
    * @opti
    */
-  getEvents<K extends keyof EventMapOf<this>>(event: K): Func[];
+  getEvents<T extends EventTarget, K extends keyof EventMapOf<this>>(this: T, event: K): EventListenerInfo<T, K>[];
+  getEvents<T extends EventTarget>(this: T): { [K in keyof EventMapOf<T>]: EventListenerInfo<T, K>[] };
 }
 
 interface DateConstructor {
@@ -813,12 +810,18 @@ interface Array<T> {
    * @opti
    * @param order The order to sort in. Options are `random`, `alpha`, `alpha-reverse`, `increasing`,`decreasing`, `earlier` and `later`
    */
-  sort(mode?: SortMode<T>): T[];
+  sort(mode: SortMode<T>): T[];
 
   /**
-   * Tests the type of values in an array
+   * Tests the type of values in an array.
+   * 
+   * Note: This inspects every element, so it is recommended for smaller arrays.
    * @opti
-   * @param type The type of value to check
+   * @returns A string representation of the types that the array contains
+   * @example
+   * [1, 2, 3].type // ["number"]
+   * ["A", "B", "C"].type // ["string"]
+   * [1, "a", new Date()].type // ["Date", "number", "string"]
    */
   get type<T>(): string[];
 }
@@ -875,7 +878,7 @@ interface Function {
    * 
    * console.log(example.getArgs()); /// ["a", "b", "c"]
    */
-  getArgs(): string[]
+  get args(): string[]
 }
 
 interface FunctionConstructor {
@@ -884,4 +887,12 @@ interface FunctionConstructor {
   debounce<T extends Func>(func: T, ms: number): (this: Func.This<T>, ...args: Func.Arguments<T>) => Future<Func.Return<T>, DebouncedException>
 
   throttle<T extends Func>(func: T, ms: number): (this: Func.This<T>, ...args: Func.Arguments<T>) => Func.Return<T> | null
+}
+
+interface Function {
+  memo(this: Func): T
+
+  debounce(this: Func, ms: number): Func<Func.This<this>, Func.Arguments<this>, Future<Func.Return<this>, DebouncedException>>
+
+  throttle(this: Func, ms: number):  Func<Func.This<this>, Func.Arguments<this>, Func.Return<this> | null>
 }

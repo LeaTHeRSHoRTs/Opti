@@ -1,9 +1,10 @@
-import * as Classes from "./classes";
+import * as Classes from "./constructableobjects";
 import * as Doc from "./document";
 import * as Elements from "./elements";
 import * as Exceptions from "./exception";
 import * as Globals from "./globals";
-import * as Lists from "./lists";
+import * as Lists from "./collections";
+import * as Arrays from "./arrays";
 import * as Misc from "./misc";
 import * as Decorators from "./decorators";
 
@@ -20,6 +21,9 @@ function get<T>(
 }
 
 (function() {
+  let _evFuncData;
+  let _evFuncType;
+
   globalThis.opti = {
     crafty: false,
     query: false,
@@ -66,9 +70,6 @@ function get<T>(
   globalThis.Enum = Classes.Enum;
   globalThis.Tuple = Classes.Tuple;
 
-  get(Window.prototype, "width", () => window.innerWidth || document.body.clientWidth );
-  get(Window.prototype, "height", () => window.innerHeight || document.body.clientHeight );
-
   Document.prototype.ready = Doc.ready;
   Document.prototype.leaving = Doc.leaving;
   Document.prototype.css = Doc.documentCss;
@@ -76,11 +77,13 @@ function get<T>(
 
   Node.prototype.$ = Elements.$;
   Node.prototype.$$ = Elements.$$;
+  Node.prototype.cut = Elements.cut;
   Node.prototype.parent = Elements.getParent;
   Node.prototype.ancestor = Elements.getAncestor;
   Node.prototype.getChildren = Elements.getChildren;
   Node.prototype.siblings = Elements.getSiblings;
 
+  Element.prototype.copy = Elements.copy;
   Element.prototype.hasText = Elements.hasText;
   Element.prototype.txt = Elements.text;
   Element.prototype.html = Elements.html;
@@ -95,10 +98,7 @@ function get<T>(
   HTMLElement.prototype.toggle = Elements.toggle;
   get(HTMLElement.prototype, "isVisible", Elements.isVisible);
 
-  Object.defineProperty(HTMLInputElement.prototype, "val", {
-    get(this: HTMLInputElement) { return Elements.val(this); },
-    configurable: true
-  });
+  get(HTMLInputElement.prototype, "val", Elements.val);
 
   HTMLFormElement.prototype.serialize = Elements.serialize;
 
@@ -124,19 +124,22 @@ function get<T>(
   Function.debounce = Misc.debounce;
   Function.throttle = Misc.throttle;
   Function.memo = Misc.memo;
-  Function.prototype.getArgs = Misc.args;
+  Function.prototype.debounce = Misc.instDebounce;
+  Function.prototype.throttle = Misc.instThrottle;
+  Function.prototype.memo = Misc.instMemo;
+  get(Function.prototype, "args", Misc.args);
 
-  Array.prototype.unique = Misc.unique;
-  Array.prototype.chunk = Misc.chunk;
-  Array.prototype.pluck = Misc.pluck;
-  Array.prototype.pluckLast = Misc.pluckLast;
-  Array.prototype.relocate = Misc.relocate;
-  Array.prototype.relocateTo = Misc.relocateTo;
-  Array.prototype.replace = Misc.replace;
-  Array.prototype.replaceLast = Misc.replaceLast;
-  Array.prototype.sort = Misc.sortBy;
-  Array.prototype.insert = Misc.insert;
-  get(Array.prototype, "type", Misc.arrayType);
+  Array.prototype.unique = Arrays.unique;
+  Array.prototype.chunk = Arrays.chunk;
+  Array.prototype.pluck = Arrays.pluck;
+  Array.prototype.pluckLast = Arrays.pluckLast;
+  Array.prototype.relocate = Arrays.relocate;
+  Array.prototype.relocateTo = Arrays.relocateTo;
+  Array.prototype.replace = Arrays.replace;
+  Array.prototype.replaceLast = Arrays.replaceLast;
+  Array.prototype.sort = Arrays.sortBy;
+  Array.prototype.insert = Arrays.insert;
+  get(Array.prototype, "type", Arrays.arrayType);
 
   Math.random = Misc.random;
 
@@ -144,5 +147,4 @@ function get<T>(
   Object.forEach = Misc.forEach;
 
   Date.at = Misc.atDate;
-  Date.fromTime = Misc.fromTime;
 })();

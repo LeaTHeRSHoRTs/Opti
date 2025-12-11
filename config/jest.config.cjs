@@ -10,14 +10,15 @@ module.exports = {
   coverageDirectory: 'coverage',
   collectCoverageFrom: [
     "src/**/*.ts",
-    "!src/**/*.d.ts"
+    "!src/**/*.d.ts",
+    "!src/**/_*.*",
+    "Store/*.ts"
   ],
   coveragePathIgnorePatterns: [
     '/coverage/',
     '/node_modules/'
   ],
-  setupFilesAfterEnv: [ "./config/jest.setup.cjs" ],
-  moduleFileExtensions: ['test.ts', 'test.js'],
+  moduleFileExtensions: ['ts', 'js'],
   testRegex: '\\.test\\.(ts|js)$',
   transform: {
     '^.+\\.ts$': ['ts-jest', { tsconfig: './tsconfig.json' }],

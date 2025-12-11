@@ -1,4 +1,4 @@
-import "../../dist/opti";
+import "../../src/opti";
 
 describe("Array.unique", () => {
   it("should filter out the non-unique values", () => {
@@ -151,6 +151,18 @@ describe("Array.replaceLast", () => {
 });
 
 describe("Array.sort", () => {
+  it("should be able to work normally", () => {
+    expect(["A", "D", "C", "B"].sort()).toStrictEqual(["A", "B", "C", "D"]);
+    expect([1, 4, 3, 2].sort()).toStrictEqual([1, 2, 3, 4]);
+    expect([].sort()).toStrictEqual([]);
+  });
+
+  test("should fallback for mixed type arrays", () => {
+    const arr = [1, "2", 3];
+    const result = [...arr].sort("increasing");
+    expect(result).toEqual([1,"2",3]);
+  });
+
   it("should be able to sort numbers my numerical order", () => {
     expect([1, 7, 2, 3, 5, 4, 6].sort('increasing')).toStrictEqual([1, 2, 3, 4, 5, 6, 7]);
     expect([1, 7, 2, 3, 5, 4, 6].sort('decreasing')).toStrictEqual([7, 6, 5, 4, 3, 2, 1]);
@@ -172,5 +184,18 @@ describe("Array.sort", () => {
   it("should be able to sort normally still", () => {
     expect(["A", "C", "B", "D", "E"].sort()).toStrictEqual(["A", "B", "C", "D", "E"]);
     expect([1, 4, 5, 3, 2].sort((a, b) => a - b)).toStrictEqual([1, 2, 3, 4, 5]);
+  });
+});
+
+describe("Array.type", () => {
+  it("should be able to return the type of array", () => {
+    expect([1, 2, 3].type).toEqual(["number"]);
+    expect(["A", "B", "C"].type).toEqual(["string"]);
+    expect([true, false, false].type).toEqual(["boolean"]);
+    expect([String, String, String].type).toEqual(["StringConstructor"]);
+  });
+
+  it("should be able to handle arrays with multiple different types", () => {
+    expect([1, "B", new Date()].type).toEqual(["Date", "number", "string"]);
   });
 });

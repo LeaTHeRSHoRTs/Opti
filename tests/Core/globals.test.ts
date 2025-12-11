@@ -1,30 +1,55 @@
-import "../../dist/opti";
-import { expectTypeOf } from "expect-type";
-import "./jest.d.ts";
+import "../../src/opti";
 
 describe('type', () => {
-  const nullVal: TypeGuard<null | true> = typed<null | true>(null);
-  const undefinedVal: TypeGuard<undefined | true> = typed<undefined | true>(undefined);
-  const numberVal: TypeGuard<number> = typed(42);
-  const zeroVal: TypeGuard<number> = typed(0);
-  const trueVal: TypeGuard<boolean> = typed(true);
-  const falseVal: TypeGuard<boolean> = typed(false);
-  const regexVal: TypeGuard<RegExp> = typed(/test/);
-  const emptyStringVal: TypeGuard<string> = typed("");
-  const helloStringVal: TypeGuard<string> = typed("Hello");
-  const numberArrayVal: TypeGuard<number[]> = typed([2, 3, 4]);
-  const objectLiteralVal: TypeGuard<{ name: string, age: number }> = typed({ name: "John", age: 30 });
-  const emptyObjectVal: TypeGuard<object> = typed({});
-  const emptyArrayVal: TypeGuard<any[]> = typed<any[]>([]);
-  const anonymousFuncVal: TypeGuard<() => void> = typed(() => { });
-  const anonymousFuncParamsVal: TypeGuard<(_: any) => void> = typed((_: any) => { });
-  const namedFuncVal: TypeGuard<(a: string, b: number) => void> = typed(function myFunction(a: string, b: number) { });
-  const mapVal: TypeGuard<Map<string, string>> = typed(new Map([["key1", "value1"], ["key2", "value2"]]));
-  const setVal: TypeGuard<Set<number>> = typed(new Set([1, 2, 3]));
-  const dateVal: TypeGuard<Date> = typed(new Date('2021-09-01'));
-  const badDateVal: TypeGuard<Date> = typed(new Date('invalid-date'));
-  const undefinedArray: TypeGuard<undefined[]> = typed([undefined, undefined]);
-  const nullArray: TypeGuard<null[]> = typed([null, null]);
+  let nullVal: TypeGuard<null | true>;
+  let undefinedVal: TypeGuard<undefined | true>;
+  let numberVal: TypeGuard<number>;
+  let zeroVal: TypeGuard<number>;
+  let trueVal: TypeGuard<boolean>;
+  let falseVal: TypeGuard<boolean>;
+  let regexVal: TypeGuard<RegExp>;
+  let emptyStringVal: TypeGuard<string>;
+  let helloStringVal: TypeGuard<string>;
+  let numberArrayVal: TypeGuard<number[]>;
+  let objectLiteralVal: TypeGuard<{ name: string; age: number }>;
+  let emptyObjectVal: TypeGuard<object>;
+  let emptyArrayVal: TypeGuard<any[]>;
+  let anonymousFuncVal: TypeGuard<() => void>;
+  let anonymousFuncParamsVal: TypeGuard<(_: any) => void>;
+  let namedFuncVal: TypeGuard<(a: string, b: number) => void>;
+  let mapVal: TypeGuard<Map<string, string>>;
+  let setVal: TypeGuard<Set<number>>;
+  let dateVal: TypeGuard<Date>;
+  let badDateVal: TypeGuard<Date>;
+  let undefinedArray: TypeGuard<undefined[]>;
+  let nullArray: TypeGuard<null[]>;
+  let symbolVal: TypeGuard<symbol>;
+
+  beforeEach(() => {
+    nullVal = typed<null | true>(null);
+    undefinedVal = typed<undefined | true>(undefined);
+    numberVal = typed(42);
+    zeroVal = typed(0);
+    trueVal = typed(true);
+    falseVal = typed(false);
+    regexVal = typed(/test/);
+    emptyStringVal = typed("");
+    helloStringVal = typed("Hello");
+    numberArrayVal = typed([2, 3, 4]);
+    objectLiteralVal = typed({ name: "John", age: 30 });
+    emptyObjectVal = typed({});
+    emptyArrayVal = typed<any[]>([]);
+    anonymousFuncVal = typed(() => {});
+    anonymousFuncParamsVal = typed((_: any) => {});
+    namedFuncVal = typed(function myFunction(a: string, b: number) {});
+    mapVal = typed(new Map([["key1", "value1"], ["key2", "value2"]]));
+    setVal = typed(new Set([1, 2, 3]));
+    dateVal = typed(new Date("2021-09-01"));
+    badDateVal = typed(new Date("invalid-date"));
+    undefinedArray = typed([undefined, undefined]);
+    nullArray = typed([null, null]);
+    symbolVal = typed(Symbol("symbol"));
+  });
 
   it('should return the data type for a data type\'s input', () => {
     expect(numberVal.stringOf()).toBe("Number");
@@ -39,6 +64,10 @@ describe('type', () => {
     expect(objectLiteralVal.stringOf()).toBe("Object(2)");
     expect(emptyObjectVal.stringOf()).toBe("Object(0)");
     expect(emptyArrayVal.stringOf()).toBe("Array(0)");
+  });
+
+  it("should return Symbol(value) for symbols", () => {
+    expect(symbolVal.stringOf()).toBe("Symbol(symbol)");
   });
 
   it('should return the value via the value property', () => {
@@ -79,13 +108,27 @@ describe('type', () => {
   it("should return a boolean to match other objects", () => {
     expect(emptyStringVal.is("type:String(0)")).toBe(true);
     expect(emptyStringVal.is("")).toBe(true);
-    expect(helloStringVal.isTypeString("String(5)")).toBe(true);
     expect(numberVal.is(42)).toBe(true);
     expect(numberVal.is(43)).toBe(false);
     expect(trueVal.is(true)).toBe(true);
     expect(trueVal.is(false)).toBe(false);
     expect(anonymousFuncVal.is(() => { })).toBe(true);
     expect(anonymousFuncParamsVal.is(() => { })).toBe(false);
+    expect(nullVal.is(null)).toBe(true);
+  });
+
+  it("should be able to compare type strings", () => {
+    expect(helloStringVal.isTypeString("String(5)")).toBe(true);
+    expect(emptyStringVal.isTypeString("String(0)")).toBe(true);
+    expect(numberVal.isTypeString("Number")).toBe(true);
+    expect(numberVal.isTypeString("String(42)")).toBe(false);
+    expect(trueVal.isTypeString("Boolean")).toBe(true);
+    expect(trueVal.isTypeString("String")).toBe(false);
+    expect(anonymousFuncVal.isTypeString("Function:<anonymous>()")).toBe(true);
+    expect(anonymousFuncParamsVal.isTypeString("Function:<anonymous>(_)")).toBe(true);
+    expect(namedFuncVal.isTypeString("Function:myFunction(a,b)")).toBe(true);
+    expect(nullVal.isTypeString("null")).toBe(true);
+    expect(undefinedVal.isTypeString("undefined")).toBe(true);
   });
 
   it("should be able to match objects using isInstanceOf", () => {
@@ -143,11 +186,9 @@ describe('type', () => {
     expect(numberArrayVal.isShorter(2)).toBe(false);
   });
 
-  it("should return a boolean to match function properties", () => {
+  it("should be able to check a function's name", () => {
     expect(namedFuncVal.isName("myFunction")).toBe(true);
-    expect(namedFuncVal.isTypeString("Function:myFunction(a,b)")).toBe(true);
     expect(anonymousFuncVal.isName("anonymous")).toBe(true);
-    expect(anonymousFuncVal.isTypeString("Function:<anonymous>()")).toBe(true);
   });
 
   it("should be able to check if something is defined", () => {
@@ -269,11 +310,17 @@ describe('type', () => {
     expect(emptyArrayVal.value).toBeTruthy();
   });
 
-  it("should have a containsValues function for arrays", () => {
+  it("should be able to check if an array contains values", () => {
+    console.log("empty array: ", emptyArrayVal.value.length);
     expect(emptyArrayVal.containsValues()).toBe(false);
     expect(numberArrayVal.containsValues()).toBe(true);
     expect(nullArray.containsValues()).toBe(false);
     expect(undefinedArray.containsValues()).toBe(false);
+  });
+
+  it("should count nullish values if the falg is set to true", () => {
+    expect(nullArray.containsValues(true)).toBe(true);
+    expect(undefinedArray.containsValues(true)).toBe(true);
   });
 
   it("should be able to insert values into arrays", () => {
@@ -358,6 +405,18 @@ describe("sleep", () => {
 
     expect(callback).toHaveBeenCalledTimes(1);
   });
+
+  it("should reject immediately if the sleep length is 0 or lower", async () => {
+    await sleep(0).catch(err => {
+      expect(err).toBeInstanceOf(NumberTooSmallException);
+      expect(err.getMessage()).toBe("Invalid timeout value (must be greater than 0)");
+    });
+    
+    await sleep(-10).catch(err => {
+      expect(err).toBeInstanceOf(NumberTooSmallException);
+      expect(err.getMessage()).toBe("Invalid timeout value (must be greater than 0)");
+    });
+  });
 });
 
 describe("isEmpty, notEmpty", () => {
@@ -401,94 +460,5 @@ describe("opti", () => {
     expect(opti.flow).toBeFalsy();
     expect(opti.query).toBeFalsy();
     expect(opti.requests).toBeFalsy();
-  });
-});
-
-describe("Enum", () => {
-  it("should create properties", () => {
-    const myEnum = Enum("A", "B", "C");
-
-    expect(typeof myEnum.A).toBe("symbol");
-    expect(typeof myEnum.B).toBe("symbol");
-    expect(typeof myEnum.C).toBe("symbol");
-  });
-
-  it("should make unique properties", () => {
-    const myEnum = Enum("A", "B");
-
-    expect(myEnum.A === myEnum.B).toBeFalsy();
-  });
-
-  it("should throw when the wrong characters are added", () => {
-    expect(() => {
-      Enum("A", "B", "{}");
-    }).toThrow(SyntaxException);
-  });
-});
-
-describe("Tuple", () => {
-  const tuple = Tuple("A", "B", "C");
-
-  it("should create a correct tuple", () => {
-    expectTypeOf<typeof tuple>().toEqualTypeOf<[string, string, string]>();
-    expectTypeOf<typeof tuple>().not.toBeArray;
-    expect(tuple).toEqual(["A", "B", "C"]);
-  });
-
-  it("should be able to access the values inside the tuple", () => {
-    expect(tuple[0]).toBe("A");
-    expect(tuple[1]).toBe("B");
-    expect(tuple[2]).toBe("C");
-  });
-});
-
-describe("Collection", () => {
-  beforeAll(() => {
-    document.body.append(document.createElement("h1"));
-    document.body.append(document.createElement("div"));
-    document.body.append(document.createElement("div"));
-    document.body.append(document.createElement("div"));
-  });
-
-  const htmlCollection: Collection<HTMLElement> = Collection.from(document.querySelectorAll("div"));
-  const stringCollection: Collection<string> = Collection.of("A", "B", "C", "D", "E");
-  const numberCollection: Collection<number> = Collection.of(1, 2, 3, 4, 5);
-  const multiCollection: Collection<string | number | boolean> = Collection.of(1, "A", true);
-  const emptyCollection: Collection<any> = Collection.from([]);
-  const noCollection: Collection<any> = Collection.of();
-
-  it("should be able to make collections using `from` and `of`", () => {
-    expect(Collection.of()).toBeInstanceOf(Collection);
-    expect(Collection.of(1, 2, 3)).toBeInstanceOf(Collection);
-    expect(Collection.of("X", true, 3)).toBeInstanceOf(Collection);
-
-    expect(Collection.from([])).toBeInstanceOf(Collection);
-    expect(Collection.from([1, 2, 3])).toBeInstanceOf(Collection);
-    expect(Collection.from(["X", true, 3])).toBeInstanceOf(Collection);
-  });
-
-  it("should construct the right types using the constructors", () => {
-    expectTypeOf(Collection.of()).toBeAny;
-    expectTypeOf(Collection.of(1, 2, 3)).toBeNumber;
-
-    expectTypeOf(Collection.from([])).toBeAny;
-    expectTypeOf(numberCollection).toBeNumber;
-  });
-
-  it("should b e able to be accessed like an array", () => {
-    expect(htmlCollection[0]).toBeInstanceOf(HTMLElement);
-
-    expect(stringCollection[0]).toBeType("string");
-    expect(numberCollection[0]).toBeType("number");
-
-    expect(multiCollection[0]).toBeType("string");
-    expect(multiCollection[1]).toBeType("boolean");
-    expect(multiCollection[2]).toBeType("number");
-  });
-});
-
-describe("Future", () => {
-  it("should just be a promise in disguise", () => {
-    expect(Future).toBeInstanceOf(Promise);
   });
 });

@@ -1,14 +1,14 @@
-import "../../dist/opti";
-import "../../dist/evented";
+import "../../src/opti";
+import "../../src/Evented/evented";
 
-describe("EventTarget.addBoundListener", () => {
+describe("EventTarget.addConditionalListener", () => {
   it("should cancel the listener after `x` amount of times", () => {
     const div = document.createElement("div");
     document.body.append(div);
 
     let count = 0;
 
-    div.addBoundListener("click", () => {
+    div.addConditionalListener("click", () => {
       count++;
     }, 2); // Only allow the listener to run twice
 
@@ -25,7 +25,7 @@ describe("EventTarget.addBoundListener", () => {
 
     let ran = false;
 
-    div.addBoundListener("click", () => {
+    div.addConditionalListener("click", () => {
       ran = true;
     }, () => ran);
   });

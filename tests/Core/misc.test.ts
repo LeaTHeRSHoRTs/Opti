@@ -1,4 +1,4 @@
-import "../../dist/opti";
+import "../../src/opti";
 
 describe("Date.at", () => {
   it("should return a number that is the same as the milliseconds since `DateOrigin`", () => {
@@ -126,13 +126,13 @@ describe("String.capitalize", () => {
 describe("String.remove", () => {
   it("should remove a substring by a regular expression", () => {
     expect("Hello_ World_".remove(/_/)).toBe("Hello World_");
-    expect("Hello_ World _@Advanced".remove(/_@/)).toBe("Hello World Advanced");
+    expect("Hello_ World _@Advanced".remove(/_@/)).toBe("Hello_ World Advanced");
     expect("(hello) (Hello) World".remove(/\(h\w+\)\s/)).toBe("(Hello) World");
   });
 
   it("should support the global regex flag to remove more than one occurence", () => {
     expect("Hello_ World_".remove(/_/g)).toBe("Hello World");
-    expect("Hello_@_ World_@ _@Advanced".remove(/@?_[@\s_]/g)).toBe("Hello World Advanced");
+    expect("Hello_@_ World_@ _@Advanced".remove(/_@_?/g)).toBe("Hello World Advanced");
     expect("(hello) (Hello) World".remove(/\((?=h\w+)|\)/g)).toBe("(Hello) World");
   });
 

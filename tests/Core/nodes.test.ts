@@ -1,4 +1,4 @@
-import "../../dist/opti";
+import "../../src/opti";
 
 describe("Node.parent", () => {
   it("should return the direct parent element", () => {

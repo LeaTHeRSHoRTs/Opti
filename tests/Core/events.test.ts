@@ -1,4 +1,4 @@
-import "../../dist/opti";
+import "../../src/opti";
 
 describe("EventTarget.addEventListener", () => {
   it("should still normally work", () => {
@@ -26,7 +26,7 @@ describe("EventTarget.addEventListener", () => {
   });
 });
 
-describe("EventTarget.#.events", () => {
+describe("EventTarget.events", () => {
   let element: HTMLDivElement;
 
   const clickFn1 = () => console.log("first click event");

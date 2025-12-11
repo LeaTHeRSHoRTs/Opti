@@ -83,7 +83,7 @@ export function documentCss(
   const newStyles: StringRecord<string> = {};
   for (const [prop, val] of Object.entries(object)) {
     if (val !== null && val !== undefined) {
-      const kebab = prop.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
+      const kebab = prop.toString().replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
       newStyles[kebab] = val.toString();
     }
   }
@@ -133,7 +133,7 @@ export function createElements<T extends HTMLElement>(node: ElementNode): T {
       key !== 'style' &&
       key !== 'children'
     ) {
-      if (typeof val === 'string') {
+      if (typeof val === 'string' && typeof key === "string") {
         el.setAttribute(key, val);
       } else throw new globalThis.TypeException("Custom parameters must be of type 'string'");
     }
@@ -152,11 +152,3 @@ export function createElements<T extends HTMLElement>(node: ElementNode): T {
 
   return el as T;
 }
-
-export function $ (selector: string) {
-  return document.querySelector(selector);
-};
-
-export function $$ (selector: string) {
-  return document.querySelectorAll(selector);
-};

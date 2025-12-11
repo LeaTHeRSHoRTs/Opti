@@ -1,5 +1,7 @@
+type _EventsRecord<T extends EventTarget> = { [K in keyof EventMapOf<T>]?: EventListenerInfo<T, K>[] };
+
 declare interface EventTarget {
-  _events: Partial<Record<keyof EventMapOf<this>, EventListener[]>>
+  _events: _EventsRecord<this>;
 }
 
 //* Function
@@ -75,19 +77,28 @@ export function memo<T extends Func>(fn: T): T {
   } as T;
 }
 
+export function instMemo(this: Func) {
+  return memo(this);
+}
+
+export function instDebounce(this: Func, ms: number) {
+  return debounce(this, ms);
+}
+
+export function instThrottle(this: Func, ms: number) {
+  return throttle(this, ms);
+}
+
 //* Date
 
 export function atDate(year: number, monthIndex: number, date?: number, hours?: number, minutes?: number, seconds?: number, ms?: number): number {
   return new Date(year, monthIndex, date, hours, minutes, seconds, ms).getTime();
 }
 
-export function fromTime(this: DateConstructor, time: Time, year: number, monthIndex: number, date?: number | undefined): Date {
-  return new Date(year, monthIndex, date, time.getHours(), time.getMinutes(), time.getSeconds(), time.getMilliseconds());
-}
-
 //* Object
 
 export function clone<T>(object: symbol, deep?: boolean): never;
+export function clone<T>(object: T, deep?: boolean): T;
 export function clone<T>(object: T, deep: boolean = true): T {
   if (typeof object === "symbol") {
     throw new globalThis.CloneException("Symbols cannot be cloned");
@@ -95,9 +106,9 @@ export function clone<T>(object: T, deep: boolean = true): T {
 
   if (!deep) {
     if (Array.isArray(object)) {
-      return [...object] as unknown as T;
+      return [...object] as T;
     }
-    return { ...object } as unknown as T;
+    return { ...object };
   }
 
   if (
@@ -155,157 +166,6 @@ export function repeat(this: number, iterator: (i: number) => any): void {
   }
 };
 
-//* Arrays
-
-export function unique<T>(this: T[]): T[] {
-  return [...new Set(this)];
-};
-
-export function pluck<T>(this: T[], finder: (v: T) => boolean): T | null {
-  const res = this.findIndex(finder);
-
-  if (res === -1) return null;
-
-  const [item] = this.splice(res, 1);
-  return item;
-}
-
-export function pluckLast<T>(this: T[], finder: (v: T) => boolean): T | null {
-  // find index of last matching element
-  const index = this.map(finder).lastIndexOf(true);
-  if (index === -1) return null;
-
-  // remove and return it
-  const [item] = this.splice(index, 1);
-  return item;
-}
-
-export function relocate<T>(this: T[], index: number, offset: number): number | null {
-  const value = this.splice(index, 1)[0] ?? null;
-  if (value) {
-    this.splice(index + offset, 0, value);
-    return index + offset;
-  } else return null;
-}
-
-export function relocateTo<T>(this: T[], index: number, location: number): number | null {
-  const value = this.splice(index, 1)[0] ?? null;
-  if (value) {
-    this.splice(location, 0, value);
-    return location;
-  } else return null;
-}
-
-type AnyConstructor<T = any> = new (...args: any[]) => T;
-
-export function arrayType(this: any[]) {
-  return this.map(v => globalThis.typed(v).stringOf());
-}
-
-function arrType<T extends AnyConstructor | StringConstructor | NumberConstructor | BooleanConstructor | SymbolConstructor>(
-  array: any[],
-  type: T
-): array is Unboxed<T>[] {
-  return array.every(v =>
-    type === String ? typeof v === "string" :
-      type === Number ? typeof v === "number" :
-        type === Boolean ? typeof v === "boolean" :
-          type === Symbol ? typeof v === "symbol" :
-            v instanceof type
-  );
-}
-
-const origionalSort: <T>(this: T[], compareFn?: ((a: any, b: any) => number) | undefined) => any[] = Array.prototype.sort;
-export function sortBy<T>(this: T[], order?: SortMode<T> | ((a: T, b: T) => number)): T[] {
-  if (typeof order === "function") {
-    return origionalSort.call(this, order);
-  } else if (order === undefined) {
-    return origionalSort.call(this);
-  }
-
-  if (this.length === 0) return [];
-
-  const copy = [...this];
-  if (arrType(this, Date)) {
-    switch (order) {
-      case "earlier": return origionalSort.call(copy, (a, b) => a.getTime() - b.getTime());
-      case "later": return origionalSort.call(copy, (a, b) => b.getTime() - a.getTime());
-    }
-  } else if (arrType(this, String)) {
-    switch (order) {
-      case "alpha": return origionalSort.call(copy);
-      case "alpha-reverse": return origionalSort.call(copy).reverse();
-    }
-  } else if (arrType(this, Number)) {
-    switch (order) {
-      case "increasing": return origionalSort.call(copy, (a, b) => a - b);
-      case "decreasing": return origionalSort.call(copy, (a, b) => b - a);
-    }
-  }
-
-  return origionalSort.call(this);
-}
-
-export function shuffle<T>(this: T[]): T[] {
-  return this.sort(() => {
-    return origionalRandom() - 0.5;
-  });
-}
-
-export function replace<T>(this: T[], index: number | ((value: T) => boolean), newVal: T): T | null {
-  if (typeof index === "number") {
-    const oldVal = this[index];
-    this[index] = newVal;
-
-    return oldVal ?? null;
-  } else {
-    const i = this.findIndex(index);
-    if (i === -1) return null;
-
-    const oldVal = this[i];
-    this[i] = newVal;
-
-    return oldVal;
-  }
-}
-
-export function replaceLast<T>(this: T[], finder: (value: T) => boolean, newVal: T): T | null {
-  for (let i = this.length - 1; i >= 0; i--) {
-    if (finder(this[i])) {
-      const oldVal = this[i];
-      this[i] = newVal;
-      return oldVal ?? null;
-    }
-  }
-  return null;
-}
-
-export function chunk<T>(this: T[], chunkSize: number): T[][] {
-  if (chunkSize <= 0) throw new globalThis.NumberTooSmallException("`chunkSize` cannot be a number below 1");
-
-  const newArr: T[][] = [];
-  let tempArr: T[] = [];
-
-  this.forEach(val => {
-    tempArr.push(val);
-    if (tempArr.length === chunkSize) {
-      newArr.push(tempArr);
-      tempArr = []; // Reset tempArr for the next chunk
-    }
-  });
-
-  // Add the remaining elements in tempArr if any
-  if (tempArr.length) {
-    newArr.push(tempArr);
-  }
-
-  return newArr;
-};
-
-export function insert<U>(this: unknown[], index: number, ...values: U[]) {
-  this.splice(index, 0, ...values);
-}
-
 //* Strings
 
 export function remove(this: string, finder: string | RegExp): string {
@@ -313,7 +173,7 @@ export function remove(this: string, finder: string | RegExp): string {
 };
 
 export function capitalize(this: string): string {
-  const i = this.search(/\S/);
+  const i = this.search(/[a-z]/);
   return i === -1 ? this : this.slice(0, i) + this.charAt(i).toUpperCase() + this.slice(i + 1);
 };
 
@@ -383,22 +243,42 @@ export function mixin<T extends Func, This = ThisParameterType<T>, Ret = ReturnT
   }
 }
 
-export function getEvents<T extends EventTarget>(this: T, key: keyof EventMapOf<T>): Func[] {
+export function getEvents<T extends EventTarget, K extends keyof EventMapOf<T> = any>(this: T, key: K): EventListenerInfo<T, K>[];
+export function getEvents<T extends EventTarget>(this: T): { [K in keyof EventMapOf<T>]: EventListenerInfo<T, K>[] };
+export function getEvents<T extends EventTarget, K extends keyof EventMapOf<T> = any>(this: T, key?: K) {
+  if (key === undefined) {
+    return this._events;
+  }
+
   return this._events[key] ?? [];
 }
 
 const originalAddEventListener = EventTarget.prototype.addEventListener;
+
+declare let _evFuncType: "default" | "conditional" | "controller" | undefined;
+declare let _evFuncData: (number | ((this: any) => boolean)) | undefined;
+
 export const addEventListener = mixin(
   originalAddEventListener,
   "HEAD",
-  function <T extends EventTarget>(this: EventTarget, type: keyof EventMapOf<T>, callback: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {
-    if (!(this instanceof EventTarget)) return;
-
+  function <T extends EventTarget, K extends keyof EventMapOf<T>>(this: T, type: K, callback: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {
     this._events[type] ??= [];
-    if ("handleEvent" in callback) {
-      this._events[type].push(callback.handleEvent);
-    } else {
-      this._events[type].push(callback);
-    }
+
+    const listener: EventFunc<T, K> =
+      "handleEvent" in callback
+        ? (callback.handleEvent as EventFunc<T, K>)
+        : (callback as EventFunc<T, K>);
+
+    this._events[type].push({
+      func: listener,
+      options:
+        typeof options === "boolean"
+          ? { capture: options }
+          : options
+          ? options
+          : {},
+      listener: _evFuncType ?? "default",
+      special: _evFuncData
+    });
   }
 );

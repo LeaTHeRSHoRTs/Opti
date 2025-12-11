@@ -1,5 +1,5 @@
-import "../../dist/opti";
-import "../../dist/flow";
+import "../../src/opti";
+import "../../src/Flow/flow";
 
 declare global {
   interface Document {

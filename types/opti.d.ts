@@ -7,8 +7,14 @@ type char =
 
 // type char = string & { length: 1 }
 
+/** Shorthand for `unknown` */
+type _ = unknown;
+
 /** Shortcut for `Record<string, T>` */
 type StringRecord<T> = Record<string, T>;
+
+/** Construct a type with a set of properties K of type T, all of which are optional */
+type PartialRecord<K extends keyof any, T> = Partial<Record<K, T>>;
 
 type CaseConventions = "camel" | "kebab" | "pascal" | "snake" | "train" | "dot";
 
@@ -16,16 +22,27 @@ type CSSObject = Partial<Record<keyof CSSStyleDeclaration, string | number>>;
 
 type CSSPropertyName = Exclude<keyof CSSStyleDeclaration, number | symbol>;
 
-type Func = (this: any, ...args: any[]) => any;
+type Func<T = any, A extends any[] = any[], R = any> = (this: T, ...args: A) => R;
 namespace Func {
   /** Gets a function's argument list types */
-  export type Arguments<T extends Func> = Parameters<T>;
+  export type Arguments<T extends Func> = T extends (...args: infer P) => any ? P : never;
 
   /** Get a function's return type */
   export type Return<T extends Func> = ReturnType<T>
 
   /** Get a function's `this` argument type */
   export type This<T extends Func> = ThisParameterType<T>
+}
+
+type Class<Abstract extends boolean = true, A extends any[] = any[], I = any> = Abstract extends true ? abstract new(...args: A) => I : new(...args: A) => I;
+namespace Class {
+  export type Instance<T extends Class> = T extends Class<boolean, any[], infer I> ? I : never;
+  export type Constructor<T extends Class> = T extends Class<boolean, infer A, infer I> ? (this: void, ...args: A) => I : never;
+
+  export namespace Instance {
+    type InstanceType<I> = Class<any, any[], I>;
+    export type Methods<T extends Class> = T extends InstanceType<infer I> ? { [K in I]: K extends Func ? K : never } : never;
+  }
 }
 
 /** Used as a placeholder type */
@@ -134,43 +151,7 @@ type TypeOf<T extends string> =
   T extends "object" ? object | null :
   never;
 
-interface BaseTypeOperators<T> {
-  get value(): T;
-  is(other: unknown): boolean;
-  /**
-   * Checks if a value is in the format Object, Object(size), Date:time or Function:<name>(...params,)
-   * @param str The type string to check
-   */
-  isTypeString(str: string): boolean;
-  stringOf(): string;
-  isInstanceOf<U extends Class>(clazz: U): this is BaseTypeOperators<InstanceType<U>>;
-  isTypeOf<T extends Primitive>(type: T): this is TypeGuard<TypeOf<T>>;
-  isDefined(): this is BaseTypeOperators<NonNullable<T>>;
-  isFalsy(): this is BaseTypeOperators<Falsy<T>>;
-  isTruthy(): this is BaseTypeOperators<Truthy<T>>;
-  isNull(): this is BaseTypeOperators<null>;
-  isUndefined(): this is BaseTypeOperators<undefined>;
-  alwaysDefined<U>(orElse: U): asserts this is BaseTypeOperators<Exclude<T | U, undefined>>;
-  alwaysTruthy<U>(truthy: Truthy<U>): asserts this is BaseTypeOperators<Truthy<T | U>>;
-}
-
-interface SizedObjectTesters<T> extends BaseTypeOperators<T> {
-  isLength<U extends number>(length: U): this is TypeGuard<T & { length: U }>;
-  isLonger(object: Sized): boolean;
-  isLonger(length: number): boolean;
-  isShorter(length: number): boolean;
-  isShorter(object: Sized): boolean;
-}
-
-interface ArrayTesters<T extends unknown[]> extends SizedObjectTesters<T> {
-  isLength<U extends number>(length: U): this is TypeGuard<TupleOf<T[number], U>>;
-  alwaysContainsValues<U extends T[number]>(values: [U, ...U[]]): asserts this is TypeGuard<[U, ...U[]]> | TypeGuard<T>;
-  containsValues<U extends T[number]>(): this is TypeGuard<[U, ...U[]]>
-}
-
-interface FuncTesters<T extends Func> extends BaseTypeOperators<T> {
-  isName(name: string): boolean;
-}
+type EventFunc<T, K extends keyof EventMapOf<T> = Event> = (this: T, e: EventMapOf<T>[K]) => void
 
 type TypeGuard<T> = T extends Func ? FuncTesters<T>
   : T extends Array<infer U> ? ArrayTesters<T>
@@ -238,7 +219,7 @@ type SortMode<T> =
   T extends string ? "alpha" | "alpha-reverse" :
   T extends number ? "increasing" | "decreasing" :
   T extends Date ? "earlier" | "later" :
-  "random";
+  never;
 
 /** Gest the event map for the specified object */
 type EventMapOf<T> =
@@ -319,50 +300,3 @@ type EventMapOf<T> =
   T extends WindowEventHandlers ? WindowEventHandlersEventMap :
   T extends AbstractWorker ? AbstractWorkerEventMap :
   never; // fallback
-
-
-/**
- * @opti
- */
-type HTMLAttrs = {
-  text?: string,
-  html?: string,
-  id?: string;
-  class?: string | string[];
-  style?: { [key: string]: string };
-  [key: string]: any
-};
-
-/**
- * @opti
- */
-type ElementNode = {
-  tag: HTMLTag;
-  class?: string;
-  text?: string;
-  html?: string;
-  style?: Record<string, string | number>;
-  children?: ElementNode | ElementNode[];
-  [key: string]:
-  | string
-  | number
-  | Record<string, string | number>
-  | ElementNode
-  | ElementNode[]
-  | undefined;
-}
-
-interface ValueAccessor {
-  asString(): string;
-  asNumber(): number | null;
-  asBoolean(): boolean | null
-  asDate(): Date | null
-}
-
-interface OptiObject {
-  crafty: false,
-  query: false,
-  evented: false,
-  requests: false,
-  flow: false
-};

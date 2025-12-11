@@ -1,3 +1,9 @@
+type _EventsRecord<T extends EventTarget> = { [K in keyof EventMapOf<T>]?: EventListenerInfo<T, K>[] };
+
+declare interface EventTarget {
+  _events: _EventsRecord<this>;
+}
+
 export function hasText(this: Element, text: string | RegExp): boolean {
   if (typeof text === "string") {
     return this.txt().includes(text);
@@ -94,7 +100,7 @@ export function css(
     // Set multiple
     for (const [prop, val] of Object.entries(key)) {
       if (val !== null && val !== undefined) {
-        css.setProperty(camelToDash(prop), val.toString());
+        css.setProperty(camelToDash(prop.toString()), val.toString());
       }
     }
   }
@@ -208,25 +214,81 @@ export function serialize(this: HTMLFormElement): string {
     .join('&'); // Join the array into a single string, separated by '&'
 };
 
-export function cut<T extends Element>(this: T): T {
+export function cut<T extends Node>(this: T): T {
+  this.parentNode?.removeChild(this);
+  return this;
+}
+
+const defaultCopy: Required<CopyOptions> = {
+  copyAll: false,
+  copyAttributes: true,
+  copyChildren: false,
+  copyEvents: false,
+  copyStyles: true
+};
+
+function isEventTarget(obj: any): obj is EventTarget {
+  return obj && 
+         typeof obj.addEventListener === "function" &&
+         typeof obj.removeEventListener === "function" &&
+         typeof obj.dispatchEvent === "function";
+}
+
+export function copy<T extends Element>(this: T, object: CopyOptions): T;
+export function copy<T extends Element>(this: T, children?: boolean, events?: boolean): T;
+export function copy<T extends Element>(this: T, childrenOrObject?: boolean | CopyOptions, events?: boolean): T;
+export function copy<T extends Element>(this: T, childrenOrObject: boolean | CopyOptions = true, events: boolean = false): T {
+  let options: Required<CopyOptions>;
+  if (typeof childrenOrObject === "boolean") {
+    options = { 
+      ...defaultCopy, 
+      copyChildren: childrenOrObject, 
+      copyEvents: events 
+    };
+  } else {
+    options = { 
+      ...defaultCopy,
+      ...childrenOrObject
+    };
+  }
+
   const clone = document.createElementNS(this.namespaceURI, this.tagName) as T;
 
-  // Copy all attributes
-  for (const attr of Array.from(this.attributes)) {
-    clone.setAttribute(attr.name, attr.value);
+  if (options.copyAttributes || options.copyAll) {
+    for (const attr of Array.from(this.attributes)) {
+      clone.setAttribute(attr.name, attr.value);
+    }
   }
 
-  // Deep copy child nodes (preserves text, elements, etc.)
-  for (const child of Array.from(this.childNodes)) {
-    clone.appendChild(child.cloneNode(true));
+  if (options.copyChildren || options.copyAll) {
+    for (const child of Array.from(this.childNodes)) {
+      clone.appendChild(child.cloneNode(true));
+    }
   }
 
-  // Optionally copy inline styles (not always needed if using setAttribute above)
-  if (this instanceof HTMLElement && clone instanceof HTMLElement) {
-    clone.style.cssText = this.style.cssText;
+  if (options.copyStyles || options.copyAll) {
+    if (this instanceof HTMLElement && clone instanceof HTMLElement) {
+      clone.style.cssText = this.style.cssText;
+    }
   }
 
-  this.remove(); // Remove original from DOM
+  if ((options.copyEvents || options.copyAll) && isEventTarget(this)) {
+    for (const [event, funcs] of Object.entries(this._events)) {
+      funcs?.forEach(prop => {
+        if (opti.evented /* Evented is active */) {
+          switch (prop.listener) {
+            case "default": break;
+            case "conditional":
+              return this.addConditionalListener(event, prop.func, prop.special, prop.options);
+            case "controller":
+              return this.addEventController(event, prop.func, prop.options);
+          }
+        }
+
+        this.addEventListener(event as string, prop.func as EventListener, prop.options);
+      });
+    }
+  }
 
   return clone;
 }
@@ -237,34 +299,6 @@ export function isVisible(this: HTMLElement) {
     : Number(this.css("opacity")) > 0;
 }
 
-function as(this: HTMLInputElement, type: "number"): number | null;
-function as(this: HTMLInputElement, type: "string"): string | null;
-function as(this: HTMLInputElement, type: "boolean"): boolean | null;
-function as(this: HTMLInputElement, type: "date"): Date | null;
-function as(this: HTMLInputElement, type: string): string | number | boolean | Date | null {
-  const value = this.value.trim();
-
-  switch (type) {
-    case "string":
-      return value;
-
-    case "number":
-      const num = Number(value);
-      return !isNaN(num) && value !== "" ? num : null;
-
-    case "boolean":
-      if (value.toLowerCase() === "true") return true;
-      if (value.toLowerCase() === "false") return false;
-
-    case "date":
-      const date = new Date(value);
-      if (!isNaN(date.getTime())) return date;
-
-    default:
-      return null;
-  }
-}
-
 function parseTime(value: string) {
   const [h, m, s] = value.split(":");
   const [sec, ms] = (s ?? "0").split(".");
@@ -273,7 +307,9 @@ function parseTime(value: string) {
   return date;
 }
 
-export function val(self: HTMLInputElement): ValueAccessor {
+export function val(this: HTMLInputElement): ValueAccessor {
+  const self = this;
+
   return {
     asBoolean(): boolean | null {
       switch (self.type) {

@@ -1,5 +1,5 @@
-import "../../dist/opti";
-import "../../dist/requests";
+import "../../src/opti";
+import "../../src/Requests/requests";
 
 describe("request", () => {
   it("should be defined", () => {

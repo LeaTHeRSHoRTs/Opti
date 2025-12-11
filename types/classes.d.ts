@@ -1,5 +1,7 @@
 type EnumInstance<T> = {
   readonly [K in T[number]]: symbol;
+} & {
+  [Symbol.iterator](): IterableIterator<T[number]>
 };
 
 interface TupleConstructor {
@@ -118,13 +120,13 @@ interface CollectionConstructor {
 
 interface Collection<T> extends ArrayLike<T> {
   item(inedx: number): T | null;
-  each(callbackfn: (value: T, key: number) => void, thisArg?: any): void;
-
+  each(callbackfn: (value: T, index: number) => void, thisArg?: any): void;
   [Symbol.iterator](): IterableIterator<T>
-
   entries(): IterableIterator<[number, T]>
   keys(): IterableIterator<number>
   values(): IterableIterator<T>
+  toArray(): T[]
+  toReadonlyArray(): readonly T[];
 }
 
 // Exceptions

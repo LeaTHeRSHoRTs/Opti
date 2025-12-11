@@ -1,4 +1,4 @@
-import "../../dist/opti";
+import "../../src/opti";
 
 beforeEach(() => {
   document.body.innerHTML = "";

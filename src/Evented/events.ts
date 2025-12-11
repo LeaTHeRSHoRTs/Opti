@@ -28,14 +28,16 @@ class ThreadTerminatedException extends globalThis.Exception {
   }
 }
 
-export function addEventRuled<T extends EventTarget, K extends keyof EventMapOf<T>>(
+export function addConditionalListener<T extends EventTarget, K extends keyof EventMapOf<T>>(
   this: T,
   type: K,
-  //@ts-ignore
-  listener: (this: T, e: EventMapOf<T>[K]) => void,
+  listener: EventFunc<T, K>,
   timesOrCondition: number | ((this: T) => boolean),
   options?: boolean | AddEventListenerOptions
 ): void {
+  let _evFuncType = "conditional";
+  let _evFuncData = timesOrCondition;
+
   if (typeof timesOrCondition === "number") {
     if (timesOrCondition <= 0) return;
 
@@ -98,6 +100,8 @@ export function delegateEventListener<
   listener: (this: U, e: EventMapOf<T>[K]) => void,
   options?: boolean | AddEventListenerOptions
 ) {
+  let _evFuncType = "delegated";
+
   this.addEventListener(
     type as string,
     function (this: T, e: Event) {

@@ -1,5 +1,5 @@
-import "../../dist/opti";
-import "../../dist/query";
+import "../../src/opti";
+import "../../src/Query/query";
 
 beforeAll(() => {
   const elements = [

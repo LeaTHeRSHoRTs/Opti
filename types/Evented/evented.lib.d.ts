@@ -3,6 +3,10 @@
 declare var Evented: EventedConstructor;
 declare var Thread: ThreadConstructor;
 
+interface OptiObject {
+  evented: true
+}
+
 interface EventTarget {
   /** 
    * Creates an event listener that triggers a set amount of times
@@ -13,25 +17,25 @@ interface EventTarget {
    * @example
    * const el = document.$("#target");
    * 
-   * el.addBoundListener("click", () => {
+   * el.addConditionalListener("click", () => {
    *   el.removeAttr("id");
    * }, 1);
    * 
    * let mouseover = false;
    * 
-   * el.addBoundListener("mouseover", () => {
+   * el.addConditionalListener("mouseover", () => {
    *   el.removeAttr("id");
    *   mouseover = true;
    * }, () => mouseover);
    */
-  addBoundListener<T extends EventTarget, K extends keyof EventMapOf<T>>(
+  addConditionalListener<T extends EventTarget, K extends keyof EventMapOf<T>>(
     this: T,
     type: K,
     listener: (this: T, e: EventMapOf<T>[K]) => void,
     times: number,
     options?: boolean | AddEventListenerOptions
   ): void;
-  addBoundListener<T extends EventTarget, K extends keyof EventMapOf<T>>(
+  addConditionalListener<T extends EventTarget, K extends keyof EventMapOf<T>>(
     this: T,
     type: K,
     listener: (this: T, e: EventMapOf<T>[K]) => void,

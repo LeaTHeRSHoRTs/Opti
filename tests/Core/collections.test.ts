@@ -1,4 +1,4 @@
-import "../../dist/opti";
+import "../../src/opti";
 
 describe("NodeList.addClass, NodeList.removeClass, NodeList.toggleClass", () => {
   let nodeList: NodeListOf<Element>;
@@ -15,17 +15,23 @@ describe("NodeList.addClass, NodeList.removeClass, NodeList.toggleClass", () => 
 
   it("should add the class to each element", () => {
     nodeList.addClass('new-class');
-    //@ts-ignore
     expect(nodeList[0].classList.contains('new-class')).toBeTruthy();
-    //@ts-ignore
     expect(nodeList[1].classList.contains('new-class')).toBeTruthy();
   });
 
-  it("should add the class to each element", () => {
+  it("should remove the class from each element", () => {
     nodeList.removeClass('item');
-    //@ts-ignore
     expect(nodeList[0].classList.contains('item')).toBeFalsy();
-    //@ts-ignore
+    expect(nodeList[1].classList.contains('item')).toBeFalsy();
+  });
+
+  it("should toogle the class of each element", () => {
+    nodeList.toggleClass('item');
+    expect(nodeList[0].classList.contains('item')).toBeTruthy();
+    expect(nodeList[1].classList.contains('item')).toBeTruthy();
+
+    nodeList.toggleClass('item');
+    expect(nodeList[0].classList.contains('item')).toBeFalsy();
     expect(nodeList[1].classList.contains('item')).toBeFalsy();
   });
 });
