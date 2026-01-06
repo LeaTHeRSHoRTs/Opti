@@ -4,7 +4,7 @@ module.exports = [
   config.webpack("opti"),
   config.webpack("crafty"),
   config.webpack("query"),
-  config.webpack("evented"),
+  config.webpack("unsync"),
   config.webpack("requests"),
   config.webpack("flow"),
 ];

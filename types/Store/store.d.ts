@@ -1,8 +1,8 @@
 type ResultSet<T extends string[], U extends T[number] = T[number]> = {
-  results: { [P in T]: unknown },
+  results: placeholder,
   ok: true,
 } | {
-  error: DBQueryException,
+  error: placeholder,
   ok: false,
 }
 

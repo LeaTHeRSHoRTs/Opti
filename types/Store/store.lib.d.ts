@@ -25,7 +25,7 @@ declare function MIN(val: number | string, other: number | string)
 declare function AVG(val: number | string, other: number | string)
 declare function COALESCE(val1: string, val2: string, fallback: string)
 
-declare var DBQueryException: SubExceptionConstructor;
+declare var DBQueryException: ExceptionConstructor;
 declare var DB: Database;
 
 interface Database {

@@ -1,7 +1,8 @@
 interface JSON {
-  parse<T = any>(text: string, reviver?: (this: T, key: string, value: any) => any): T
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  parse<T = any, R = T>(text: string, reviver?: (this: T, key: string, value: T) => R): R
 }
 
-interface ObjectConstructor {
-  entries<T extends object>(obj: T): [keyof T, T[keyof T]][]
+declare namespace Reflect {
+  export function ownKeys<T>(object: T): (keyof T & (symbol | string))[]
 }

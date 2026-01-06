@@ -1,8 +1,8 @@
-import "../../src/opti";
-import "../../src/Query/query";
+import "opti";
+import "opti/query";
 
 beforeAll(() => {
-  const elements = [
+  const elements: TupleOf<HTMLDivElement | HTMLHeadingElement, 6> = [
     document.createElement("div"),
     document.createElement("div"),
     document.createElement("div"),

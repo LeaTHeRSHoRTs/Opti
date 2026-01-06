@@ -1,4 +1,4 @@
-type EnumInstance<T> = {
+type EnumInstance<T extends readonly string[]> = {
   readonly [K in T[number]]: symbol;
 } & {
   [Symbol.iterator](): IterableIterator<T[number]>
@@ -9,10 +9,10 @@ interface TupleConstructor {
 }
 
 interface TimeConstructor {
-  new();
-  new(hours: Date);
-  new(hours: number, minutes: number, seconds?: number, milliseconds?: number);
-  new(hours?: number | Date, minutes?: number, seconds?: number, milliseconds?: number);
+  new(): Time;
+  new(hours: Date): Time;
+  new(hours: number, minutes: number, seconds?: number, milliseconds?: number): Time;
+  new(hours?: number | Date, minutes?: number, seconds?: number, milliseconds?: number): Time;
 
   of(date: Date): Time;
   at(hours: number, minutes: number, seconds?: number, milliseconds?: number): number;
@@ -58,33 +58,6 @@ interface Time {
   equals(other: Time): boolean;
 }
 
-interface TypedMap<R extends Record<string | number, any> = {}> {
-  readonly size: number;
-
-  set<K extends string, F>(
-    key: K,
-    value: F
-  ): asserts this is TypedMap<R & { [P in K]: F }>;
-
-  get<K extends keyof R>(key: K): R[K];
-
-  notNull<K extends keyof R>(key: K): boolean;
-
-  delete<K extends keyof R>(key: K): asserts this is TypedMap<Omit<R, K>>;
-
-  keys(): (keyof R)[];
-
-  entries(): [keyof R, R[keyof R]][];
-
-  clear(): void;
-
-  [Symbol.iterator](): IterableIterator<[keyof R, R[keyof R]]>;
-
-  readonly [Symbol.toStringTag]: string;
-
-  forEach(callback: <K extends keyof R>(value: R[K], key: K) => void): void;
-}
-
 interface FutureConstructor extends PromiseConstructor {
   new <T, R extends Error | Exception = Error>(executor: (resolve: (value: T) => void, reject: (err?: R) => void) => void): Future<T, R>;
 }
@@ -109,30 +82,31 @@ interface Future<T, R extends Error | Exception = Error> extends Promise<T> {
    * Attaches a callback that is invoked when the Future is settled (resolved or rejected).
    */
   finally(onfinally?: (() => void) | undefined | null): Future<T, R>;
-};
+}
 
 interface CollectionConstructor {
   from<T>(arrayLike: ArrayLike<T>): Collection<T>;
 
   of<T extends unknown[]>(...values: T): Collection<T[number]>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   of(): Collection<any>
 }
 
 interface Collection<T> extends ArrayLike<T> {
-  item(inedx: number): T | null;
-  each(callbackfn: (value: T, index: number) => void, thisArg?: any): void;
+  item(index: number): T | Missing;
+  each(callbackfn: (value: T, index: number) => void, thisArg?: unknown): void;
   [Symbol.iterator](): IterableIterator<T>
-  entries(): IterableIterator<[number, T]>
-  keys(): IterableIterator<number>
-  values(): IterableIterator<T>
+  entries(): ArrayIterator<[number, T]>
+  keys(): ArrayIterator<number>
+  values(): ArrayIterator<T>
   toArray(): T[]
   toReadonlyArray(): readonly T[];
 }
 
-// Exceptions
-
+//* Exceptions
 interface Exception {
-  get name(): string;
+  _name: string
+  readonly name: string;
   getMessage(): string;
   getCause(): string;
   getStackTrace(): string;
@@ -140,80 +114,88 @@ interface Exception {
   toString(): string;
 }
 
-interface ExceptionConstructor {
-  prototype: Exception;
-  new(message?: string, cause?: string): Exception
+interface BaseExceptionConstructor extends ExceptionConstructor<Exception> {
+  isException(ctor: Class): ctor is ExceptionConstructor;
+  isAnyException(ctor: Class): ctor is ExceptionConstructor | RuntimeExceptionConstructor;
+}
+
+interface ExceptionConstructor<Inst extends Exception = Exception> {
+  new(message?: string, cause?: string): Inst;
+  prototype: Inst;
+}
+
+// ------------------------------
+// RuntimeException
+// ------------------------------
+interface RuntimeException {
+  readonly name: "RuntimeException";
+  getMessage(): string;
+  getCause(): string;
+  getStackTrace(): string;
+  throw(): never;
+  toString(): string;
 }
 
 interface RuntimeExceptionConstructor {
   new(message?: string, cause?: string): RuntimeException
 }
 
-interface RuntimeException {
-  get name(): "RuntimeException";
-  getMessage(): string;
-  getCause(): string;
-  toString(): string;
-}
+interface DecoratorException extends Exception {}
+interface DecoratorExceptionConstructor extends ExceptionConstructor<DecoratorException> {}
 
-interface SubExceptionConstructor {
-  new(message?: string, cause?: string): Exception;
-  readonly prototype: Exception;
-}
+  interface IncorrectDecoratorPlacementException extends DecoratorException {}
+  interface IncorrectDecoratorPlacementExceptionConstructor extends ExceptionConstructor<IncorrectDecoratorPlacementException> {}
 
-interface UnknownExceptionConstructor {
-  new(message?: string): Exception;
-  readonly prototype: Exception;
-}
+  interface AbstractException extends DecoratorException {}
+  interface AbstractExceptionConstructor extends ExceptionConstructor<AbstractException> {}
+
+    interface AbstractInitializationException extends AbstractException {}
+    interface AbstractInitializationExceptionConstructor extends ExceptionConstructor<AbstractInitializationException> {}
+    interface AbstractMethodInvokedException extends AbstractException {}
+    interface AbstractMethodInvokedExceptionConstructor extends ExceptionConstructor<AbstractMethodInvokedException> {}
+
+// ------------------------------
+// Other exceptions
+// ------------------------------
+interface UnknownException extends Exception {}
+interface UnknownExceptionConstructor extends ExceptionConstructor<UnknownException> {}
 
 interface DebouncedException extends Exception {}
-interface DebouncedExceptionConstructor extends SubExceptionConstructor {
-  new(message?: string, cause?: string): DebouncedException;
-}
+interface DebouncedExceptionConstructor extends ExceptionConstructor<DebouncedException> {}
 
 interface SyntaxException extends Exception {}
-interface SyntaxExceptionConstructor extends SubExceptionConstructor {
-  new(message?: string, cause?: string): SyntaxException;
-}
+interface SyntaxExceptionConstructor extends ExceptionConstructor<SyntaxException> {}
+
+interface NotImplementedException extends Exception {}
+interface NotImplementedExceptionConstructor extends ExceptionConstructor<NotImplementedException> {}
+
+interface AccessException extends Exception {}
+interface AccessExceptionConstructor extends ExceptionConstructor<AccessException> {}
+
+interface AssertionException extends Exception {}
+interface AssertionExceptionConstructor extends ExceptionConstructor<AssertionException> {}
+
+interface FetchException extends Exception {}
+interface FetchExceptionConstructor extends ExceptionConstructor<FetchException> {}
 
 interface TypeException extends Exception {}
-interface TypeExceptionConstructor extends SubExceptionConstructor {
-  new(message?: string, cause?: string): TypeException;
-}
+interface TypeExceptionConstructor extends ExceptionConstructor<TypeException> {}
 
 interface CloneException extends Exception {}
-interface CloneExceptionConstructor extends SubExceptionConstructor {
-  new(message?: string, cause?: string): CloneException;
-}
+interface CloneExceptionConstructor extends ExceptionConstructor<CloneException> {}
 
-interface NumberTooSmallException extends Exception {}
-interface NumberTooSmallExceptionConstructor extends SubExceptionConstructor {
-  new(message?: string, cause?: string): NumberTooSmallException;
-}
+interface NumberException extends Exception {}
+interface NumberExceptionConstructor extends ExceptionConstructor<NumberException> {}
 
-interface AbstractInitializationException extends Exception {}
-interface AbstractInitializationExceptionConstructor extends SubExceptionConstructor {
-  new(message?: string, cause?: string): AbstractInitializationException;
-}
+  interface NumberTooSmallException extends Exception {}
+  interface NumberTooSmallExceptionConstructor extends ExceptionConstructor<NumberTooSmallException> {}
 
-interface AbstractMethodInvokedException extends Exception {}
-interface AbstractMethodInvokedExceptionConstructor extends SubExceptionConstructor {
-  new(message?: string, cause?: string): AbstractMethodInvokedException;
-}
 
-interface SortException extends Exception {}
-interface SortExceptionConstructor extends SubExceptionConstructor {
-  new(message?: string, cause?: string): SortException;
-}
+interface CollectionException extends Exception {}
+interface CollectionExceptionConstructor extends ExceptionConstructor<CollectionException> {}
 
-interface CollectionOutOfBoundsException extends Exception {};
+  interface CollectionOutOfBoundsException extends Exception {}
+  interface CollectionOutOfBoundsExceptionConstructor extends ExceptionConstructor<CollectionOutOfBoundsException> {}
 
-interface CollectionOutOfBoundsExceptionConstructor extends SubExceptionConstructor {
-  new(message?: string, cause?: string): CollectionOutOfBoundsException;
-}
-
-interface MalformedQueryException extends Exception {};
-
-interface MalformedQueryExceptionConstructor extends SubExceptionConstructor {
-  new(message?: string, cause?: string): MalformedQueryException;
-}
+interface MalformedQueryException extends Exception {}
+interface MalformedQueryExceptionConstructor extends ExceptionConstructor<MalformedQueryException> {}

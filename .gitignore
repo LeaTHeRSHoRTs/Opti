@@ -1,10 +1,16 @@
-tsconfig.json
-.npmignore
+# Node
 /node_modules
 .env
-/scripts
-/build
+
+# Generated
 /dist
-.eslintignore
-package-lock.json
+/bin
+
+# Vscode
+.vscode/
+
+# Logs
+*.log
+
+# Ideas
 _future.*

@@ -2,49 +2,46 @@ export function unique<T>(this: T[]): T[] {
   return [...new Set(this)];
 };
 
-export function pluck<T>(this: T[], finder: (v: T) => boolean): T | null {
+export function pluck<T>(this: T[], finder: (v: T) => boolean): T | Missing {
   const res = this.findIndex(finder);
 
-  if (res === -1) return null;
+  if (res === -1) return Missing;
 
   const [item] = this.splice(res, 1);
-  return item;
+  return item ?? Missing;
 }
 
-export function pluckLast<T>(this: T[], finder: (v: T) => boolean): T | null {
-  // find index of last matching element
+export function pluckLast<T>(this: T[], finder: (v: T) => boolean): T | Missing {
   const index = this.map(finder).lastIndexOf(true);
-  if (index === -1) return null;
 
-  // remove and return it
+  if (index === -1) return Missing;
+
   const [item] = this.splice(index, 1);
-  return item;
+  return item ?? Missing;
 }
 
 export function relocate<T>(this: T[], index: number, offset: number): number | null {
-  const value = this.splice(index, 1)[0] ?? null;
-  if (value) {
+  const value = this.splice(index, 1)[0] ?? Missing;
+  if (value !== Missing) {
     this.splice(index + offset, 0, value);
     return index + offset;
   } else return null;
 }
 
 export function relocateTo<T>(this: T[], index: number, location: number): number | null {
-  const value = this.splice(index, 1)[0] ?? null;
-  if (value) {
+  const value = this.splice(index, 1)[0] ?? Missing;
+  if (value !== Missing) {
     this.splice(location, 0, value);
     return location;
   } else return null;
 }
 
-type AnyConstructor<T = any> = new (...args: any[]) => T;
-
-export function arrayType(this: any[]) {
+export function arrayType(this: unknown[]): string[] {
   return [...new Set(this.map(v => typed(v).stringOfBasic()))].sort();
 }
 
-function arrType<T extends AnyConstructor | StringConstructor | NumberConstructor | BooleanConstructor | SymbolConstructor>(
-  array: any[],
+function arrType<T extends Class.Constructor | StringConstructor | NumberConstructor | BooleanConstructor | SymbolConstructor>(
+  array: unknown[],
   type: T
 ): array is Unboxed<T>[] {
   return array.every(v =>
@@ -56,7 +53,7 @@ function arrType<T extends AnyConstructor | StringConstructor | NumberConstructo
   );
 }
 
-const origionalSort: <T>(this: T[], compareFn?: ((a: any, b: any) => number) | undefined) => any[] = Array.prototype.sort;
+const origionalSort = Array.prototype.sort;
 export function sortBy<T>(this: T[], order?: SortMode<T> | ((a: T, b: T) => number)): T[] {
   if (typeof order === "function") {
     return origionalSort.call(this, order);
@@ -85,32 +82,33 @@ export function sortBy<T>(this: T[], order?: SortMode<T> | ((a: T, b: T) => numb
   return copy.sort();
 }
 
-export function replace<T>(this: T[], index: number | ((value: T) => boolean), newVal: T): T | null {
+export function replace<T>(this: T[], index: number | ((value: T) => boolean), newVal: T): T | Missing {
   if (typeof index === "number") {
     const oldVal = this[index];
     this[index] = newVal;
 
-    return oldVal ?? null;
+    return oldVal ?? Missing;
   } else {
     const i = this.findIndex(index);
-    if (i === -1) return null;
+    if (i === -1) return Missing;
 
     const oldVal = this[i];
     this[i] = newVal;
 
-    return oldVal;
+    return oldVal ?? Missing;
   }
 }
 
-export function replaceLast<T>(this: T[], finder: (value: T) => boolean, newVal: T): T | null {
+export function replaceLast<T>(this: T[], finder: (value: T) => boolean, newVal: T): T | Missing {
   for (let i = this.length - 1; i >= 0; i--) {
-    if (finder(this[i])) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    if (finder(this[i]!)) {
       const oldVal = this[i];
       this[i] = newVal;
-      return oldVal ?? null;
+      return oldVal ?? Missing;
     }
   }
-  return null;
+  return Missing;
 }
 
 export function chunk<T>(this: T[], chunkSize: number): T[][] {
@@ -135,6 +133,6 @@ export function chunk<T>(this: T[], chunkSize: number): T[][] {
   return newArr;
 };
 
-export function insert<U>(this: unknown[], index: number, ...values: U[]) {
+export function insert<U>(this: U[], index: number, ...values: U[]): void {
   this.splice(index, 0, ...values);
 }

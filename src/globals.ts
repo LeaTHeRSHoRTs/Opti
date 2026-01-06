@@ -35,11 +35,11 @@ function typeObject<T>(val: T, str: string, basicStr: string = str): TypeGuard<T
           if (other === null) {
             return v === null;
           }
-          const ctorName = (other as any).constructor?.name;
+          const ctorName = other.constructor?.name;
           if (ctorName && str.includes(ctorName)) return true;
 
-          if (typeof (other as any).toString === "function") {
-            return str === (other as any).toString();
+          if (typeof other.toString === "function") {
+            return str === other.toString();
           }
 
           return false;
@@ -53,10 +53,10 @@ function typeObject<T>(val: T, str: string, basicStr: string = str): TypeGuard<T
       return v !== undefined && v !== null;
     },
     isFalsy() {
-      return !v;
+      return !Boolean(v);
     },
     isTruthy() {
-      return !!v;
+      return Boolean(v);
     },
     isNull() {
       return v === null;
@@ -78,13 +78,13 @@ function typeObject<T>(val: T, str: string, basicStr: string = str): TypeGuard<T
     }
   });
 
-  function hasOwn<U extends string>(val: T, prop: U): val is typeof val & { [K in U]: number } {
-    if (val === null || val === undefined) {
+  function hasOwn<U extends string>(intVal: T, prop: U): intVal is typeof intVal & { [K in U]: number } {
+    if (intVal === null || intVal === undefined) {
       return false;
     }
 
-    if (typeof val === "string") return true;
-    return Object.prototype.hasOwnProperty.call(val, prop);
+    if (typeof intVal === "string") return true;
+    return Object.prototype.hasOwnProperty.call(intVal, prop);
   }
 
   if (typeof v === "string" || hasOwn(v, "size") || hasOwn(v, "length")) {
@@ -135,11 +135,11 @@ function typeObject<T>(val: T, str: string, basicStr: string = str): TypeGuard<T
   if (Array.isArray(v)) {
     obj = Object.assign(obj, {
       containsValues(countNullish: boolean = false): boolean {
-        let arr: any[] = v as any[];
-        if (!countNullish) arr = arr.filter(val => val !== null && val !== undefined);
+        let arr = v as unknown[];
+        if (!countNullish) arr = arr.filter(fval => fval !== null && fval !== undefined);
         return arr.length > 0;
       },
-      alwaysContainsValues(values: [any, ...any[]]): void {
+      alwaysContainsValues(values: [unknown, ...unknown[]]): void {
         if ((v as unknown[]).length === 0) {
           (v as unknown[]).push(...values);
         }
@@ -202,15 +202,15 @@ export function typed<T>(val: T): TypeGuard<T> {
   }
 
   let typeName = Object.prototype.toString.call(val).slice(8, -1);
-  typeName = typeName[0].toUpperCase() + typeName.slice(1);
+  typeName = (typeName[0]?.toUpperCase() ?? "") + typeName.slice(1);
 
   const ctor = val.constructor.name;
   if (ctor && ctor === "Object") {
     typeName = ctor;
   }
 
-  const valtype = typeof val;
-  const basicTypeName = valtype === "object" ? valtype : typeName;
+  const valType = typeof val;
+  const basicTypeName = valType === "function" || valType === "object" ? typeName : valType;
 
   switch (typeof val) {
     case "string":
@@ -234,7 +234,7 @@ export function typed<T>(val: T): TypeGuard<T> {
   return typeObject<T>(val, typeName, basicTypeName);
 };
 
-export function info(val: any): string {
+export function info(val: unknown): string {
   return String(val);
 }
 
@@ -255,13 +255,14 @@ export function isEmpty(val: string): val is "";
 export function isEmpty(val: number): val is typeof NaN;
 export function isEmpty(val: boolean): val is false;
 export function isEmpty(val: null | undefined): true;
-export function isEmpty(val: Array<any>): val is [];
-export function isEmpty(val: Record<any, unknown>): val is Record<any, never>;
-export function isEmpty(val: Map<any, any>): val is Map<any, never>;
-export function isEmpty(val: Set<any>): val is Set<never>;
-export function isEmpty(val: WeakMap<object, any>): val is WeakMap<object, any>;
+export function isEmpty(val: unknown[]): val is [];
+export function isEmpty(val: Record<Key, unknown>): val is Record<Key, never>;
+export function isEmpty(val: Map<unknown, unknown>): val is Map<unknown, never>;
+export function isEmpty(val: Set<unknown>): val is Set<never>;
+export function isEmpty(val: WeakMap<object, unknown>): val is WeakMap<object, unknown>;
 export function isEmpty(val: WeakSet<object>): val is WeakSet<object>;
-export function isEmpty(val: any): boolean {
+export function isEmpty(val: unknown): boolean;
+export function isEmpty(val: unknown): boolean {
   // Generic type checking
   // eslint-disable-next-line eqeqeq
   if (val == null || val === false || val === "") return true;
@@ -272,9 +273,8 @@ export function isEmpty(val: any): boolean {
   // Array checking
   if (Array.isArray(val) && val.length === 0) return true;
 
-  // Map, Set, and weak variant checks
-  if (val instanceof Map || val instanceof Set || val instanceof WeakMap || val instanceof WeakSet) {
-    return (val as any).size === 0; // size check works for these types
+  if (val instanceof Map || val instanceof Set) {
+    return val.size === 0; // size check works for these types
   }
 
   // Object checking
@@ -291,23 +291,13 @@ export function notEmpty(val: string | ""): val is string;
 export function notEmpty(val: number | 0): val is number;
 export function notEmpty(val: boolean): val is true;
 export function notEmpty(val: null | undefined): false;
-export function notEmpty(val: [...any] | []): val is [any, ...any];
+export function notEmpty(val: unknown[] | []): val is [unknown, ...unknown[]];
 export function notEmpty(val: Record<Key, unknown>): val is Record<Key, unknown>;
-export function notEmpty(val: Map<any, any>): val is Map<any, never>;
-export function notEmpty(val: Set<any>): val is Set<never>;
-export function notEmpty(val: WeakMap<object, any>): val is WeakMap<object, any>;
+export function notEmpty(val: Map<unknown, unknown>): val is Map<unknown, never>;
+export function notEmpty(val: Set<unknown>): val is Set<never>;
+export function notEmpty(val: WeakMap<object, unknown>): val is WeakMap<object, unknown>;
 export function notEmpty(val: WeakSet<object>): val is WeakSet<object>;
-export function notEmpty(val: any): boolean {
+export function notEmpty(val: unknown): boolean;
+export function notEmpty(val: unknown): boolean {
   return !isEmpty(val);
 }
-
-// eslint-disable-next-line prefer-const
-export let opti = {
-  crafty: false as false,
-  query: false as false,
-  evented: false as false,
-  requests: false as false,
-  templated: false as false,
-  flow: false as false,
-  help: {}
-};

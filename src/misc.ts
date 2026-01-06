@@ -1,35 +1,36 @@
-type _EventsRecord<T extends EventTarget> = { [K in keyof EventMapOf<T>]?: EventListenerInfo<T, K>[] };
-
-declare interface EventTarget {
-  _events: _EventsRecord<this>;
-}
-
 //* Function
 
 export function args(this: Func): string[] {
-  return this.toString()
+  const match = this.toString()
     .replace(/\s*=\s*.*?(,|\))/g, "$1")
-    .match(/\(([^)]*)\)/)?.[1]
-    .split(",")
+    .match(/\(([^)]*)\)/)?.[1];
+  if (match !== undefined) {
+    return match.split(",")
     .map(p => p.trim())
-    .filter(Boolean) || [];
+    .filter(Boolean);
+  } else return [];
 }
 
-export function throttle<T extends Func>(func: T, ms: number): (this: Func.This<T>, ...args: Func.Arguments<T>) => Func.Return<T> | null {
+export function throttle<T extends Func>(func: T, ms: number): Func<Func.This<T>, Func.Arguments<T>, Func.Return<T> | null> {
   let throttled: boolean = false;
   const cache: Func.Arguments<T>[] = [];
-  return function (this: Func.This<T>, ...args: Func.Arguments<T>) {
+  return function (this: Func.This<T>, ...rargs: Func.Arguments<T>) {
     if (!throttled) {
       const self = this;
       throttled = true;
-      const val: Func.Return<T> = func.apply(self, args);
+      const val: Func.Return<T> = func.apply(self, rargs);
       setTimeout(() => {
         throttled = false;
-        if (cache.length > 0) func.apply(self, cache.shift()!);
+        if (cache.length > 0) {
+          const item = cache.shift();
+          if (item !== undefined) {
+            func.apply(self, item);
+          }
+        }
       }, ms);
       return val;
     }
-    cache.push(args);
+    cache.push(rargs);
     return null;
   };
 }
@@ -41,7 +42,7 @@ export function debounce<T extends Func>(
   let timer: ReturnType<typeof setTimeout> | null = null;
   let globRej: ((err?: DebouncedException) => void) | null = null;
 
-  return function (this: Func.This<T>, ...args: Func.Arguments<T>) {
+  return function (this: Func.This<T>, ...rargs: Func.Arguments<T>) {
     if (globRej && timer) {
       const rej = globRej;
       globRej = null;
@@ -59,7 +60,7 @@ export function debounce<T extends Func>(
       timer = setTimeout(() => {
         globRej = null;
         timer = null; // clear timer reference
-        res(func.apply(self, args));
+        res(func.apply(self, rargs));
       }, ms);
     });
   };
@@ -68,24 +69,24 @@ export function debounce<T extends Func>(
 export function memo<T extends Func>(fn: T): T {
   const cache = new Map<string, ReturnType<T>>();
 
-  return function (this: Func.This<T>, ...args: Func.Arguments<T>): Func.Return<T> {
-    const key = JSON.stringify(args); // unique per argument set
+  return function (this: Func.This<T>, ...rargs: Func.Arguments<T>): Func.Return<T> {
+    const key = JSON.stringify(rargs); // unique per argument set
     if (cache.has(key)) return cache.get(key)!; // return cached result
-    const result = fn.apply(this, args);       // call original function
+    const result = fn.apply(this, rargs);       // call original function
     cache.set(key, result);                    // store in cache
     return result;
   } as T;
 }
 
-export function instMemo(this: Func) {
+export function instMemo<T extends Func>(this: T): T {
   return memo(this);
 }
 
-export function instDebounce(this: Func, ms: number) {
+export function instDebounce<T extends Func>(this: T, ms: number): Func<Func.This<T>, Func.Arguments<T>, Future<Func.Return<T>, DebouncedException>> {
   return debounce(this, ms);
 }
 
-export function instThrottle(this: Func, ms: number) {
+export function instThrottle<T extends Func>(this: T, ms: number): Func<Func.This<T>, Func.Arguments<T>, Func.Return<T> | null> {
   return throttle(this, ms);
 }
 
@@ -101,7 +102,7 @@ export function clone<T>(object: symbol, deep?: boolean): never;
 export function clone<T>(object: T, deep?: boolean): T;
 export function clone<T>(object: T, deep: boolean = true): T {
   if (typeof object === "symbol") {
-    throw new globalThis.CloneException("Symbols cannot be cloned");
+    throw new CloneException("Symbols cannot be cloned");
   }
 
   if (!deep) {
@@ -143,14 +144,14 @@ export function clone<T>(object: T, deep: boolean = true): T {
   const result = Object.create(proto);
 
   for (const key of Reflect.ownKeys(object)) {
-    const value = (object as any)[key];
-    (result as any)[key] = deep ? clone(value, true) : value;
+    const value = object[key];
+    result[key] = deep ? clone(value, true) : value;
   }
 
   return result;
 };
 
-export function forEach<T>(object: T, iterator: (key: keyof T, value: T[keyof T]) => any): void {
+export function forEach<T>(object: T, iterator: (key: keyof T, value: T[keyof T]) => unknown): void {
   for (const key in object) {
     if (Object.prototype.hasOwnProperty.call(object, key)) {
       iterator(key, object[key]);
@@ -160,7 +161,7 @@ export function forEach<T>(object: T, iterator: (key: keyof T, value: T[keyof T]
 
 //* Number
 
-export function repeat(this: number, iterator: (i: number) => any): void {
+export function repeat(this: number, iterator: (i: number) => void): void {
   for (let i = 0; i < this; i++) {
     iterator(i);
   }
@@ -177,7 +178,7 @@ export function capitalize(this: string): string {
   return i === -1 ? this : this.slice(0, i) + this.charAt(i).toUpperCase() + this.slice(i + 1);
 };
 
-export function matches(this: String, regexp: string | RegExp) {
+export function matches(this: String, regexp: string | RegExp): boolean {
   return this.search(regexp) !== -1;
 };
 
@@ -198,87 +199,10 @@ export function toCase(this: string, format: CaseConventions): string {
 //* Math
 
 const origionalRandom = Math.random;
-export const random = (minOrMax?: number, max?: number) => {
+export function random(minOrMax?: number, max?: number): number {
   if (typeof minOrMax !== "undefined" && typeof max !== "undefined") {
     return origionalRandom() * (max - minOrMax) + minOrMax;
   } else if (typeof minOrMax !== "undefined") {
     return origionalRandom() * minOrMax;
   } else return origionalRandom();
 };
-
-//* Others
-
-/** @future */
-export function mixin<T extends Func>(
-  fn: T,
-  location: "HEAD",
-  mixinFn: T
-): T;
-
-export function mixin<T extends Func, This = ThisParameterType<T>, Ret = ReturnType<T>>(
-  fn: T,
-  location: "TAIL",
-  mixinFn: (this: This & { mixin: { value: Ret } }, ...args: Parameters<T>) => Ret
-): T;
-
-export function mixin<T extends Func, This = ThisParameterType<T>, Ret = ReturnType<T>>(
-  fn: T,
-  location: "HEAD" | "TAIL",
-  mixinFn: any
-): T {
-  switch (location) {
-    case "HEAD":
-      return (function (this: This, ...args: Parameters<T>): Ret {
-        mixinFn.call(this, ...args);
-        return fn.call(this, ...args);
-      }) as T;
-
-    case "TAIL":
-      return (function (this: This, ...args: Parameters<T>): Ret {
-        const result = fn.call(this, ...args);
-        const self = Object.assign({ mixin: { value: result } }, this);
-        mixinFn.call(self, ...args);
-        return result;
-      }) as T;
-  }
-}
-
-export function getEvents<T extends EventTarget, K extends keyof EventMapOf<T> = any>(this: T, key: K): EventListenerInfo<T, K>[];
-export function getEvents<T extends EventTarget>(this: T): { [K in keyof EventMapOf<T>]: EventListenerInfo<T, K>[] };
-export function getEvents<T extends EventTarget, K extends keyof EventMapOf<T> = any>(this: T, key?: K) {
-  if (key === undefined) {
-    return this._events;
-  }
-
-  return this._events[key] ?? [];
-}
-
-const originalAddEventListener = EventTarget.prototype.addEventListener;
-
-declare let _evFuncType: "default" | "conditional" | "controller" | undefined;
-declare let _evFuncData: (number | ((this: any) => boolean)) | undefined;
-
-export const addEventListener = mixin(
-  originalAddEventListener,
-  "HEAD",
-  function <T extends EventTarget, K extends keyof EventMapOf<T>>(this: T, type: K, callback: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {
-    this._events[type] ??= [];
-
-    const listener: EventFunc<T, K> =
-      "handleEvent" in callback
-        ? (callback.handleEvent as EventFunc<T, K>)
-        : (callback as EventFunc<T, K>);
-
-    this._events[type].push({
-      func: listener,
-      options:
-        typeof options === "boolean"
-          ? { capture: options }
-          : options
-          ? options
-          : {},
-      listener: _evFuncType ?? "default",
-      special: _evFuncData
-    });
-  }
-);

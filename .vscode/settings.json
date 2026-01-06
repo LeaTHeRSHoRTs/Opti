@@ -1,13 +1,21 @@
 {
   "typescript.tsdk": "./node_modules/typescript/lib",
-  "jest.runMode": "on-demand",
-  "jest.jestCommandLine": "npm run test --",
+  "jest.runMode": {
+    "runAllTestsOnStartup": true,
+    "type": "on-demand"
+  },
+  "code-runner.executorMap": {
+    "typescript": "node scripts/ts-node.cjs $fullFileName",
+  },
+  "jest.jestCommandLine": "npm run test",
   "files.exclude": {
-    "**/.git": true,
-    "**/.svn": true,
-    "**/.hg": true,
-    "**/.DS_Store": true,
-    "**/Thumbs.db": true,
-    "**/coverage": true
-  }
+    "**/coverage": true,
+  },
+  "cSpell.words": [
+    "broski",
+    "constructableobjects",
+    "flowclass",
+    "optijs",
+    "unsync"
+  ]
 }

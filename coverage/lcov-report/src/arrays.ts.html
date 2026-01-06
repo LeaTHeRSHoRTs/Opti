@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.25% </span>
+                <span class="strong">96.62% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>83/89</span>
+                <span class='fraction'>86/89</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">80% </span>
+                <span class="strong">86.66% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>48/60</span>
+                <span class='fraction'>52/60</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">96.2% </span>
+                <span class="strong">97.46% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>76/79</span>
+                <span class='fraction'>77/79</span>
             </div>
         
             
@@ -217,10 +217,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -233,18 +241,10 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">15x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">15x</span>
-<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -262,10 +262,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-yes">15x</span>
-<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">18x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">17x</span>
+<span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
@@ -318,7 +318,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">15x</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
@@ -345,19 +345,19 @@
   return [...new Set(this)];
 };
 &nbsp;
-export function pluck&lt;T&gt;(this: T[], finder: (v: T) =&gt; boolean): T | null {
+export function pluck&lt;T&gt;(this: T[], finder: (v: T) =&gt; boolean): T | Missing {
   const res = this.findIndex(finder);
 &nbsp;
-  if (res === -1) return null;
+  if (res === -1) return Missing;
 &nbsp;
   const [item] = this.splice(res, 1);
   return item;
 }
 &nbsp;
-export function pluckLast&lt;T&gt;(this: T[], finder: (v: T) =&gt; boolean): T | null {
+export function pluckLast&lt;T&gt;(this: T[], finder: (v: T) =&gt; boolean): T | Missing {
   // find index of last matching element
   const index = this.map(finder).lastIndexOf(true);
-  <span class="missing-if-branch" title="if path not taken" >I</span>if (index === -1) <span class="cstat-no" title="statement not covered" >return null;</span>
+  if (index === -1) return Missing;
 &nbsp;
   // remove and return it
   const [item] = this.splice(index, 1);
@@ -365,16 +365,16 @@ export function pluckLast&lt;T&gt;(this: T[], finder: (v: T) =&gt; boolean): T |
 }
 &nbsp;
 export function relocate&lt;T&gt;(this: T[], index: number, offset: number): number | null {
-  const value = this.splice(index, 1)[0] ?? <span class="branch-1 cbranch-no" title="branch not covered" >null;</span>
-  if (value) {
+  const value = this.splice(index, 1)[0] ?? Missing;
+  if (value !== Missing) {
     this.splice(index + offset, 0, value);
     return index + offset;
-  } else <span class="cstat-no" title="statement not covered" ><span class="missing-if-branch" title="else path not taken" >E</span>return null;</span>
+  } else return null;
 }
 &nbsp;
 export function relocateTo&lt;T&gt;(this: T[], index: number, location: number): number | null {
-  const value = this.splice(index, 1)[0] ?? <span class="branch-1 cbranch-no" title="branch not covered" >null;</span>
-  if (value) {
+  const value = this.splice(index, 1)[0] ?? <span class="branch-1 cbranch-no" title="branch not covered" >Missing;</span>
+  if (value !== Missing) {
     this.splice(location, 0, value);
     return location;
   } else <span class="cstat-no" title="statement not covered" ><span class="missing-if-branch" title="else path not taken" >E</span>return null;</span>
@@ -428,15 +428,15 @@ export function sortBy&lt;T&gt;(this: T[], order?: SortMode&lt;T&gt; | ((a: T, b
   return copy.sort();
 }
 &nbsp;
-export function replace&lt;T&gt;(this: T[], index: number | ((value: T) =&gt; boolean), newVal: T): T | null {
+export function replace&lt;T&gt;(this: T[], index: number | ((value: T) =&gt; boolean), newVal: T): T | Missing {
   if (typeof index === "number") {
     const oldVal = this[index];
     this[index] = newVal;
 &nbsp;
-    return oldVal ?? <span class="branch-1 cbranch-no" title="branch not covered" >null;</span>
+    return oldVal ?? <span class="branch-1 cbranch-no" title="branch not covered" >Missing;</span>
   } else {
     const i = this.findIndex(index);
-    <span class="missing-if-branch" title="if path not taken" >I</span>if (i === -1) <span class="cstat-no" title="statement not covered" >return null;</span>
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (i === -1) <span class="cstat-no" title="statement not covered" >return Missing;</span>
 &nbsp;
     const oldVal = this[i];
     this[i] = newVal;
@@ -445,19 +445,19 @@ export function replace&lt;T&gt;(this: T[], index: number | ((value: T) =&gt; bo
   }
 }
 &nbsp;
-export function replaceLast&lt;T&gt;(this: T[], finder: (value: T) =&gt; boolean, newVal: T): T | null {
+export function replaceLast&lt;T&gt;(this: T[], finder: (value: T) =&gt; boolean, newVal: T): T | Missing {
   for (let i = this.length - 1; i &gt;= 0; i--) {
     <span class="missing-if-branch" title="else path not taken" >E</span>if (finder(this[i])) {
       const oldVal = this[i];
       this[i] = newVal;
-      return oldVal ?? <span class="branch-1 cbranch-no" title="branch not covered" >null;</span>
+      return oldVal ?? <span class="branch-1 cbranch-no" title="branch not covered" >Missing;</span>
     }
   }
-<span class="cstat-no" title="statement not covered" >  return null;</span>
+<span class="cstat-no" title="statement not covered" >  return Missing;</span>
 }
 &nbsp;
 export function chunk&lt;T&gt;(this: T[], chunkSize: number): T[][] {
-  <span class="missing-if-branch" title="if path not taken" >I</span>if (chunkSize &lt;= 0) <span class="cstat-no" title="statement not covered" >throw new globalThis.NumberTooSmallException("`chunkSize` cannot be a number below 1");</span>
+  if (chunkSize &lt;= 0) throw new globalThis.NumberTooSmallException("`chunkSize` cannot be a number below 1");
 &nbsp;
   const newArr: T[][] = [];
   let tempArr: T[] = [];
@@ -487,7 +487,7 @@ export function insert&lt;U&gt;(this: unknown[], index: number, ...values: U[]) 
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-12-07T06:08:22.735Z
+                at 2025-12-13T01:47:47.369Z
             </div>
         <script src="../prettify.js"></script>
         <script>

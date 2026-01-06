@@ -17,7 +17,3 @@ interface RequestFunction {
   of: <T extends Object>(datatype: T, method: RequestType, url: string, data: any, options: RequestOptions) => Promise<Unboxed<T>>
   of: <T = any>(options: RequestOptions) => Promise<T>
 }
-
-interface OptiObject {
-  requests: true,
-};

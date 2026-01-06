@@ -1,23 +1,64 @@
+/**
+ * @file opti.lib.d.ts
+ * @description Main type declarations for the Opti library
+ * @version 1.0.0
+ */
+
 /// <reference path="./opti.d.ts" />
 /// <reference path="./deprecation.d.ts" />
 /// <reference path="./alterations.d.ts" />
 /// <reference path="./classes.d.ts" />
 /// <reference path="./interfaces.d.ts" />
 
-/* eslint-disable no-var */
+//-------------------------------------      Symbols      -------------------------------------
+
+/**
+ * `Missing` is used when a value is not present.
+ * 
+ * The new array methods return a `Missing` when a value is not found, so that they support `null` and `undefined` arrays.
+ * 
+ * @opti
+ * @readonly
+ * @author LeaTHeR_SHoRTs
+ * @since 1.0.0
+ */
+declare const Missing: unique symbol;
+type Missing = typeof Missing;
+
+//------------------------------------- Global Functions  -------------------------------------
 
 /** 
  * Creates an iife (Immediately invoked function expression) that triggers on run 
  * @opti
- * @param iife The function to run the code in for the iife
+ * @param iife The function to run immediately
+ * @param args The arguments to pass to the `iife` function
+ * @returns The value returned from the `iife` function
+ * @since 1.0.0
+ * @example
+ * ```ts
+ * f(() => {
+ *   console.log("I run when the file loads!");
+ * });
+ * 
+ * const res = f(() => {
+ *   return "I go into the res variable!";
+ * });
+ * 
+ * const otherRes = f(r => {
+ *   return r.insert(1, " don't");
+ * }, res);
+ * ```
  */
-declare function f<T>(iife: () => T): T;
+declare function f<T, P extends unknown[]>(iife: (...args: P) => T, ...args: P): T;
 
 /**
  * Gets the type of the value and returns a string representation of the type of the value
  * @opti
  * @param val The value who's type is being tested
+ * @returns An object that has multiple testing functions and assertions functions
+ * @since 1.0.0
  * @example
+ * ```ts
  * type(5).stringOf()           // "number"
  * type("hello").stringOf()     // "string"
  * type(null).stringOf()        // "null"
@@ -29,15 +70,18 @@ declare function f<T>(iife: () => T): T;
  * type(() => {}).stringOf()    // "function"
  * type(new Map()).stringOf()   // "map"
  * type(new Set()).stringOf()   // "set"
+ * ```
  */
 declare function typed<T>(val: T): TypeGuard<T>;
 
 /**
  * Asserts whether `condition` is true or not and throws an {@linkcode AssertionException} if it fails
  * @opti
- * @throws AssertException
+ * @throws {AssertionException} Throws if the assertion fails
  * @param condition The condition to test
+ * @since 1.0.0
  * @example
+ * ```ts
  * let mayVar = 32;
  * if (Math.random() > 0.5) {
  *   myVar = 33;
@@ -45,17 +89,46 @@ declare function typed<T>(val: T): TypeGuard<T>;
  * 
  * assert(myVar === 33); // From now on, intellisense thinks that myVar: 33
  * console.log(myVar); // Will not log if myVar is 32 before the assertion
+ * ```
  */
 declare function assert(condition: boolean): asserts condition;
-declare function assert<T>(value: any): asserts value is T;
 
 /**
- * Cheks whether the value given is empty, `null`, or `undefined`
+ * Gets the events on an object
  * 
- * See {@linkcode notEmpty} for inverse function
  * @opti
- * @param value The value to check
+ * @function
+ * @param target The target object that events are being fetched from
+ * @param event The optional event that is being fetched from the object
+ * @returns Either an event object of all events on the EventTarget or a specific event's info
+ * @since 1.0.0
  * @example
+ * ```ts
+ * const el = document.getElementById("example");
+ * 
+ * document.addEventListener("click", () => console.log("clicked"));
+ * document.addConditionalEvent("focus", () => console.log("focused"));
+ * 
+ * const eventList = events(el);
+ * console.log("All event listeners for #example", eventList); 
+ * // [{ type: "click", func: [Function], options {}, listener: "default" }, 
+ * //  { type: "focus", func: [Function], options {}, listener: "default" }]
+ * const clickEvent = events(el, "click");
+ * console.log("Click event listener for #example:", clickEvent); // { type: "click", func: () => void, options: {}, listener: "default" }
+ * ```
+ */
+declare function events<T extends EventTarget, K extends keyof EventMapOf<T>>(target: T, event: K): EventListenerInfo<T, K>[];
+declare function events<T extends EventTarget>(target: T): { [K in keyof EventMapOf<T>]: EventListenerInfo<T, K>[] };
+
+/**
+ * Checks whether the value given is empty, `null`, or `undefined`
+ * 
+ * @opti
+ * @see {@linkcode notEmpty} inverse of `isEmpty`
+ * @param val The value to check
+ * @since 1.0.0
+ * @example
+ * ```ts
  * isEmpty(""); // true
  * isEmpty("Hello"); // false
  * isEmpty(NaN); // true
@@ -63,180 +136,315 @@ declare function assert<T>(value: any): asserts value is T;
  * isEmpty({}); // true
  * isEmpty([]); // true
  * isEmpty([1, 2]); // false
+ * ```
  */
 declare function isEmpty(val: string): val is "";
-declare function isEmpty(val: number): val is typeof NaN;
+declare function isEmpty(val: number): boolean;
 declare function isEmpty(val: boolean): val is false;
 declare function isEmpty(val: null | undefined): true;
-declare function isEmpty(val: [...any]): val is [];
-declare function isEmpty(val: Record<Key, unknown>): val is Record<Key, never>;
-declare function isEmpty(val: Map<any, any>): val is Map<any, never>;
-declare function isEmpty(val: Set<any>): val is Set<never>;
-declare function isEmpty(val: WeakMap<object, any>): val is WeakMap<object, any>;
-declare function isEmpty(val: WeakSet<object>): val is WeakSet<object>;
-declare function isEmpty(val: any): boolean;
+declare function isEmpty<T>(val: T[]): val is T[] & { length: 0 };
+declare function isEmpty<K extends Key>(val: Record<K, unknown>): val is Record<K, never>;
+declare function isEmpty<K extends Key>(val: Map<K, unknown>): val is Map<K, never>;
+declare function isEmpty(val: Set<unknown>): val is Set<never>;
+declare function isEmpty(val: unknown): boolean;
 
 /**
- * Inverse function to {@linkcode isEmpty}
+ * Performs inverse function to {@linkcode isEmpty}
  * @opti
- * @param value The value to check
+ * @see {@linkcode isEmpty} inverse of `notEmpty`
+ * @param val The value to check 
+ * @since 1.0.0
  * @example
+ * ```ts
  * isEmpty("") === notEmpty("Hello") // true
+ * notEmpty(""); // false
+ * notEmpty("Hello"); // true
+ * notEmpty(NaN); // false
+ * notEmpty(0); // true
+ * notEmpty({}); // false
+ * notEmpty([]); // false
+ * notEmpty([1, 2]); // true
+ * ```
  */
-declare function notEmpty(val: string | ""): val is string;
-declare function notEmpty(val: number | 0): val is number;
+declare function notEmpty(val: string): val is string;
+declare function notEmpty(val: number): val is number;
 declare function notEmpty(val: boolean): val is true;
 declare function notEmpty(val: null | undefined): false;
-declare function notEmpty(val: [...any] | []): val is [any, ...any];
-declare function notEmpty(val: Record<Key, unknown>): val is Record<Key, unknown>;
-declare function notEmpty(val: Map<any, any>): val is Map<any, never>;
-declare function notEmpty(val: Set<any>): val is Set<never>;
-declare function notEmpty(val: WeakMap<object, any>): val is WeakMap<object, any>;
-declare function notEmpty(val: WeakSet<object>): val is WeakSet<object>;
-declare function notEmpty(val: any): boolean;
+declare function notEmpty<T>(val: T[]): val is [T, ...T[]];
+declare function notEmpty<K extends Key, V>(val: Record<K, V>): val is Record<K, V>;
+declare function notEmpty<K extends Key, V>(val: Map<K, V>): val is Map<K, V>;
+declare function notEmpty<T>(val: Set<T>): val is Set<T>;
+declare function notEmpty(val: unknown): boolean;
 
 /**
- * Waits the specified number of ms before returning control to the then block, or the main program
+ * Waits the specified number of ms before returning control to the `then` block, or the main program when using `async` blocks with `await`
  * @opti
- * @param ms The amout of milliseconds to wait
+ * @throws {NumberTooSmallException} When the returned {@linkcode Future} object fails because `ms` is less than 1
+ * @param ms The amount of milliseconds to wait
+ * @returns A {@linkcode Future} that resolves to void on success and rejects to a {@linkcode NumberTooSmallException} when the number specified is less than 1
+ * @since 1.0.0
  * @example
- * console.log("I log when the program runs!")
+ * ```ts
+ * console.log("I log when the program runs!");
  * 
  * await sleep(500);
  * 
- * console.log("I wait 5 seconds before executing!")
+ * console.log("I wait 5 seconds before executing!");
+ * ```
  */
 declare function sleep(ms: number): Future<void, NumberTooSmallException>;
 
-// /**
-//  * Makes a function mixin and returns that mixin for other use
-//  * @opti
-//  * @param fn The function to use for the mixin
-//  * @param location The location to put the `mixinFn`'s code
-//  * @param mixinFn The function taht will be inserted into `fn`
-//  */
-// declare function mixin<T extends Func>(fn: T, location: "HEAD", mixinFn: T): T;
-// declare function mixin<T extends Func, This = ThisParameterType<T>, Ret = ReturnType<T>>(fn: T, location: "TAIL", mixinFn: (this: This & { mixin: { value: Ret } }, ...args: Parameters<T>) => Ret): T
-
-// /**
-//  * Colorizes a string based on the colorized syntax
-//  * @opti
-//  * @example
-//  * Colorize`{color:red}Red Text!{/color:red}`
-//  */
-// declare function Colorize(strings: TemplateStringsArray, ...values: any[]): string;
-
 /**
- * Creates a new typesafe enum full of Symbols
+ * Creates a new type-safe enum full of `string: symbol` pairs. Values in an Enum must follow the variable naming rules of JavaScript, matching `/^[A-Za-z_$][A-Za-z0-9_$]*$/`
  * @opti
- * @param values The enum's values
+ * @throws {SyntaxException} When a property key is not unique or invalid characters are passed
+ * @param values The values that will be used for the new enum
+ * @returns A new type-safe enum whose properties map the provided strings to symbols, to make the properties unique when checked with `===`
+ * @since 1.0.0
  * @example
- * const Colors = Enum("RED", "ORAGNE", "YELLOW", "GREEN", "BLUE")
+ * ```ts
+ * const Colors = Enum("RED", "ORANGE", "YELLOW", "GREEN", "BLUE")
  * 
  * const color = Colors.ORANGE
- * switch(Color) {
- *   case Color.RED:
+ * switch(color) {
+ *   case Colors.RED:
  *     console.log("Red")
  *     break;
- *   case Color.ORANGE:
+ *   case Colors.ORANGE:
  *     console.log("Orange")
  *     break;
- *   case Color.YELLOW:
+ *   case Colors.YELLOW:
  *     console.log("Yellow")
  *     break;
- *   case Color.GREEN:
+ *   case Colors.GREEN:
  *     console.log("Green")
  *     break;
- *   case Color.BLUE:
+ *   case Colors.BLUE:
  *     console.log("Blue")
  *     break;
  *   default:
- *     console.log("Unknown number")
+ *     console.log("Unknown color")
  *     break;
  * }
+ * ```
  */
-declare function Enum<T extends readonly string[]>(...values: T): EnumInstance<T>
+declare function Enum<const T extends readonly string[]>(...values: T): EnumInstance<T>
 
 /**
- * Creates a tuple of values from a spread provided
+ * Creates a tuple of values from a spread provided. Used for tuple inference where literal arrays are widened to T[] instead of inferring a tuple type.
  * @opti
  * @param values The values to use for the tuple
+ * @returns A new tuple constructed from the values specified
+ * @since 1.0.0
  * @example
- * const myTuple = Tuple("X", 2, true); // [string, number, boolean]
+ * ```ts
+ * const myTuple = Tuple("X", 2, true); // Tuple is of type [string, number, boolean]
+ * myTuple[0] = 3;         // Type 'number' is not assignable to type 'string'.
+ * myTuple[1] = false;     // Type 'boolean' is not assignable to type 'number'.
+ * myTuple[2] = "Goodbye"; // Type 'string' is not assignable to type 'boolean'.
+ * myTuple[1] = 3;         // Valid
+ * ```
  */
 declare function Tuple<T extends unknown[]>(...values: T): T
 
+//-------------------------------------    Exceptions     -------------------------------------
+
 /**
- * Info about `Opti`
+ * Base class for all the Opti Exceptions.
+ * 
+ * Extends `Error` for compatibility with standard error handing
  * @opti
+ * @extends Error
+ * @since 1.0.0
  */
-declare var opti: OptiObject;
-
-
-/**
- * Base class for all the Opti Exceptions
- */
-declare var Exception: ExceptionConstructor;
+declare var Exception: BaseExceptionConstructor;
 
 /**
  * Exception that cannot be caught using `instanceof Exception` or `instanceof Error`
+ * @opti
+ * @extends Object
+ * @since 1.0.0
  */
 declare var RuntimeException: RuntimeExceptionConstructor;
 
 /**
- * Exception for unimplemented things
+ * Exception for unimplemented functions, objects, classes, and others
+ * @opti
+ * @extends Exception
+ * @since 1.0.0
  */
-declare var NotImplementedException: SubExceptionConstructor;
+declare var NotImplementedException: NotImplementedExceptionConstructor;
 
 /**
  * Exception for unknown causes
+ * @opti
+ * @extends Exception
+ * @since 1.0.0
  */
 declare var UnknownException: UnknownExceptionConstructor;
 
 /**
  * Exception for illegal access
+ * @opti
+ * @extends Exception
+ * @since 1.0.0
  */
-declare var AccessException: SubExceptionConstructor;
+declare var AccessException: AccessExceptionConstructor;
 
 /**
  * Error for assertion related errors
+ * @opti
+ * @extends Exception
+ * @since 1.0.0
  */
-declare var AssertionException: SubExceptionConstructor;
+declare var AssertionException: AssertionExceptionConstructor;
 
 /**
  * Exception for starting a new debounce
+ * @opti
+ * @extends Exception
+ * @since 1.0.0
  */
 declare var DebouncedException: DebouncedExceptionConstructor;
+
+/**
+ * Exception for invalid syntax
+ * @opti
+ * @extends Exception
+ * @since 1.0.0
+ */
 declare var SyntaxException: SyntaxExceptionConstructor;
+
+/**
+ * Exception for invalid provided types
+ * @opti
+ * @extends Exception
+ * @since 1.0.0
+ */
 declare var TypeException: TypeExceptionConstructor;
+
+/**
+ * Exception thrown when cloning of objects is invalid
+ * @opti
+ * @extends Exception
+ * @since 1.0.0
+ */
 declare var CloneException: CloneExceptionConstructor;
+
+/**
+ * Exception for all number-related errors
+ * @opti
+ * @extends Exception
+ * @since 1.0.0
+ */
+declare var NumberException: NumberExceptionConstructor;
+
+/**
+ * Exception for when a number is too small
+ * @opti
+ * @extends NumberException
+ * @since 1.0.0
+ */
 declare var NumberTooSmallException: NumberTooSmallExceptionConstructor;
-declare var AbstractInitializationException: AbstractInitializationExceptionConstructor;
-declare var AbstractMethodInvokedException: AbstractMethodInvokedExceptionConstructor;
-declare var SortException: SortExceptionConstructor;
+
+/**
+ * Exception for all decorator-related errors
+ * @opti
+ * @extends Exception
+ * @since 1.0.0
+ */
+declare var DecoratorException: DecoratorExceptionConstructor;
+
+  /**
+   * Exception for all decorator-related errors
+   * @opti
+   * @extends DecoratorException
+   * @since 1.0.0
+   */
+  declare var IncorrectDecoratorPlacementException: IncorrectDecoratorPlacementExceptionConstructor;
+
+  /**
+   * Exception for all `@Abstract` decorator related errors
+   * @opti
+   * @extends DecoratorException
+   * @since 1.0.0
+   */
+  declare var AbstractException: AbstractExceptionConstructor;
+
+    /**
+     * Exception for when `@Abstract` marked classes are attempted to be constructed
+     * @opti
+     * @extends AbstractException
+     * @since 1.0.0
+     */
+    declare var AbstractInitializationException: AbstractInitializationExceptionConstructor;
+
+    /**
+     * Exception for when a `@Abstract` method is attempted to be invoked
+     * @opti
+     * @extends AbstractException
+     * @since 1.0.0
+     */
+    declare var AbstractMethodInvokedException: AbstractMethodInvokedExceptionConstructor;
+
+/**
+ * Exception thrown when an item in a {@linkcode Collection} is attempted to be accessed
+ * @opti
+ * @extends Exception
+ * @since 1.0.0
+ */
 declare var CollectionOutOfBoundsException: CollectionOutOfBoundsExceptionConstructor;
+
+/**
+ * Exception for when a query passed to `Node.querySelector`, `Node.$`, `Node.querySelectorAll` or `Node.$$` is invalid
+ * @opti
+ * @extends Exception
+ * @since 1.0.0
+ */
 declare var MalformedQueryException: MalformedQueryExceptionConstructor;
 
 /**
- * The collection class that can make collections of any object
+ * Exception for when a fetch request fails unexpectedly (not handled in the .catch block of the returned promise)
+ * @opti
+ * @extends Exception
+ * @since 1.0.0
+ */
+declare var FetchException: FetchExceptionConstructor;
+
+//------------------------------------- Classes & Objects -------------------------------------
+
+/**
+ * The `Collection` class is an alternative to the `Array` class for collections of objects, primitives, and more
  */
 declare var Collection: CollectionConstructor;
 
+/**
+ * The `Future` class is just a promise with a error parameter in TS
+ * @is Promise
+ * @since 1.0.0
+ */
 declare var Future: FutureConstructor;
 
-/** @decorator */
-declare var Abstract: MethodDecorator & ClassDecorator;
+/**
+ * The `Opti` object provides information about the `opti` module
+ * @property
+ */
+declare var Opti: Opti;
+
+//-------------------------------------    Decorators     -------------------------------------
 
 /** @decorator */
-declare function Final(
-  target: any,
-): ClassDecorators;
+declare function Abstract<T extends Class<false>>(clazz: T): T;
+declare function Abstract<T>(
+  target: Object, 
+  propertyKey: string | symbol, 
+  descriptor: TypedPropertyDescriptor<T>
+): void | TypedPropertyDescriptor<T>;
+
 /** @decorator */
-declare function Final(
-  target: any,
-  propertyKey: string,
-  descriptor: PropertyDescriptor
-): void;
+declare function Final<T extends Class<false>>(clazz: T): T | void;
+
+//-------------------------------------   Augmentations   -------------------------------------
 
 interface Document {
   /** 
@@ -275,7 +483,7 @@ interface Document {
    *   const el = document.$("body");
    * })
    */
-  ready(callback: (this: Document, ev: Event) => any): void;
+  ready(callback: (this: Document, ev: Event) => void): void;
 
   /**
    * Calls the callback when the user leaves the page or website
@@ -290,7 +498,7 @@ interface Document {
    *   Cookie.clear();
    * })
    */
-  leaving(callback: (this: Document, ev: Event) => any): void;
+  leaving(callback: (this: Document, ev: Event) => void): void;
 
   /**
    * Creates an element tree to create trees of HTML
@@ -402,9 +610,9 @@ interface Node {
    * 
    * el.$$(".hidden", true).removeClass("hidden");
    */
-  $$<K extends keyof HTMLElementTagNameMap>(selectors: K): NodeListOf<HTMLElementTagNameMap[K]>;
-  $$<K extends keyof SVGElementTagNameMap>(selectors: K): NodeListOf<SVGElementTagNameMap[K]>;
-  $$<K extends keyof MathMLElementTagNameMap>(selectors: K): NodeListOf<MathMLElementTagNameMap[K]>;
+  $$<K extends keyof HTMLElementTagNameMap>(selectors: K): NodeListOf<HTMLElementOf<K>>;
+  $$<K extends keyof SVGElementTagNameMap>(selectors: K): NodeListOf<HTMLElementOf<K>>;
+  $$<K extends keyof MathMLElementTagNameMap>(selectors: K): NodeListOf<MathMLElementOf<K>>;
   /** @deprecated */
   $$<K extends keyof HTMLElementDeprecatedTagNameMap>(selectors: K): NodeListOf<HTMLElementDeprecatedTagNameMap[K]>;
   $$<E extends Element = HTMLElement>(selectors: string): NodeListOf<E>;
@@ -485,7 +693,7 @@ interface Element {
   /**
    * Gets and sets the elements html
    * @opti
-   * @notice use HTMLElement.{@link text} instead if you are not insterting raw html
+   * @notice use HTMLElement.{@link text} instead if you are not inserting raw html
    * @param input The html to insert in place of the old html
    * @example
    * const el = document.$("target");
@@ -654,15 +862,6 @@ interface HTMLCollection {
   toggleClass(elClass: string): void;
 }
 
-interface EventTarget {
-  /**
-   * The events registered on an `EventTarget`
-   * @opti
-   */
-  getEvents<T extends EventTarget, K extends keyof EventMapOf<this>>(this: T, event: K): EventListenerInfo<T, K>[];
-  getEvents<T extends EventTarget>(this: T): { [K in keyof EventMapOf<T>]: EventListenerInfo<T, K>[] };
-}
-
 interface DateConstructor {
   /** 
    * Returns an absolute number of time from January 1, 1970 
@@ -690,6 +889,7 @@ interface Math {
    * @opti
    * @param max the maximum random number 
    */
+  random(): number;
   random(max: number): number
   random(min: number, max: number): number
 }
@@ -726,7 +926,7 @@ interface ObjectConstructor {
    *  console.log(`Key: ${key}, Value: ${value}`);
    * });
    */
-  forEach<T extends object>(object: T, iterator: (key: keyof T, value: T[keyof T]) => any): void;
+  forEach<T extends object>(object: T, iterator: (key: keyof T, value: T[keyof T]) => void): void;
 }
 
 interface Number {
@@ -753,10 +953,10 @@ interface Array<T> {
    */
   unique(this: T[]): T[]
   /**
-   * Seperates an array into an array of arrays, with each subarray of a defined size
+   * Separates an array into an array of arrays, with each subarray of a defined size
    * @opti
-   * @param size The size of the subarrays
-   * @examplef
+   * @param size The size of the sub-arrays
+   * @example
    * const newArr = [1, 2, 3, 3, 4].chunk(2);
    * console.log(newArr); // [[1, 2], [3, 3], [4]]
    */
@@ -767,10 +967,16 @@ interface Array<T> {
    * @opti
    * @param finder The finder function to find the value to remove
    */
-  pluck(finder: (v: T) => boolean): T | null;
+  pluck(finder: (v: T) => boolean): T | Missing;
 
-  pluckLast(finder: (v: T) => boolean): T | null;
+  pluckLast(finder: (v: T) => boolean): T | Missing;
 
+  /**
+   * Relocates an item in an array by a set amount
+   * @param index The item to move
+   * @param offset The offset to move it by
+   * @returns The new location of the item
+   */
   relocate(index: number, offset: number): number | null
 
   relocateTo(index: number, location: number): number | null
@@ -794,8 +1000,8 @@ interface Array<T> {
    * @param finder The function that searches for the right value to replace
    * @param newVal The new value to put in place of the old removed value
    */
-  replace(this: T[], replaceIndex: number, newVal: T): T | null;
-  replace(this: T[], finder: (val: T) => boolean, newVal: T): T | null;
+  replace(this: T[], replaceIndex: number, newVal: T): T | Missing;
+  replace(this: T[], finder: (val: T) => boolean, newVal: T): T | Missing;
 
   /**
    * Replaces the last value in an array and returns the new value
@@ -803,7 +1009,7 @@ interface Array<T> {
    * @param finder The function that searches for the right value to replace
    * @param newVal The new value to put in place of the old removed value
    */
-  replaceLast(this: T[], finder: (val: T) => boolean, newVal: T): T | null;
+  replaceLast(this: T[], finder: (val: T) => boolean, newVal: T): T | Missing;
 
   /**
    * Sorts an array by a specific type of sorting
@@ -811,6 +1017,7 @@ interface Array<T> {
    * @param order The order to sort in. Options are `random`, `alpha`, `alpha-reverse`, `increasing`,`decreasing`, `earlier` and `later`
    */
   sort(mode: SortMode<T>): T[];
+  sort(compareFn?: (a: T, b: T) => number): this;
 
   /**
    * Tests the type of values in an array.
@@ -823,14 +1030,14 @@ interface Array<T> {
    * ["A", "B", "C"].type // ["string"]
    * [1, "a", new Date()].type // ["Date", "number", "string"]
    */
-  get type<T>(): string[];
+  get type(): string[];
 }
 
 interface String {
   /**
    * Removes text in a string, using a regular expression or search string.
    * @opti
-   * @param finder The serching string or regular expression
+   * @param finder The searching string or regular expression
    * @example 
    * const oldString = "Hello! World!";
    * const newString = oldString.remove("!") // Hello World!
@@ -841,7 +1048,7 @@ interface String {
   /**
    * Removes the captured text in a string, using a regular expression or search string.
    * @opti
-   * @param finder The serching string or regular expression
+   * @param finder The searching string or regular expression
    * @example 
    * const oldString = "Hello! World!";
    * const newString = oldString.remove(/(!)/) // Hello World
@@ -850,7 +1057,7 @@ interface String {
   removeCaptured(finder: RegExp): string;
 
   /**
-   * Capitalises the first character in a string
+   * Capitalizes the first character in a string
    * @opti
    * @example
    * const myString = "hello world";
@@ -890,9 +1097,9 @@ interface FunctionConstructor {
 }
 
 interface Function {
-  memo(this: Func): T
+  memo<T extends Func>(this: T): T
 
-  debounce(this: Func, ms: number): Func<Func.This<this>, Func.Arguments<this>, Future<Func.Return<this>, DebouncedException>>
+  debounce<T extends Func>(this: T, ms: number): Func<Func.This<T>, Func.Arguments<T>, Future<Func.Return<T>, DebouncedException>>
 
-  throttle(this: Func, ms: number):  Func<Func.This<this>, Func.Arguments<this>, Func.Return<this> | null>
+  throttle<T extends Func>(this: T, ms: number):  Func<Func.This<T>, Func.Arguments<T>, Func.Return<T> | null>
 }

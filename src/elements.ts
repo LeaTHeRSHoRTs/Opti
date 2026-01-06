@@ -1,14 +1,8 @@
-type _EventsRecord<T extends EventTarget> = { [K in keyof EventMapOf<T>]?: EventListenerInfo<T, K>[] };
-
-declare interface EventTarget {
-  _events: _EventsRecord<this>;
-}
-
-export function hasText(this: Element, text: string | RegExp): boolean {
-  if (typeof text === "string") {
-    return this.txt().includes(text);
+export function hasText(this: Element, itext: string | RegExp): boolean {
+  if (typeof itext === "string") {
+    return this.txt().includes(itext);
   } else {
-    return text.test(this.txt());
+    return itext.test(this.txt());
   }
 }
 
@@ -53,18 +47,18 @@ export function css(
   key?: CSSPropertyName | CSSObject | true,
   value?: string | number
 ): CSSObject | string | number | void {
-  const css = this.style;
+  const icss = this.style;
 
   if (!key || key === true) {
     // Return all styles
     const result: CSSObject = {};
-    for (let i = 0; i < css.length; i++) {
-      const prop: CSSStyleDeclaration[number] = css[i];
+    for (let i = 0; i < icss.length; i++) {
+      const prop: CSSStyleDeclaration[number] = icss[i] as CSSStyleDeclaration[number];
 
       if (!prop) continue;
 
       const camelProp = dashToCamel(prop);
-      const style = css.getPropertyValue(prop).trim();
+      const style = icss.getPropertyValue(prop).trim();
 
       result[camelProp as keyof CSSStyleDeclaration] = parseUnit(style);
     }
@@ -89,18 +83,18 @@ export function css(
 
   if (typeof key === "string") {
     if (value === undefined) {
-      return parseUnit(css.getPropertyValue(camelToDash(key)).trim());
+      return parseUnit(icss.getPropertyValue(camelToDash(key)).trim());
     } else {
       // Set one value
-      if (key in css) {
-        css.setProperty(camelToDash(key), value.toString());
+      if (key in icss) {
+        icss.setProperty(camelToDash(key), value.toString());
       }
     }
   } else {
     // Set multiple
-    for (const [prop, val] of Object.entries(key)) {
-      if (val !== null && val !== undefined) {
-        css.setProperty(camelToDash(prop.toString()), val.toString());
+    for (const [prop, ival] of Object.entries(key)) {
+      if (ival !== null && ival !== undefined) {
+        icss.setProperty(camelToDash(prop.toString()), ival.toString());
       }
     }
   }
@@ -123,7 +117,7 @@ export function getAncestor<T extends Element>(this: ChildNode, arg: string | nu
 
   // Case 2: selector string
   const selector = arg;
-  let el: Element | null = this instanceof Element ? this : this.parentElement;
+  let el = this instanceof Element ? this : this.parentElement;
   while (el) {
     if (el.matches(selector)) {
       return el as T;
@@ -137,11 +131,11 @@ export function html(this: Element, input?: string): string {
   return input !== undefined ? (this.innerHTML = input) : this.innerHTML;
 };
 
-export function text(this: Element, text?: string | ((text: string) => string), ...input: (string)[]): string {
+export function text(this: Element, itext?: string | ((iitext: string) => string), ...input: (string)[]): string {
   // If text is provided, update the textContent
-  if (text !== undefined) {
-    if (typeof text === "string") {
-      input.unshift(text); // Add the text parameter to the beginning of the input array
+  if (itext !== undefined) {
+    if (typeof itext === "string") {
+      input.unshift(itext); // Add the text parameter to the beginning of the input array
       const joined = input.join(" "); // Join all the strings with a space
 
       // Replace "textContent" if it's found in the joined string (optional logic)
@@ -149,7 +143,7 @@ export function text(this: Element, text?: string | ((text: string) => string), 
         ? joined.replace("textContent", this.textContent ?? "")
         : joined;
     } else {
-      this.textContent = text(this.textContent ?? "");
+      this.textContent = itext(this.textContent ?? "");
     }
   }
 
@@ -157,15 +151,15 @@ export function text(this: Element, text?: string | ((text: string) => string), 
   return this.textContent ?? "";
 };
 
-export function show(this: HTMLElement) {
+export function show(this: HTMLElement): void {
   this.css("visibility", "visible");
 };
 
-export function hide(this: HTMLElement) {
+export function hide(this: HTMLElement): void {
   this.css("visibility", "hidden");
 };
 
-export function toggle(this: HTMLElement) {
+export function toggle(this: HTMLElement): void {
   if (this.css("visibility") === "visible" || this.css("visibility") === "") {
     this.hide();
   } else {
@@ -187,7 +181,9 @@ export function getChildren(this: Node): NodeListOf<ChildNode> {
 };
 
 export function getSiblings(this: ChildNode, inclusive?: boolean): ChildNode[] {
-  const siblings = Array.from(this.parentNode!.childNodes);
+  if (!this.parentNode) return[];
+
+  const siblings = Array.from(this.parentNode.childNodes);
   if (inclusive) {
     return siblings; // Include current node as part of siblings
   } else {
@@ -227,12 +223,14 @@ const defaultCopy: Required<CopyOptions> = {
   copyStyles: true
 };
 
-function isEventTarget(obj: any): obj is EventTarget {
-  return obj && 
+function isEventTarget(obj: Partial<EventTarget>): obj is EventTarget {
+  return (obj && 
          typeof obj.addEventListener === "function" &&
          typeof obj.removeEventListener === "function" &&
-         typeof obj.dispatchEvent === "function";
+         typeof obj.dispatchEvent === "function");
 }
+
+type _EventsRecord<T extends EventTarget> = { [K in keyof EventMapOf<T>]?: EventListenerInfo<T, K>[] };
 
 export function copy<T extends Element>(this: T, object: CopyOptions): T;
 export function copy<T extends Element>(this: T, children?: boolean, events?: boolean): T;
@@ -252,6 +250,7 @@ export function copy<T extends Element>(this: T, childrenOrObject: boolean | Cop
     };
   }
 
+  //@ts-ignore
   const clone = document.createElementNS(this.namespaceURI, this.tagName) as T;
 
   if (options.copyAttributes || options.copyAll) {
@@ -273,9 +272,10 @@ export function copy<T extends Element>(this: T, childrenOrObject: boolean | Cop
   }
 
   if ((options.copyEvents || options.copyAll) && isEventTarget(this)) {
-    for (const [event, funcs] of Object.entries(this._events)) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    for (const [event, funcs] of Object.entries((this as any)._events) as [keyof EventMapOf<T>, _EventsRecord<T>[keyof EventMapOf<T>]][]) {
       funcs?.forEach(prop => {
-        if (opti.evented /* Evented is active */) {
+        if (Opti.evented /* Evented is active */) {
           switch (prop.listener) {
             case "default": break;
             case "conditional":
@@ -293,7 +293,7 @@ export function copy<T extends Element>(this: T, childrenOrObject: boolean | Cop
   return clone;
 }
 
-export function isVisible(this: HTMLElement) {
+export function isVisible(this: HTMLElement): boolean {
   return this.css("visibility") !== "hidden"
     ? this.css("display") !== "none"
     : Number(this.css("opacity")) > 0;
@@ -303,7 +303,7 @@ function parseTime(value: string) {
   const [h, m, s] = value.split(":");
   const [sec, ms] = (s ?? "0").split(".");
   const date = new Date();
-  date.setHours(+h, +m, +sec, +ms || 0);
+  date.setHours(+(h || 0), +(m || 0), +(sec || 0), +(ms || 0));
   return date;
 }
 

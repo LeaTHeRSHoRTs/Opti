@@ -15,7 +15,3 @@ interface Flow {
   flowback(file: string): boolean;
   flowback(test: FlowbackTest): void;
 }
-
-interface OptiObject {
-  flow: true,
-};

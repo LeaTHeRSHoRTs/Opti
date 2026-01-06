@@ -10,11 +10,15 @@ type char =
 /** Shorthand for `unknown` */
 type _ = unknown;
 
+type GlobalThis = typeof globalThis;
+
 /** Shortcut for `Record<string, T>` */
 type StringRecord<T> = Record<string, T>;
 
+type Stringed<T> = T extends string ? T : never;
+
 /** Construct a type with a set of properties K of type T, all of which are optional */
-type PartialRecord<K extends keyof any, T> = Partial<Record<K, T>>;
+type PartialRecord<K extends Key, T> = Partial<Record<K, T>>;
 
 type CaseConventions = "camel" | "kebab" | "pascal" | "snake" | "train" | "dot";
 
@@ -22,10 +26,11 @@ type CSSObject = Partial<Record<keyof CSSStyleDeclaration, string | number>>;
 
 type CSSPropertyName = Exclude<keyof CSSStyleDeclaration, number | symbol>;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Func<T = any, A extends any[] = any[], R = any> = (this: T, ...args: A) => R;
-namespace Func {
+declare namespace Func {
   /** Gets a function's argument list types */
-  export type Arguments<T extends Func> = T extends (...args: infer P) => any ? P : never;
+  export type Arguments<T extends Func> = T extends Func<any, infer P, any> ? P : never;
 
   /** Get a function's return type */
   export type Return<T extends Func> = ReturnType<T>
@@ -34,55 +39,54 @@ namespace Func {
   export type This<T extends Func> = ThisParameterType<T>
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Class<Abstract extends boolean = true, A extends any[] = any[], I = any> = Abstract extends true ? abstract new(...args: A) => I : new(...args: A) => I;
-namespace Class {
+declare namespace Class {
   export type Instance<T extends Class> = T extends Class<boolean, any[], infer I> ? I : never;
-  export type Constructor<T extends Class> = T extends Class<boolean, infer A, infer I> ? (this: void, ...args: A) => I : never;
+
+  export interface Constructable { new(...args: any[]): any }
+  export type Constructor<T extends Class = Class> = T extends Class<boolean, infer A, infer I> ? (this: void, ...args: A) => I : never;
 
   export namespace Instance {
-    type InstanceType<I> = Class<any, any[], I>;
-    export type Methods<T extends Class> = T extends InstanceType<infer I> ? { [K in I]: K extends Func ? K : never } : never;
+    type InstanceType<I> = Class<boolean, any[], I>;
+    export type Methods<T extends Class> = T extends InstanceType<infer I extends Key> ? { [K in I]: K extends Func ? K : never } : never;
   }
 }
 
 /** Used as a placeholder type */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type placeholder = any;
 
-/** Reperesents a key in a key-value object */
+/** Represents a key in a key-value object */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Key = keyof any;
-
-type Defined<T extends object, U extends keyof T | undefined = undefined> = U extends undefined
-  ? { [P in keyof T]-?: T[P] }
-  : { [K in U]-?: T[K] } & Omit<T, U>;
 
 /** Flattens array types like `T[][]` and others */
 type Flatten<T extends readonly unknown[]> =
-  T extends readonly (infer U)[]
+  T extends readonly (infer U extends readonly unknown[])[]
   ? Flatten<U>
   : T;
 
-/** Unboxes Object types to primatives */
+/** Unboxes Object types to primitives */
 type Unboxed<T> =
-  // Handle arrays recursively
-  T extends (infer U)[] ? Unboxed<U>[] :
-  // Handle constructors (e.g., String)
-  T extends new (...args: any[]) => infer R ? Unboxed<R> :
-  // Handle boxed primitives
-  T extends String ? string :
-  T extends Number ? number :
-  T extends Boolean ? boolean :
-  T extends Symbol ? symbol :
-  // Otherwise leave it as-is
-  T;
+  T extends readonly [infer First, ...infer Rest]
+    ? [Unboxed<First>, ...Unboxed<Rest>]
+    : T extends new (...args: unknown[]) => infer R
+      ? Unboxed<R>
+      : T extends StringConstructor ? string
+      : T extends NumberConstructor ? number
+      : T extends BooleanConstructor ? boolean
+      : T extends SymbolConstructor ? symbol
+      : T;
 
 type GetterKeys<T> = {
-  [K in keyof T]-?: T[K] extends Function ? never : (
+  [K in keyof T]-?: T[K] extends Func ? never : (
     { -readonly [P in K]: T[K] } extends { [P in K]: T[K] } ? K : never
   )
 }[keyof T];
 
 type SetterKeys<T> = {
-  [K in keyof T]-?: T[K] extends Function ? never : (
+  [K in keyof T]-?: T[K] extends Func ? never : (
     { -readonly [P in K]: T[K] } extends { [P in K]: T[P] } ? K : never
   )
 }[keyof T];
@@ -94,12 +98,9 @@ type WritableKeys<T> = {
 
 type WritableOnly<T> = Pick<T, WritableKeys<T>>;
 
-type Only<T, U> = { [K in keyof T as Extract<T[K], U> extends never ? never : K]: T[K] }
+type Only<T, U extends keyof T> = { [K in keyof T as Extract<T[K], U> extends never ? never : K]: T[K] }
 
 type AccessorKeys<T> = GetterKeys<T> | SetterKeys<T>;
-
-/** Matches classes */
-type Class<T = any> = abstract new (...args: any[]) => T;
 
 /** Makes a raw type defined. Does not make object values not undefined */
 type Defined<T> = Exclude<T, undefined>;
@@ -110,13 +111,22 @@ type Sized = { size: number } | { length: number }
 type TupleOf<T, N extends number, R extends unknown[] = []> =
   R['length'] extends N
     ? R
-    : TupleOf<T, N, [T, ...R]>;
+    : R['length'] extends 20 
+      ? T[] 
+      : TupleOf<T, N, [T, ...R]>
 
 type BuildTuple<L extends number, T extends unknown[] = []> = 
   T['length'] extends L ? T : BuildTuple<L, [unknown, ...T]>;
 
 type Increment<N extends number> = [...BuildTuple<N>, unknown]['length']; 
-type Decrement<N extends number> = BuildTuple<N> extends [infer _, ...infer Rest] ? Rest['length'] : never;
+type Decrement<N extends number> = BuildTuple<N> extends [infer _u, ...infer Rest] ? Rest['length'] : never;
+
+type Widen<T> = 
+  T extends string ? string :
+  T extends number ? number :
+  T extends boolean ? boolean :
+  T extends symbol ? symbol :
+  T;
 
 type Falsy<T> =
   T extends false ? false :
@@ -147,28 +157,30 @@ type TypeOf<T extends string> =
   T extends "boolean" ? boolean :
   T extends "symbol" ? symbol :
   T extends "undefined" ? undefined :
-  T extends "function" ? (...args: any[]) => any :
+  T extends "function" ? Func :
   T extends "object" ? object | null :
   never;
 
-type EventFunc<T, K extends keyof EventMapOf<T> = Event> = (this: T, e: EventMapOf<T>[K]) => void
+type EventFunc<T, K extends keyof EventMapOf<T> = keyof EventMapOf<T>> = (this: T, e: EventMapOf<T>[K]) => void
 
 type TypeGuard<T> = T extends Func ? FuncTesters<T>
-  : T extends Array<infer U> ? ArrayTesters<T>
+  : T extends unknown[] ? ArrayTesters<T>
   : T extends Sized ? SizedObjectTesters<T> 
   : BaseTypeOperators<T>
 
-type UUIDConstructor = new () => readonly string & { readonly __brand: unique symbol };
+type UUIDConstructor = new () => string & { readonly __brand: unique symbol };
 
 /** Repesents a html tag in string form */
 type HTMLTag = keyof HTMLElementTagNameMap;
+type SGVTag = keyof SVGElementTagNameMap;
+type MathMLTag = keyof MathMLElementTagNameMap;
 
 type PropertiesOf<T> = {
-  [K in keyof T]: T[K] extends Function ? never : K;
+  [K in keyof T]: T[K] extends Func ? never : K;
 }[keyof T];
 
 type Broadcaster<T> = {
-  [K in keyof T]: T[K] extends (...args: any[]) => infer R
+  [K in keyof T]: T[K] extends (...args: unknown[]) => infer R
     ? (...args: Parameters<T[K]>) => Broadcaster<R>
     : never;
 }
@@ -207,13 +219,6 @@ type MathMLElementTagNameOf<T extends MathMLElement> = {
 }[keyof MathMLElementTagNameMap];
 
 /** Returns the resulting type(s) of the function(s) given */
-type CallbackResult<T extends ((...args: any[]) => any) | readonly ((...args: any[]) => any)[]> =
-  T extends ((...args: any[]) => any) ? ReturnType<T> :
-  T extends readonly [...infer R] ? R extends ((...args: any[]) => any)[] ? { [K in keyof R]: ReturnType<R[K]> } : never : never;
-type EventList<T> =
-  T extends { events?: any }
-  ? Record<string, Func[]> // stop if "events" already exists
-  : Partial<Record<keyof EventMapOf<T>, Func[]>>;
 
 type SortMode<T> =
   T extends string ? "alpha" | "alpha-reverse" :
@@ -221,7 +226,7 @@ type SortMode<T> =
   T extends Date ? "earlier" | "later" :
   never;
 
-/** Gest the event map for the specified object */
+/** Gets the event map for the specified object */
 type EventMapOf<T> =
   T extends HTMLVideoElement ? HTMLVideoElementEventMap :
   T extends HTMLMediaElement ? HTMLMediaElementEventMap :
@@ -261,7 +266,7 @@ type EventMapOf<T> =
   T extends MediaRecorder ? MediaRecorderEventMap :
   T extends MediaSource ? MediaSourceEventMap :
   T extends MessagePort ? MessagePortEventMap :
-  T extends MessageEventTarget<any> ? MessageEventTargetEventMap :
+  T extends MessageEventTarget<unknown> ? MessageEventTargetEventMap :
   T extends BroadcastChannel ? BroadcastChannelEventMap :
   T extends WebSocket ? WebSocketEventMap :
   T extends NavigationHistoryEntry ? NavigationHistoryEntryEventMap :

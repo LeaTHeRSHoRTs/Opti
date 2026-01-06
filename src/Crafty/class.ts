@@ -1,43 +1,75 @@
-import * as Nodes from "./nodes";
-export class Crafty {
-  private constructor() { }
-  static Node = Nodes.Node;
-  static Element = Nodes.Element;
-  static Fragment = Nodes.Fragment;
+import Internal_Node from "./node";
+import Internal_Text from "./text";
+import Internal_Unknown from "./unknown";
+import Internal_Fragment from "./fragment";
+import { Internal_Element, Internal_HTMLElement, Internal_VoidHTMLElement } from "./element";
+import { isHTMLTag } from "./helpers";
+import Internal_Exception, { Internal_ChildrenNotAllowedException, Internal_NormalizationError } from "./exceptions";
 
-  static Unknown = class Unknown<T extends unknown[]> {
-    private data: T;
-    constructor(...data: T) {
-      this.data = data;
+export class Internal_Crafty {
+  private constructor() {}
+  public static craft<T extends HTMLTag, U extends Crafty.Props<T> = {}, V extends Crafty.Children = []>(
+    el: T,
+    props: U,
+    children: V
+  ): Crafty.HTMLElement<T, U>;
+  public static craft<N extends Crafty.Namespace, T extends Crafty.TagFromNamespace<N>, U extends Crafty.Props<T> = {}, V extends Crafty.Children = []>(
+    namespace: N,
+    el: T,
+    props: U,
+    children: V
+  ): Crafty.Element<N, T, U>;
+  public static craft<T extends Crafty.Children>(...children: T): Crafty.Fragment;
+  public static craft(str: string): Crafty.Text;
+  public static craft(
+    arg: string | Crafty.Node,
+    propsOrChild?: Crafty.Props<string> | Crafty.Node,
+    childrenOrMore?: Crafty.Node | Crafty.Children,
+    ...moreChildren: Crafty.Children
+  ): Crafty.Node {
+    if (typeof arg === 'string' && propsOrChild === undefined) {
+      return new Internal_Text(arg);
     }
-  };
-  static craft<C extends Crafty.Child[]>(children: C): Crafty.Fragment<C>;
-  static craft<T extends HTMLTag, U extends Crafty.Props<T>, V extends Crafty.Child[]>(
-    tag: T,
-    props?: U,
-    children?: V
-  ): Crafty.Element<T, U, V>;
-  static craft<T extends HTMLTag, U extends Crafty.Props<T>, V extends Crafty.Child[]>(
-    tagOrChildList: T | V,
-    propsOrChild?: U,
-    children?: V
-  ): Crafty.Element<T, U, V> | Crafty.Fragment<V> {
-    if (typeof tagOrChildList === "string") {
-      return new Crafty.Element((tagOrChildList as T), propsOrChild as U, children);
+
+    if (typeof arg === 'string' && isHTMLTag(arg) && moreChildren.length === 0) {
+      return new Internal_HTMLElement(
+        arg,
+        propsOrChild as Crafty.Props<HTMLTag>,
+        childrenOrMore as Crafty.Children
+      );
+    }
+
+    if (typeof arg === 'string' && moreChildren.length === 0) {
+      const namespace = arg as Crafty.Namespace;
+      const el = propsOrChild as Crafty.TagFromNamespace<typeof namespace>;
+      const props = childrenOrMore as Crafty.Props<typeof el>;
+      return new Internal_Element(namespace, el, props, []);
+    }
+
+    return new Internal_Fragment(
+      ...([arg as Crafty.Node, propsOrChild as Crafty.Node, childrenOrMore as Crafty.Node, ...moreChildren].filter(
+        (v) => v !== undefined
+      ))
+    );
+  }
+
+  public static from(html: string): Crafty.Unknown;
+  public static from(el: Element): Crafty.Unknown;
+  public static from<T extends Crafty.Node>(node: T): T;
+  public static from(arg: Crafty.Node | string | Element): Crafty.Node | Crafty.Unknown {
+    if (arg instanceof Internal_Node) {
+      return arg.clone();
     } else {
-      return new Crafty.Fragment(tagOrChildList);
+      return new Internal_Unknown(arg as Element | string);
     }
   }
+  static Element: PrototypeObject<Crafty.Element> = Internal_Element;
+  static HTMLElement: PrototypeObject<Crafty.HTMLElement> = Internal_HTMLElement;
+  static Text: PrototypeObject<Crafty.Text> = Internal_Text;
+  static Fragment: PrototypeObject<Crafty.Fragment> = Internal_Fragment;
+  static Unknown: PrototypeObject<Crafty.Unknown> = Internal_Unknown;
 
-  static from(element: string): Crafty.Unknown;
-  static from(html: HTMLElement): Crafty.Unknown;
-  static from(frag: DocumentFragment): Crafty.Unknown;
-  static from(element: HTMLElement | string | DocumentFragment): Crafty.Unknown {
-    if (typeof element === "string") {
-      return new Crafty.Unknown(element);
-    } else if (element instanceof DocumentFragment) {
-      return new Crafty.Unknown(element.children);
-    }
-    return new Crafty.Unknown(element.tagName, {}, element.children);
-  }
+  static Exception: Crafty.ExceptionConstructor = Internal_Exception;
+  static ChildrenNotAllowedException: Crafty.ChildrenNotAllowedExceptionConstructor = Internal_ChildrenNotAllowedException;
+  static NormalizationException: Crafty.NormalizationExceptionConstructor = Internal_NormalizationError;
 }

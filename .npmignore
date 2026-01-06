@@ -1,0 +1,12 @@
+# Dev-only
+
+.vscode/
+test/
+scripts/
+cli/
+src/
+.env
+*.log
+eslint.config.cjs
+
+_future.*

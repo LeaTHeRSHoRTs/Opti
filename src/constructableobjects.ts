@@ -1,9 +1,9 @@
-export function Tuple<T extends unknown[]>(...values: T) {
+export function Tuple<T extends unknown[]>(...values: T): T {
   return values;
 }
 
-export function Enum<T extends readonly string[]>(...values: T): any {
-  const obj = {} as { [K in T[number]]: symbol };
+export function Enum<T extends readonly string[]>(...values: T): EnumInstance<T> {
+  const obj = {} as EnumInstance<T>;
 
   values.forEach((val) => {
     const key = String(val);
@@ -39,7 +39,7 @@ function deepFreeze<T>(obj: T): Readonly<T> {
   // Only freeze objects or arrays
   if (obj && typeof obj === "object") {
     Object.getOwnPropertyNames(obj).forEach((prop) => {
-      const value = (obj as any)[prop];
+      const value = obj[prop as keyof T];
       // Recursively freeze nested objects
       if (value && typeof value === "object" && !Object.isFrozen(value)) {
         deepFreeze(value);
@@ -62,42 +62,39 @@ export class Collection<T> implements ArrayLike<T> {
     return this.items.length;
   }
 
-  public static from<T>(arrayLike: ArrayLike<T>) {
+  public static from<T>(arrayLike: ArrayLike<T>): Collection<T> {
     return new Collection<T>(Array.from(arrayLike));
   }
 
-  public static of<T extends unknown[]>(...values: T) {
+  public static of<T extends unknown[]>(...values: T): Collection<T[number]> {
     return new Collection<T[number]>(values);
   }
 
-  /**
-   * @throws {CollectionOutOfBoundsException} The index does not exist
-   */
-  item(index: number): T {
+  item(index: number): T | Missing {
     const item = this.items[index];
 
     if (!item) throw new CollectionOutOfBoundsException("index " + index + " does not exist on this collection");
 
-    return this.items[index];
+    return this.items[index] ?? Missing;
   }
 
-  each(callback: (value: T, key: number) => void, thisArg?: any) {
+  each(callback: (value: T, key: number) => void, thisArg?: unknown): void {
     this.items.forEach(callback, thisArg);
   }
 
-  *[Symbol.iterator]() {
+  *[Symbol.iterator](): IterableIterator<T> {
     yield* this.items;
   }
 
-  *entries() {
+  *entries(): ArrayIterator<[number, T]> {
     yield* this.items.entries();
   }
 
-  *keys() {
+  *keys(): ArrayIterator<number> {
     yield* this.items.keys();
   }
 
-  *values() {
+  *values(): ArrayIterator<T> {
     yield* this.items.values();
   }
 

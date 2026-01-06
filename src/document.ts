@@ -1,8 +1,8 @@
-export function ready (callback: (this: Document, ev: Event) => any) {
+export function ready(callback: (this: Document, ev: Event) => unknown): void {
   document.addEventListener("DOMContentLoaded", callback);
 }
 
-export function leaving (callback: (this: Document, ev: Event) => any): void {
+export function leaving (callback: (this: Document, ev: Event) => unknown): void {
   document.addEventListener("beforeunload", (e) => callback.call(document, e));
 }
 
@@ -40,20 +40,34 @@ export function leaving (callback: (this: Document, ev: Event) => any): void {
 //   });
 // }
 
+
+export function documentCss(
+  element: keyof HTMLElementTagNameMap
+): Partial<Record<keyof CSSStyleDeclaration, string>>;
+export function documentCss(
+  element: keyof HTMLElementTagNameMap,
+  object: Partial<Record<keyof CSSStyleDeclaration, string | number>>
+): void;
+export function documentCss(
+  element: string
+): Partial<Record<keyof CSSStyleDeclaration, string>>;
+export function documentCss(
+  element: string,
+  object: Partial<Record<keyof CSSStyleDeclaration, string | number>>
+): void;
 export function documentCss(
   element: string,
   object?: Partial<Record<keyof CSSStyleDeclaration, string | number>>
-): any {
+): Partial<Record<keyof CSSStyleDeclaration, string>> | void {
   const selector = element.trim();
   if (!selector) {
     throw new globalThis.SyntaxException("Selector cannot be empty.");
   }
 
-  //@ts-ignore
-  let styleTag = document.querySelector("style[js-styles]") as HTMLStyleElement | null;
+  let styleTag: HTMLStyleElement | null = document.querySelector<HTMLStyleElement>("style[js-styles]");
 
   if (!styleTag) {
-    styleTag = document.createElement("style");
+    styleTag = document.createElement<"style">("style");
     styleTag.setAttribute("js-styles", "");
     document.head.appendChild(styleTag);
   }
@@ -69,6 +83,8 @@ export function documentCss(
       const declarations = rule.style;
       for (let j = 0; j < declarations.length; j++) {
         const name = declarations[j];
+        if (!name) continue;
+
         existingStyles[name] = declarations.getPropertyValue(name).trim();
       }
       break;

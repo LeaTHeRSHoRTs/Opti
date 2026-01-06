@@ -24,13 +24,13 @@ interface ValueAccessor {
   asDate(): Date | null
 }
 
-interface OptiObject {
-  crafty: false,
-  query: false,
-  evented: false,
-  requests: false,
-  flow: false
-};
+interface Opti {
+  crafty: boolean,
+  query: boolean,
+  unsync: boolean,
+  requests: boolean,
+  flow: boolean
+}
 
 interface BaseTypeOperators<T> {
   get value(): T;
@@ -48,8 +48,8 @@ interface BaseTypeOperators<T> {
    * Returns the type of object as a string without extra data
    */
   stringOfBasic(): string;
-  isInstanceOf<U extends Class>(clazz: U): this is BaseTypeOperators<InstanceType<U>>;
-  isTypeOf<T extends Primitive>(type: T): this is TypeGuard<TypeOf<T>>;
+  isInstanceOf<U extends Class>(clazz: U): this is BaseTypeOperators<Class.Instance<U>>;
+  isTypeOf<U extends Primitive>(type: U): this is TypeGuard<TypeOf<U>>;
   isDefined(): this is BaseTypeOperators<NonNullable<T>>;
   isFalsy(): this is BaseTypeOperators<Falsy<T>>;
   isTruthy(): this is BaseTypeOperators<Truthy<T>>;
@@ -60,7 +60,7 @@ interface BaseTypeOperators<T> {
 }
 
 interface SizedObjectTesters<T> extends BaseTypeOperators<T> {
-  isLength<U extends number>(length: U): this is TypeGuard<T & { length: U }>;
+  isLength<U extends number>(length: U): this is TypeGuard<T extends unknown[] ? TupleOf<T[number], U> : T & { length: U }>;
   isLonger(object: Sized): boolean;
   isLonger(length: number): boolean;
   isShorter(length: number): boolean;
@@ -68,7 +68,7 @@ interface SizedObjectTesters<T> extends BaseTypeOperators<T> {
 }
 
 interface ArrayTesters<T extends unknown[]> extends SizedObjectTesters<T> {
-  isLength<U extends number>(length: U): this is TypeGuard<TupleOf<T[number], U>>;
+  //isLength<U extends number>(length: U): this is TypeGuard<TupleOf<T[number], U>>;
   alwaysContainsValues<U extends T[number]>(values: [U, ...U[]]): asserts this is TypeGuard<[U, ...U[]]> | TypeGuard<T>;
   containsValues<U extends T[number]>(countNullish?: boolean): this is TypeGuard<[U, ...U[]]>
 }
@@ -77,12 +77,21 @@ interface FuncTesters<T extends Func> extends BaseTypeOperators<T> {
   isName(name: string): boolean;
 }
 
-interface EventListenerInfo<T, K extends keyof EventMapOf<T> = keyof EventMapOf<T>> {
-  func: EventFunc<T, K>;
-  options: AddEventListenerOptions;
-  listener: "default" | "conditional" | "controller";
-  special: any;
-}
+type EventListenerInfo<T, K extends keyof EventMapOf<T> = keyof EventMapOf<T>> =
+  | {
+      type: K, 
+      func: EventFunc<T, K>;
+      options: AddEventListenerOptions;
+      listener: "default" | "controller";
+      special?: undefined;
+    }
+  | {
+      type: K, 
+      func: EventFunc<T, K>;
+      options: AddEventListenerOptions;
+      listener: "conditional";
+      special: ((this: T, e: EventMapOf<T>[K]) => boolean) | number;
+    };
 
 interface CopyOptions {
   /**
@@ -96,7 +105,7 @@ interface CopyOptions {
   /**
    * Defines if the new element should have the same children. Defaults to `false`.
    * 
-   * If `copyAttribues` is set to true, this property is also set to true
+   * If `copyAttributes` is set to true, this property is also set to true
    */
   copyChildren?: boolean;
   /**
@@ -106,9 +115,11 @@ interface CopyOptions {
   /**
    * Defines if the new element should have the same styles. Defaults to `true`.
    * 
-   * If `copyAttribues` is set to true, this property is also set to true
+   * If `copyAttributes` is set to true, this property is also set to true
    */
   copyStyles?: boolean;
 }
 
-interface CutOptions extends CopyOptions {};
+interface PrototypeObject<T> {
+  readonly prototype: T;
+}

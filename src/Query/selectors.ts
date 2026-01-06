@@ -1,7 +1,3 @@
-export class MalformedQueryException extends Exception {
-  name = "MalformedQueryException";
-}
-
 type QueryCustom = Partial<{
   hidden: boolean,
   visible: boolean,

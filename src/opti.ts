@@ -1,3 +1,4 @@
+import { setGetter, setReadOnly } from "./helpers/helpers";
 import * as Classes from "./constructableobjects";
 import * as Doc from "./document";
 import * as Elements from "./elements";
@@ -5,29 +6,15 @@ import * as Exceptions from "./exception";
 import * as Globals from "./globals";
 import * as Lists from "./collections";
 import * as Arrays from "./arrays";
+import * as Events from "./events";
 import * as Misc from "./misc";
 import * as Decorators from "./decorators";
 
-function get<T>(
-  object: T,
-  prop: keyof T,
-  getter: () => any
-): void {
-  Object.defineProperty(object, prop, {
-    get: getter,
-    enumerable: false,
-    configurable: true
-  });
-}
-
 (function() {
-  let _evFuncData;
-  let _evFuncType;
-
-  globalThis.opti = {
+  globalThis.Opti = {
     crafty: false,
     query: false,
-    evented: false,
+    unsync: false,
     requests: false,
     flow: false
   };
@@ -41,31 +28,31 @@ function get<T>(
   globalThis.TypeException = Exceptions.TypeException;
   globalThis.CloneException = Exceptions.CloneException;
   globalThis.NumberTooSmallException = Exceptions.NumberTooSmallException;
-  globalThis.AssertionException = Exceptions.AssertionException;
   globalThis.NotImplementedException = Exceptions.NotImplementedException;
   globalThis.AccessException = Exceptions.AccessException;
   globalThis.UnknownException = Exceptions.UnknownException;
   globalThis.DebouncedException = Exceptions.DebouncedException;
   globalThis.AbstractMethodInvokedException = Exceptions.AbstractMethodInvokedException;
   globalThis.AbstractInitializationException = Exceptions.AbstractInitializationException;
-  globalThis.SortException = Exceptions.SortException;
+  globalThis.AssertionException = Exceptions.AssertionException;
+  globalThis.FetchException = Exceptions.FetchException;
   globalThis.CollectionOutOfBoundsException = Exceptions.CollectionOutOfBoundsException;
   globalThis.MalformedQueryException = Exceptions.MalformedQueryException;
   globalThis.RuntimeException = Exceptions.RuntimeException;
+  globalThis.IncorrectDecoratorPlacementException = Exceptions.IncorrectDecoratorPlacementException;
 
   globalThis.Abstract = Decorators.Abstract;
   globalThis.Final = Decorators.Final;
 
-  Object.defineProperty(globalThis, "f", {
-    value: <T>(iife: () => T) => iife(),
-    writable: false,
-    configurable: false,
-  });
+  setReadOnly(globalThis, "Missing", Symbol("Missing"));
+  setReadOnly(globalThis, "f", <T>(iife: () => T) => iife());
+
   globalThis.typed = Globals.typed;
   globalThis.assert = Globals.assert;
   globalThis.sleep = Globals.sleep;
   globalThis.isEmpty = Globals.isEmpty;
   globalThis.notEmpty = Globals.notEmpty;
+  globalThis.events = Events.getEvents;
 
   globalThis.Enum = Classes.Enum;
   globalThis.Tuple = Classes.Tuple;
@@ -96,9 +83,9 @@ function get<T>(
   HTMLElement.prototype.show = Elements.show;
   HTMLElement.prototype.hide = Elements.hide;
   HTMLElement.prototype.toggle = Elements.toggle;
-  get(HTMLElement.prototype, "isVisible", Elements.isVisible);
+  setGetter(HTMLElement.prototype, "isVisible", Elements.isVisible);
 
-  get(HTMLInputElement.prototype, "val", Elements.val);
+  setGetter(HTMLInputElement.prototype, "val", Elements.val);
 
   HTMLFormElement.prototype.serialize = Elements.serialize;
 
@@ -110,9 +97,8 @@ function get<T>(
   HTMLCollection.prototype.removeClass = Lists.removeClassList;
   HTMLCollection.prototype.toggleClass = Lists.toggleClassList;
 
-  EventTarget.prototype.addEventListener = Misc.addEventListener;
-  (EventTarget.prototype as any)._events = {};
-  EventTarget.prototype.getEvents = Misc.getEvents;
+  EventTarget.prototype.addEventListener = Events.addEventListener;
+  (EventTarget.prototype as unknown as { _events: unknown })._events = {};
 
   String.prototype.remove = Misc.remove;
   String.prototype.matches = Misc.matches;
@@ -127,7 +113,7 @@ function get<T>(
   Function.prototype.debounce = Misc.instDebounce;
   Function.prototype.throttle = Misc.instThrottle;
   Function.prototype.memo = Misc.instMemo;
-  get(Function.prototype, "args", Misc.args);
+  setGetter(Function.prototype, "args", Misc.args);
 
   Array.prototype.unique = Arrays.unique;
   Array.prototype.chunk = Arrays.chunk;
@@ -139,7 +125,7 @@ function get<T>(
   Array.prototype.replaceLast = Arrays.replaceLast;
   Array.prototype.sort = Arrays.sortBy;
   Array.prototype.insert = Arrays.insert;
-  get(Array.prototype, "type", Arrays.arrayType);
+  setGetter(Array.prototype, "type", Arrays.arrayType);
 
   Math.random = Misc.random;
 
