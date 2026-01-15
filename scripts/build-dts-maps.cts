@@ -5,7 +5,7 @@ import ts from 'typescript';
 function getDtsPaths(dir: string): string[] {
   let results: string[] = [];
   const entries = fs.readdirSync(dir, { withFileTypes: true });
-  
+
   for (const entry of entries) {
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
@@ -66,34 +66,66 @@ for (const [k, v] of Object.entries(dtsPaths)) {
   );
 };
 
-function extractJsDoc(node: ts.Node) {
-  const docs: Record<string, string[]> = {};
+interface DocMap {
+  __doc__?: string;
+  [key: string]: string | DocMap | undefined;
+};
 
-  function visit(n: ts.Node) {
+function extractJsDoc(node: ts.Node) {
+  const docs: DocMap = {};
+
+  function visit(doc: DocMap, n: ts.Node) {
     let name: string | undefined;
+
+    if (ts.isVariableStatement(n)) {
+      // 1. Get the JSDoc from the STATEMENT (the whole line)
+      const jsDocNodes = (n as any).jsDoc as ts.JSDoc[] | undefined;
+      
+      // Use optional chaining or a null check to prevent the TypeError
+      const commentText = jsDocNodes?.map(d => d.getText()).join("\n") || "";
+
+      // 2. Iterate through the declarations on that statement
+      n.declarationList.declarations.forEach((decl) => {
+        const varName = decl.name.getText();
+        // Use the comment from the parent statement for each variable
+        doc[varName] = { "__doc__": commentText };
+      });
+      
+      return; // Stop; children of variables usually aren't documented separately
+    }
+
     if (
-      ts.isInterfaceDeclaration(n) ||
-      ts.isClassDeclaration(n) ||
-      ts.isFunctionDeclaration(n) ||
-      ts.isTypeAliasDeclaration(n) ||
-      ts.isEnumDeclaration(n)
+      ts.isInterfaceDeclaration(n) || ts.isClassDeclaration(n) ||
+      ts.isFunctionDeclaration(n) || ts.isTypeAliasDeclaration(n) ||
+      ts.isEnumDeclaration(n) || ts.isPropertySignature(n) ||
+      ts.isMethodSignature(n)
     ) {
       name = n.name?.getText();
     }
 
+
     if (name) {
-      const jsDocs = ts.getJSDocCommentsAndTags(n).map(d => d.getText()).join("\n");
-      if (jsDocs) {
-        docs[name] ??= [];
-        docs[name].push(jsDocs);
+      const entry = doc[name];
+      const subDoc: DocMap = (typeof entry === 'object' && entry !== null) 
+      ? entry 
+      : (doc[name] = {});
+
+      // Extract JSDoc safely
+      const jsDocNodes = (n as any).jsDoc as ts.JSDoc[] | undefined;
+      if (jsDocNodes) {
+        subDoc["__doc__"] = jsDocNodes.map(d => d.getText()).join("\n");
       }
+
+      // Recurse into this node's children
+      ts.forEachChild(n, child => visit(subDoc, child));
+    } else {
+      ts.forEachChild(n, child => visit(doc, child));
     }
 
-    ts.forEachChild(n, visit);
+    ts.forEachChild(n, n => visit(docs, n));
   }
 
-  visit(node);
-  Object.keys(docs).forEach(k => docs[k] = docs[k].filter(Boolean));
+  visit(docs, node);
   return docs;
 }
 

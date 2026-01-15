@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noUncheckedIndexedAccess": false,
+    "verbatimModuleSyntax": false,
+    "lib": [],
+    "types": ["node"]
+  },
+  "include": [
+    "*.ts",
+    "../../types/command/*.d.ts"
+  ]
+}

@@ -1,1 +1,15 @@
-{}
+{
+  "Crafty": {
+    "__doc__": ""
+  },
+  "craft": {},
+  "from": {},
+  "Unknown": {},
+  "Text": {},
+  "Fragment": {},
+  "Element": {},
+  "HTMLElement": {},
+  "Exception": {},
+  "ChildrenNotAllowedException": {},
+  "NormalizationException": {}
+}

@@ -1,1 +1,66 @@
-{}
+{
+  "SELECT": {
+    "__doc__": ""
+  },
+  "INSERT": {
+    "__doc__": ""
+  },
+  "UPDATE": {
+    "__doc__": ""
+  },
+  "DELETE": {
+    "__doc__": ""
+  },
+  "FROM": {
+    "__doc__": ""
+  },
+  "GROUP_BY": {
+    "__doc__": ""
+  },
+  "ORDER_BY": {
+    "__doc__": ""
+  },
+  "LIMIT": {
+    "__doc__": ""
+  },
+  "OFFSET": {
+    "__doc__": ""
+  },
+  "WHERE": {
+    "__doc__": ""
+  },
+  "VALUES": {
+    "__doc__": ""
+  },
+  "INTO": {
+    "__doc__": ""
+  },
+  "SET": {
+    "__doc__": ""
+  },
+  "AND": {
+    "__doc__": ""
+  },
+  "OR": {
+    "__doc__": ""
+  },
+  "NOT": {
+    "__doc__": ""
+  },
+  "COUNT": {},
+  "MAX": {},
+  "MIN": {},
+  "AVG": {},
+  "COALESCE": {},
+  "DBQueryException": {
+    "__doc__": ""
+  },
+  "DB": {
+    "__doc__": ""
+  },
+  "Database": {
+    "query": {}
+  },
+  "query": {},
+  "DBQuery": {}
+}

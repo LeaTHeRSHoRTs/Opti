@@ -1,6 +1,17 @@
 const globals =  require('globals');
 const tsParser = require('@typescript-eslint/parser');
 
+const tsconfigs = [
+  // Source Files
+  'src/modules/tsconfig.json',
+  'src/command/tsconfig.json',
+
+  // Test Files
+  'tests/modules/tsconfig.json',
+  'tests/command/tsconfig.json',
+];
+
+
 /** @type {import('eslint').Linter.RulesRecord} */
 const javascriptRules = {
   'no-undef': 'error',
@@ -28,6 +39,7 @@ const javascriptRules = {
 
 /** @type {import('eslint').Linter.RulesRecord} */
 const definitionRules = {
+  'semi': ['error', 'always'],
   'no-var': 'off',
   'no-undef': 'off',
   'camelcase': 'warn',
@@ -72,13 +84,6 @@ const testRules = {
   ...typescriptRules,
   '@typescript-eslint/no-explicit-any': 'off',
 };
-
-const tsconfigs = [
-  'cli/tsconfig.cli.json',
-  'scripts/tsconfig.scripts.json',
-  'tests/tsconfig.test.json',
-  'tsconfig.json'
-];
 
 /** @type {import('eslint').Linter.Config[]} */
 module.exports = [

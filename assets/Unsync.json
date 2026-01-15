@@ -1,1 +1,43 @@
-{}
+{
+  "Emitter": {
+    "__doc__": ""
+  },
+  "SetEmitter": {
+    "__doc__": ""
+  },
+  "EventTarget": {
+    "addConditionalListener": {
+      "__doc__": "/** \r\n   * Creates an event listener that triggers a set amount of times\r\n   * @opti\r\n   * @param type The type of listener to use\r\n   * @param listener The callback of the listener\r\n   * @param options Optional options to give the listener \r\n   * @example\r\n   * const el = document.$(\"#target\");\r\n   * \r\n   * el.addConditionalListener(\"click\", () => {\r\n   *   el.removeAttr(\"id\");\r\n   * }, 1);\r\n   * \r\n   * let mouseover = false;\r\n   * \r\n   * el.addConditionalListener(\"mouseover\", () => {\r\n   *   el.removeAttr(\"id\");\r\n   *   mouseover = true;\r\n   * }, () => mouseover);\r\n   */"
+    },
+    "addEventListeners": {
+      "__doc__": "/** \r\n   * Adds multiple event listeners that resolve under a unified callback\r\n   * @opti\r\n   * @param types The events to listen to\r\n   * @param listener The listener to apply\r\n   * @param options options for the event listeners\r\n   * @example\r\n   * document.addEventListeners([\"load\", \"unload\"], () => {\r\n   *   console.log(\"document experienced a loading event\");\r\n   * });\r\n   */"
+    },
+    "delegateEventListener": {
+      "__doc__": "/** \r\n   * Delegates an event listener to a child of the node\r\n   * @opti\r\n   * @param types The events to listen to\r\n   * @param delegator The child element that the event should fire on\r\n   * @param listener The listener to apply\r\n   * @param options options for the event listeners\r\n   * @example\r\n   * document.delegateEventListener(\"click\", \"button\", () => {\r\n   *   console.log(\"Button has had a click event happen\"); // Even works after DOM mutation\r\n   * });\r\n   */"
+    },
+    "addEventController": {}
+  },
+  "addConditionalListener": {
+    "__doc__": "/** \r\n   * Creates an event listener that triggers a set amount of times\r\n   * @opti\r\n   * @param type The type of listener to use\r\n   * @param listener The callback of the listener\r\n   * @param options Optional options to give the listener \r\n   * @example\r\n   * const el = document.$(\"#target\");\r\n   * \r\n   * el.addConditionalListener(\"click\", () => {\r\n   *   el.removeAttr(\"id\");\r\n   * }, 1);\r\n   * \r\n   * let mouseover = false;\r\n   * \r\n   * el.addConditionalListener(\"mouseover\", () => {\r\n   *   el.removeAttr(\"id\");\r\n   *   mouseover = true;\r\n   * }, () => mouseover);\r\n   */"
+  },
+  "addEventListeners": {
+    "__doc__": "/** \r\n   * Adds multiple event listeners that resolve under a unified callback\r\n   * @opti\r\n   * @param types The events to listen to\r\n   * @param listener The listener to apply\r\n   * @param options options for the event listeners\r\n   * @example\r\n   * document.addEventListeners([\"load\", \"unload\"], () => {\r\n   *   console.log(\"document experienced a loading event\");\r\n   * });\r\n   */"
+  },
+  "delegateEventListener": {
+    "__doc__": "/** \r\n   * Delegates an event listener to a child of the node\r\n   * @opti\r\n   * @param types The events to listen to\r\n   * @param delegator The child element that the event should fire on\r\n   * @param listener The listener to apply\r\n   * @param options options for the event listeners\r\n   * @example\r\n   * document.delegateEventListener(\"click\", \"button\", () => {\r\n   *   console.log(\"Button has had a click event happen\"); // Even works after DOM mutation\r\n   * });\r\n   */"
+  },
+  "addEventController": {},
+  "NodeList": {
+    "addEventListener": {
+      "__doc__": "/** \r\n   * Adds the same event listener to every element in the list\r\n   * @opti\r\n   * @param type The type of listener to attach\r\n   * @param listener The callback to the event\r\n   * @param options Options of the event listener\r\n   * @example\r\n   * document.$$(\"div.panel\")\r\n   *   .addEventListeners(\"click\", () => {\r\n   *     this.fadeOut(3000);\r\n   *     this.removeClass(\"panel\");\r\n   *   });\r\n   */"
+    }
+  },
+  "addEventListener": {
+    "__doc__": "/** \r\n   * Adds the same event listener to every element in the list\r\n   * @opti\r\n   * @param type The type of listener to attach\r\n   * @param listener The callback to the event\r\n   * @param options Options of the event listener\r\n   * @example\r\n   * document.$$(\"div.panel\")\r\n   *   .addEventListeners(\"click\", () => {\r\n   *     this.fadeOut(3000);\r\n   *     this.removeClass(\"panel\");\r\n   *   });\r\n   */"
+  },
+  "HTMLCollection": {
+    "addEventListener": {
+      "__doc__": "/** \r\n   * Adds the same event listener to every element in the list\r\n   * @opti\r\n   * @param type The type of listener to attach\r\n   * @param listener The callback to the event\r\n   * @param options Options of the event listener\r\n   * @example\r\n   * document.$$(\"div.panel\")\r\n   *   .addEventListeners(\"click\", () => {\r\n   *     this.fadeOut(3000);\r\n   *     this.removeClass(\"panel\");\r\n   *   });\r\n   */"
+    }
+  }
+}

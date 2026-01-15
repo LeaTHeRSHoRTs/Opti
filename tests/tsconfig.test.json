@@ -1,23 +1,7 @@
 {
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "moduleResolution": "node",
     "types": ["jest"],
-    "noEmit": true,
-    "lib": ["DOM", "ES2017"],
-    "paths": {
-      "opti": ["../types/opti.lib.d.ts"],
-      "opti/crafty": ["../types/Crafty/crafty.lib.d.ts"],
-      "opti/unsync": ["../types/Unsync/unsync.lib.d.ts"],
-      "opti/query": ["../types/Query/query.lib.d.ts"],
-      "opti/flow": ["../types/Flow/flow.lib.d.ts"],
-      "opti/requests": ["../types/Requests/requests.lib.d.ts"]
-    }
-  },
-  "include": [
-    "./**/*.test.ts",
-    "./jest.d.ts"
-  ],
-  "exclude": [
-    "../types/**/*.d.ts"
-  ]
+    "noEmit": true
+  }
 }

@@ -6,23 +6,36 @@
   "description": "Lightweight DOM manipulation, styling, and utility extension for native JavaScript objects — without wrappers.",
   "bin": "./bin/opti.js",
   "exports": {
-    "opti": { "types": "./types/opti.lib.d.ts" },
-    "opti/crafty": { "types": "./types/Crafty/crafty.lib.d.ts" },
-    "opti/unsync": { "types": "./types/Unsync/unsync.lib.d.ts" },
-    "opti/query": { "types": "./types/Query/query.lib.d.ts" },
-    "opti/flow": { "types": "./types/Flow/flow.lib.d.ts" },
-    "opti/requests": { "types": "./types/Requests/requests.lib.d.ts" }
+    "opti": {
+      "types": "./types/opti.lib.d.ts"
+    },
+    "opti/crafty": {
+      "types": "./types/Crafty/crafty.lib.d.ts"
+    },
+    "opti/unsync": {
+      "types": "./types/Unsync/unsync.lib.d.ts"
+    },
+    "opti/query": {
+      "types": "./types/Query/query.lib.d.ts"
+    },
+    "opti/flow": {
+      "types": "./types/Flow/flow.lib.d.ts"
+    },
+    "opti/requests": {
+      "types": "./types/Requests/requests.lib.d.ts"
+    }
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/LeaTHeRSHoRTs/Opti.git"
   },
   "scripts": {
+    "opti": "node cli/opti.ts",
+    "opti:bin": "node cli/opti.js",
     "build": "npx webpack --config config/webpack.config.cjs",
     "build:cli": "tsc --project ./src/cli/tsconfig.cli.json",
-    "test": "npm run check silent && npx jest --config config/jest.config.cjs --verbose --passWithNoTests --no-coverage --detectOpenHandles",
+    "test": "npx jest --config ./config/jest.config.cjs --verbose --passWithNoTests --detectOpenHandles",
     "git-push": "ts-node scripts/push.ts",
-    "check": "ts-node scripts/check.ts",
     "genCliJson": "ts-node scripts/build-dts-map.ts",
     "prepublishOnly": "npm run build:cli && npm run build && npm run check && npm run test && npm run git-push"
   },

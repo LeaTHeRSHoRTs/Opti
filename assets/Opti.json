@@ -1,35 +1,419 @@
 {
-  "f": [
-    "/** \r\n * Creates an iife (Immediately invoked function expression) that triggers on run \r\n * @opti\r\n * @param iife The function to run immediately\r\n * @param args The arguments to pass to the `iife` function\r\n * @returns The value returned from the `iife` function\r\n * @since 1.0.0\r\n * @example\r\n * ```ts\r\n * f(() => {\r\n *   console.log(\"I run when the file loads!\");\r\n * });\r\n * \r\n * const res = f(() => {\r\n *   return \"I go into the res variable!\";\r\n * });\r\n * \r\n * const otherRes = f(r => {\r\n *   return r.insert(1, \" don't\");\r\n * }, res);\r\n * ```\r\n */"
-  ],
-  "typed": [
-    "/**\r\n * Gets the type of the value and returns a string representation of the type of the value\r\n * @opti\r\n * @param val The value who's type is being tested\r\n * @returns An object that has multiple testing functions and assertions functions\r\n * @since 1.0.0\r\n * @example\r\n * ```ts\r\n * type(5).stringOf()           // \"number\"\r\n * type(\"hello\").stringOf()     // \"string\"\r\n * type(null).stringOf()        // \"null\"\r\n * type(undefined).stringOf()   // \"undefined\"\r\n * type([1,2,3]).stringOf()     // \"array\"\r\n * type({}).stringOf()          // \"object\"\r\n * type(new Date()).stringOf()  // \"date\"\r\n * type(/abc/).stringOf()       // \"regexp\"\r\n * type(() => {}).stringOf()    // \"function\"\r\n * type(new Map()).stringOf()   // \"map\"\r\n * type(new Set()).stringOf()   // \"set\"\r\n * ```\r\n */"
-  ],
-  "assert": [
-    "/**\r\n * Asserts whether `condition` is true or not and throws an {@linkcode AssertionException} if it fails\r\n * @opti\r\n * @throws {AssertionException} Throws if the assertion fails\r\n * @param condition The condition to test\r\n * @since 1.0.0\r\n * @example\r\n * ```ts\r\n * let mayVar = 32;\r\n * if (Math.random() > 0.5) {\r\n *   myVar = 33;\r\n * }\r\n * \r\n * assert(myVar === 33); // From now on, intellisense thinks that myVar: 33\r\n * console.log(myVar); // Will not log if myVar is 32 before the assertion\r\n * ```\r\n */"
-  ],
-  "events": [
-    "/**\r\n * Gets the events on an object\r\n * \r\n * @opti\r\n * @function\r\n * @param target The target object that events are being fetched from\r\n * @param event The optional event that is being fetched from the object\r\n * @returns Either an event object of all events on the EventTarget or a specific event's info\r\n * @since 1.0.0\r\n * @example\r\n * ```ts\r\n * const el = document.getElementById(\"example\");\r\n * \r\n * document.addEventListener(\"click\", () => console.log(\"clicked\"));\r\n * document.addConditionalEvent(\"focus\", () => console.log(\"focused\"));\r\n * \r\n * const eventList = events(el);\r\n * console.log(\"All event listeners for #example\", eventList); \r\n * // [{ type: \"click\", func: [Function], options {}, listener: \"default\" }, \r\n * //  { type: \"focus\", func: [Function], options {}, listener: \"default\" }]\r\n * const clickEvent = events(el, \"click\");\r\n * console.log(\"Click event listener for #example:\", clickEvent); // { type: \"click\", func: () => void, options: {}, listener: \"default\" }\r\n * ```\r\n */"
-  ],
-  "isEmpty": [
-    "/**\r\n * Checks whether the value given is empty, `null`, or `undefined`\r\n * \r\n * @opti\r\n * @see {@linkcode notEmpty} inverse of `isEmpty`\r\n * @param val The value to check\r\n * @since 1.0.0\r\n * @example\r\n * ```ts\r\n * isEmpty(\"\"); // true\r\n * isEmpty(\"Hello\"); // false\r\n * isEmpty(NaN); // true\r\n * isEmpty(0); // false\r\n * isEmpty({}); // true\r\n * isEmpty([]); // true\r\n * isEmpty([1, 2]); // false\r\n * ```\r\n */"
-  ],
-  "notEmpty": [
-    "/**\r\n * Performs inverse function to {@linkcode isEmpty}\r\n * @opti\r\n * @see {@linkcode isEmpty} inverse of `notEmpty`\r\n * @param val The value to check \r\n * @since 1.0.0\r\n * @example\r\n * ```ts\r\n * isEmpty(\"\") === notEmpty(\"Hello\") // true\r\n * notEmpty(\"\"); // false\r\n * notEmpty(\"Hello\"); // true\r\n * notEmpty(NaN); // false\r\n * notEmpty(0); // true\r\n * notEmpty({}); // false\r\n * notEmpty([]); // false\r\n * notEmpty([1, 2]); // true\r\n * ```\r\n */"
-  ],
-  "sleep": [
-    "/**\r\n * Waits the specified number of ms before returning control to the `then` block, or the main program when using `async` blocks with `await`\r\n * @opti\r\n * @throws {NumberTooSmallException} When the returned {@linkcode Future} object fails because `ms` is less than 1\r\n * @param ms The amount of milliseconds to wait\r\n * @returns A {@linkcode Future} that resolves to void on success and rejects to a {@linkcode NumberTooSmallException} when the number specified is less than 1\r\n * @since 1.0.0\r\n * @example\r\n * ```ts\r\n * console.log(\"I log when the program runs!\");\r\n * \r\n * await sleep(500);\r\n * \r\n * console.log(\"I wait 5 seconds before executing!\");\r\n * ```\r\n */"
-  ],
-  "Enum": [
-    "/**\r\n * Creates a new type-safe enum full of `string: symbol` pairs. Values in an Enum must follow the variable naming rules of JavaScript, matching `/^[A-Za-z_$][A-Za-z0-9_$]*$/`\r\n * @opti\r\n * @throws {SyntaxException} When a property key is not unique or invalid characters are passed\r\n * @param values The values that will be used for the new enum\r\n * @returns A new type-safe enum whose properties map the provided strings to symbols, to make the properties unique when checked with `===`\r\n * @since 1.0.0\r\n * @example\r\n * ```ts\r\n * const Colors = Enum(\"RED\", \"ORANGE\", \"YELLOW\", \"GREEN\", \"BLUE\")\r\n * \r\n * const color = Colors.ORANGE\r\n * switch(color) {\r\n *   case Colors.RED:\r\n *     console.log(\"Red\")\r\n *     break;\r\n *   case Colors.ORANGE:\r\n *     console.log(\"Orange\")\r\n *     break;\r\n *   case Colors.YELLOW:\r\n *     console.log(\"Yellow\")\r\n *     break;\r\n *   case Colors.GREEN:\r\n *     console.log(\"Green\")\r\n *     break;\r\n *   case Colors.BLUE:\r\n *     console.log(\"Blue\")\r\n *     break;\r\n *   default:\r\n *     console.log(\"Unknown color\")\r\n *     break;\r\n * }\r\n * ```\r\n */"
-  ],
-  "Tuple": [
-    "/**\r\n * Creates a tuple of values from a spread provided. Used for tuple inference where literal arrays are widened to T[] instead of inferring a tuple type.\r\n * @opti\r\n * @param values The values to use for the tuple\r\n * @returns A new tuple constructed from the values specified\r\n * @since 1.0.0\r\n * @example\r\n * ```ts\r\n * const myTuple = Tuple(\"X\", 2, true); // Tuple is of type [string, number, boolean]\r\n * myTuple[0] = 3;         // Type 'number' is not assignable to type 'string'.\r\n * myTuple[1] = false;     // Type 'boolean' is not assignable to type 'number'.\r\n * myTuple[2] = \"Goodbye\"; // Type 'string' is not assignable to type 'boolean'.\r\n * myTuple[1] = 3;         // Valid\r\n * ```\r\n */"
-  ],
-  "Abstract": [
-    "/** @decorator */"
-  ],
-  "Final": [
-    "/** @decorator */"
-  ]
+  "Missing": {
+    "__doc__": "/**\r\n * @file opti.lib.d.ts\r\n * @description Main type declarations for the Opti library\r\n * @version 1.0.0\r\n */\n/**\r\n * `Missing` is used when a value is not present.\r\n * \r\n * The new array methods return a `Missing` when a value is not found, so that they support `null` and `undefined` arrays.\r\n * \r\n * @opti\r\n * @readonly\r\n * @author LeaTHeR_SHoRTs\r\n * @since 1.0.0\r\n */"
+  },
+  "f": {
+    "__doc__": "/** \r\n * Creates an iife (Immediately invoked function expression) that triggers on run \r\n * @opti\r\n * @param iife The function to run immediately\r\n * @param args The arguments to pass to the `iife` function\r\n * @returns The value returned from the `iife` function\r\n * @since 1.0.0\r\n * @example\r\n * ```ts\r\n * f(() => {\r\n *   console.log(\"I run when the file loads!\");\r\n * });\r\n * \r\n * const res = f(() => {\r\n *   return \"I go into the res variable!\";\r\n * });\r\n * \r\n * const otherRes = f(r => {\r\n *   return r.insert(1, \" don't\");\r\n * }, res);\r\n * ```\r\n */"
+  },
+  "typed": {
+    "__doc__": "/**\r\n * Gets the type of the value and returns a string representation of the type of the value\r\n * @opti\r\n * @param val The value who's type is being tested\r\n * @returns An object that has multiple testing functions and assertions functions\r\n * @since 1.0.0\r\n * @example\r\n * ```ts\r\n * type(5).stringOf()           // \"number\"\r\n * type(\"hello\").stringOf()     // \"string\"\r\n * type(null).stringOf()        // \"null\"\r\n * type(undefined).stringOf()   // \"undefined\"\r\n * type([1,2,3]).stringOf()     // \"array\"\r\n * type({}).stringOf()          // \"object\"\r\n * type(new Date()).stringOf()  // \"date\"\r\n * type(/abc/).stringOf()       // \"regexp\"\r\n * type(() => {}).stringOf()    // \"function\"\r\n * type(new Map()).stringOf()   // \"map\"\r\n * type(new Set()).stringOf()   // \"set\"\r\n * ```\r\n */"
+  },
+  "assert": {
+    "__doc__": "/**\r\n * Asserts whether `condition` is true or not and throws an {@linkcode AssertionException} if it fails\r\n * @opti\r\n * @throws {AssertionException} Throws if the assertion fails\r\n * @param condition The condition to test\r\n * @since 1.0.0\r\n * @example\r\n * ```ts\r\n * let mayVar = 32;\r\n * if (Math.random() > 0.5) {\r\n *   myVar = 33;\r\n * }\r\n * \r\n * assert(myVar === 33); // From now on, intellisense thinks that myVar: 33\r\n * console.log(myVar); // Will not log if myVar is 32 before the assertion\r\n * ```\r\n */"
+  },
+  "events": {
+    "__doc__": "/**\r\n * Gets the events on an object\r\n * \r\n * @opti\r\n * @function\r\n * @param target The target object that events are being fetched from\r\n * @param event The optional event that is being fetched from the object\r\n * @returns Either an event object of all events on the EventTarget or a specific event's info\r\n * @since 1.0.0\r\n * @example\r\n * ```ts\r\n * const el = document.getElementById(\"example\");\r\n * \r\n * document.addEventListener(\"click\", () => console.log(\"clicked\"));\r\n * document.addConditionalEvent(\"focus\", () => console.log(\"focused\"));\r\n * \r\n * const eventList = events(el);\r\n * console.log(\"All event listeners for #example\", eventList); \r\n * // [{ type: \"click\", func: [Function], options {}, listener: \"default\" }, \r\n * //  { type: \"focus\", func: [Function], options {}, listener: \"default\" }]\r\n * const clickEvent = events(el, \"click\");\r\n * console.log(\"Click event listener for #example:\", clickEvent); // { type: \"click\", func: () => void, options: {}, listener: \"default\" }\r\n * ```\r\n */"
+  },
+  "isEmpty": {
+    "__doc__": "/**\r\n * Checks whether the value given is empty, `null`, or `undefined`\r\n * \r\n * @opti\r\n * @see {@linkcode notEmpty} inverse of `isEmpty`\r\n * @param val The value to check\r\n * @since 1.0.0\r\n * @example\r\n * ```ts\r\n * isEmpty(\"\"); // true\r\n * isEmpty(\"Hello\"); // false\r\n * isEmpty(NaN); // true\r\n * isEmpty(0); // false\r\n * isEmpty({}); // true\r\n * isEmpty([]); // true\r\n * isEmpty([1, 2]); // false\r\n * ```\r\n */",
+    "length": {}
+  },
+  "length": {},
+  "notEmpty": {
+    "__doc__": "/**\r\n * Performs inverse function to {@linkcode isEmpty}\r\n * @opti\r\n * @see {@linkcode isEmpty} inverse of `notEmpty`\r\n * @param val The value to check \r\n * @since 1.0.0\r\n * @example\r\n * ```ts\r\n * isEmpty(\"\") === notEmpty(\"Hello\") // true\r\n * notEmpty(\"\"); // false\r\n * notEmpty(\"Hello\"); // true\r\n * notEmpty(NaN); // false\r\n * notEmpty(0); // true\r\n * notEmpty({}); // false\r\n * notEmpty([]); // false\r\n * notEmpty([1, 2]); // true\r\n * ```\r\n */"
+  },
+  "sleep": {
+    "__doc__": "/**\r\n * Waits the specified number of ms before returning control to the `then` block, or the main program when using `async` blocks with `await`\r\n * @opti\r\n * @throws {NumberTooSmallException} When the returned {@linkcode Future} object fails because `ms` is less than 1\r\n * @param ms The amount of milliseconds to wait\r\n * @returns A {@linkcode Future} that resolves to void on success and rejects to a {@linkcode NumberTooSmallException} when the number specified is less than 1\r\n * @since 1.0.0\r\n * @example\r\n * ```ts\r\n * console.log(\"I log when the program runs!\");\r\n * \r\n * await sleep(500);\r\n * \r\n * console.log(\"I wait 5 seconds before executing!\");\r\n * ```\r\n */"
+  },
+  "Enum": {
+    "__doc__": "/**\r\n * Creates a new type-safe enum full of `string: symbol` pairs. Values in an Enum must follow the variable naming rules of JavaScript, matching `/^[A-Za-z_$][A-Za-z0-9_$]*$/`\r\n * @opti\r\n * @throws {SyntaxException} When a property key is not unique or invalid characters are passed\r\n * @param values The values that will be used for the new enum\r\n * @returns A new type-safe enum whose properties map the provided strings to symbols, to make the properties unique when checked with `===`\r\n * @since 1.0.0\r\n * @example\r\n * ```ts\r\n * const Colors = Enum(\"RED\", \"ORANGE\", \"YELLOW\", \"GREEN\", \"BLUE\")\r\n * \r\n * const color = Colors.ORANGE\r\n * switch(color) {\r\n *   case Colors.RED:\r\n *     console.log(\"Red\")\r\n *     break;\r\n *   case Colors.ORANGE:\r\n *     console.log(\"Orange\")\r\n *     break;\r\n *   case Colors.YELLOW:\r\n *     console.log(\"Yellow\")\r\n *     break;\r\n *   case Colors.GREEN:\r\n *     console.log(\"Green\")\r\n *     break;\r\n *   case Colors.BLUE:\r\n *     console.log(\"Blue\")\r\n *     break;\r\n *   default:\r\n *     console.log(\"Unknown color\")\r\n *     break;\r\n * }\r\n * ```\r\n */"
+  },
+  "Tuple": {
+    "__doc__": "/**\r\n * Creates a tuple of values from a spread provided. Used for tuple inference where literal arrays are widened to T[] instead of inferring a tuple type.\r\n * @opti\r\n * @param values The values to use for the tuple\r\n * @returns A new tuple constructed from the values specified\r\n * @since 1.0.0\r\n * @example\r\n * ```ts\r\n * const myTuple = Tuple(\"X\", 2, true); // Tuple is of type [string, number, boolean]\r\n * myTuple[0] = 3;         // Type 'number' is not assignable to type 'string'.\r\n * myTuple[1] = false;     // Type 'boolean' is not assignable to type 'number'.\r\n * myTuple[2] = \"Goodbye\"; // Type 'string' is not assignable to type 'boolean'.\r\n * myTuple[1] = 3;         // Valid\r\n * ```\r\n */"
+  },
+  "Exception": {
+    "__doc__": "/**\r\n * Base class for all the Opti Exceptions.\r\n * \r\n * Extends `Error` for compatibility with standard error handing\r\n * @opti\r\n * @extends Error\r\n * @since 1.0.0\r\n */"
+  },
+  "RuntimeException": {
+    "__doc__": "/**\r\n * Exception that cannot be caught using `instanceof Exception` or `instanceof Error`\r\n * @opti\r\n * @extends Object\r\n * @since 1.0.0\r\n */"
+  },
+  "NotImplementedException": {
+    "__doc__": "/**\r\n * Exception for unimplemented functions, objects, classes, and others\r\n * @opti\r\n * @extends Exception\r\n * @since 1.0.0\r\n */"
+  },
+  "UnknownException": {
+    "__doc__": "/**\r\n * Exception for unknown causes\r\n * @opti\r\n * @extends Exception\r\n * @since 1.0.0\r\n */"
+  },
+  "AccessException": {
+    "__doc__": "/**\r\n * Exception for illegal access\r\n * @opti\r\n * @extends Exception\r\n * @since 1.0.0\r\n */"
+  },
+  "AssertionException": {
+    "__doc__": "/**\r\n * Error for assertion related errors\r\n * @opti\r\n * @extends Exception\r\n * @since 1.0.0\r\n */"
+  },
+  "DebouncedException": {
+    "__doc__": "/**\r\n * Exception for starting a new debounce\r\n * @opti\r\n * @extends Exception\r\n * @since 1.0.0\r\n */"
+  },
+  "SyntaxException": {
+    "__doc__": "/**\r\n * Exception for invalid syntax\r\n * @opti\r\n * @extends Exception\r\n * @since 1.0.0\r\n */"
+  },
+  "TypeException": {
+    "__doc__": "/**\r\n * Exception for invalid provided types\r\n * @opti\r\n * @extends Exception\r\n * @since 1.0.0\r\n */"
+  },
+  "CloneException": {
+    "__doc__": "/**\r\n * Exception thrown when cloning of objects is invalid\r\n * @opti\r\n * @extends Exception\r\n * @since 1.0.0\r\n */"
+  },
+  "NumberException": {
+    "__doc__": "/**\r\n * Exception for all number-related errors\r\n * @opti\r\n * @extends Exception\r\n * @since 1.0.0\r\n */"
+  },
+  "NumberTooSmallException": {
+    "__doc__": "/**\r\n * Exception for when a number is too small\r\n * @opti\r\n * @extends NumberException\r\n * @since 1.0.0\r\n */"
+  },
+  "DecoratorException": {
+    "__doc__": "/**\r\n * Exception for all decorator-related errors\r\n * @opti\r\n * @extends Exception\r\n * @since 1.0.0\r\n */"
+  },
+  "IncorrectDecoratorPlacementException": {
+    "__doc__": "/**\r\n   * Exception for all decorator-related errors\r\n   * @opti\r\n   * @extends DecoratorException\r\n   * @since 1.0.0\r\n   */"
+  },
+  "AbstractException": {
+    "__doc__": "/**\r\n   * Exception for all `@Abstract` decorator related errors\r\n   * @opti\r\n   * @extends DecoratorException\r\n   * @since 1.0.0\r\n   */"
+  },
+  "AbstractInitializationException": {
+    "__doc__": "/**\r\n     * Exception for when `@Abstract` marked classes are attempted to be constructed\r\n     * @opti\r\n     * @extends AbstractException\r\n     * @since 1.0.0\r\n     */"
+  },
+  "AbstractMethodInvokedException": {
+    "__doc__": "/**\r\n     * Exception for when a `@Abstract` method is attempted to be invoked\r\n     * @opti\r\n     * @extends AbstractException\r\n     * @since 1.0.0\r\n     */"
+  },
+  "CollectionOutOfBoundsException": {
+    "__doc__": "/**\r\n * Exception thrown when an item in a {@linkcode Collection} is attempted to be accessed\r\n * @opti\r\n * @extends Exception\r\n * @since 1.0.0\r\n */"
+  },
+  "MalformedQueryException": {
+    "__doc__": "/**\r\n * Exception for when a query passed to `Node.querySelector`, `Node.$`, `Node.querySelectorAll` or `Node.$$` is invalid\r\n * @opti\r\n * @extends Exception\r\n * @since 1.0.0\r\n */"
+  },
+  "FetchException": {
+    "__doc__": "/**\r\n * Exception for when a fetch request fails unexpectedly (not handled in the .catch block of the returned promise)\r\n * @opti\r\n * @extends Exception\r\n * @since 1.0.0\r\n */"
+  },
+  "Collection": {
+    "__doc__": "/**\r\n * The `Collection` class is an alternative to the `Array` class for collections of objects, primitives, and more\r\n */"
+  },
+  "Future": {
+    "__doc__": "/**\r\n * The `Future` class is just a promise with a error parameter in TS\r\n * @is Promise\r\n * @since 1.0.0\r\n */"
+  },
+  "Opti": {
+    "__doc__": "/**\r\n * The `Opti` object provides information about the `opti` module\r\n * @property\r\n */"
+  },
+  "Abstract": {
+    "__doc__": "/** @decorator */"
+  },
+  "Final": {
+    "__doc__": "/** @decorator */"
+  },
+  "Document": {
+    "css": {
+      "__doc__": "/** \r\n   * Adds, edits and returns the element's css on the document stylesheet.\r\n   * @opti\r\n   * @example\r\n   * document.css(\"#target\", {\r\n   *   backgroundColor: \"red\",\r\n   *   color: \"grey\"\r\n   * })\r\n   */"
+    },
+    "ready": {
+      "__doc__": "/**\r\n   * Calls the callback when the document is ready and all of the content is loaded\r\n   * @opti\r\n   * @param callback The function to call when the document is ready\r\n   * @example\r\n   * document.ready(() => {\r\n   *   console.log(\"Document is ready\");\r\n   * \r\n   *   // Works because the document is ready\r\n   *   const el = document.$(\"body\");\r\n   * })\r\n   */"
+    },
+    "leaving": {
+      "__doc__": "/**\r\n   * Calls the callback when the user leaves the page or website\r\n   * @opti\r\n   * @param callback The function to call when the user leaves the page or website\r\n   * @example\r\n   * document.leaving(() => {\r\n   *   console.log(\"User is Leaving\");\r\n   * \r\n   *   // Cleanup tasks\r\n   *   localStorage.clear();\r\n   *   Cookie.clear();\r\n   * })\r\n   */"
+    },
+    "createElements": {
+      "__doc__": "/**\r\n   * Creates an element tree to create trees of HTML\r\n   * @opti\r\n   * @param node The html element(s)\r\n   * @example\r\n   * const content = Elements.createTree({\r\n   *   tag: \"div\",\r\n   *   class: \"current-class\",\r\n   *   children: [\r\n   *     {\r\n   *       tag: \"div\",\r\n   *       class: \"class-name\",\r\n   *       children: [\r\n   *         {\r\n   *           tag: \"a\",\r\n   *           attrs: {\r\n   *             href: \"https://example.com\",\r\n   *             target: \"_blank\",\r\n   *           },\r\n   *           text: \"To example.com\",\r\n   *         }\r\n   *       ]\r\n   *     }\r\n   *   ]\r\n   * });\r\n   */"
+    }
+  },
+  "css": {
+    "__doc__": "/** \r\n   * Adds inline css to the element. Using the boolean value `true` as the first argument returns the element's computed styles as well\r\n   * @opti\r\n   * @example\r\n   * const el = document.$(\"#target\");\r\n   * \r\n   * el.css(\"background-color\", \"red\");\r\n   * el.css({\r\n   *   visibility: \"visible\",\r\n   *   backgroundColor: \"blue\"\r\n   * })\r\n   * \r\n   * console.log(el.css());\r\n   */"
+  },
+  "ready": {
+    "__doc__": "/**\r\n   * Calls the callback when the document is ready and all of the content is loaded\r\n   * @opti\r\n   * @param callback The function to call when the document is ready\r\n   * @example\r\n   * document.ready(() => {\r\n   *   console.log(\"Document is ready\");\r\n   * \r\n   *   // Works because the document is ready\r\n   *   const el = document.$(\"body\");\r\n   * })\r\n   */"
+  },
+  "leaving": {
+    "__doc__": "/**\r\n   * Calls the callback when the user leaves the page or website\r\n   * @opti\r\n   * @param callback The function to call when the user leaves the page or website\r\n   * @example\r\n   * document.leaving(() => {\r\n   *   console.log(\"User is Leaving\");\r\n   * \r\n   *   // Cleanup tasks\r\n   *   localStorage.clear();\r\n   *   Cookie.clear();\r\n   * })\r\n   */"
+  },
+  "createElements": {
+    "__doc__": "/**\r\n   * Creates an element tree to create trees of HTML\r\n   * @opti\r\n   * @param node The html element(s)\r\n   * @example\r\n   * const content = Elements.createTree({\r\n   *   tag: \"div\",\r\n   *   class: \"current-class\",\r\n   *   children: [\r\n   *     {\r\n   *       tag: \"div\",\r\n   *       class: \"class-name\",\r\n   *       children: [\r\n   *         {\r\n   *           tag: \"a\",\r\n   *           attrs: {\r\n   *             href: \"https://example.com\",\r\n   *             target: \"_blank\",\r\n   *           },\r\n   *           text: \"To example.com\",\r\n   *         }\r\n   *       ]\r\n   *     }\r\n   *   ]\r\n   * });\r\n   */"
+  },
+  "Node": {
+    "parent": {
+      "__doc__": "/** \r\n   * Gets the parent of the node\r\n   * @opti\r\n   * @returns The parent node\r\n   * @example\r\n   * const el = document.$(\"#child\");\r\n   * const target = el.getParent();\r\n   * \r\n   * console.log(\"Target: \" + target);\r\n   */"
+    },
+    "getChildren": {
+      "__doc__": "/**\r\n   * Gets all the children of the node\r\n   * @opti\r\n   * @example\r\n   * const el = document.$(\"#target\").getChildren();\r\n   * \r\n   * el.forEach((child, i) => console.log(\"Child \" + i + \": \" + child));\r\n   */"
+    },
+    "siblings": {
+      "__doc__": "/**\r\n   * Gets the siblings of the node and, if 'inclusive' is true, includes itself in the list\r\n   * @opti\r\n   * @param inclusive If the list should include itself\r\n   * @example\r\n   * const el = document.$(\"#target\").getSiblings(true);\r\n   * \r\n   * el.forEach((sibling, i) => console.log(\"Sibling \" + i + \": \" + sibling));\r\n   */"
+    },
+    "ancestor": {
+      "__doc__": "/** \r\n   * Gets the element's ancestor (ancestor selected is based on the css selector) \r\n   * @opti\r\n   * @param selector The selector used to get the ancestor\r\n   * @returns The parent element\r\n   */"
+    },
+    "$": {
+      "__doc__": "/** @deprecated */"
+    },
+    "$$": {
+      "__doc__": "/** @deprecated */"
+    },
+    "cut": {}
+  },
+  "parent": {
+    "__doc__": "/** \r\n   * Gets the parent of the node\r\n   * @opti\r\n   * @returns The parent node\r\n   * @example\r\n   * const el = document.$(\"#child\");\r\n   * const target = el.getParent();\r\n   * \r\n   * console.log(\"Target: \" + target);\r\n   */"
+  },
+  "getChildren": {
+    "__doc__": "/**\r\n   * Gets all the children of the node\r\n   * @opti\r\n   * @example\r\n   * const el = document.$(\"#target\").getChildren();\r\n   * \r\n   * el.forEach((child, i) => console.log(\"Child \" + i + \": \" + child));\r\n   */"
+  },
+  "siblings": {
+    "__doc__": "/**\r\n   * Gets the siblings of the node and, if 'inclusive' is true, includes itself in the list\r\n   * @opti\r\n   * @param inclusive If the list should include itself\r\n   * @example\r\n   * const el = document.$(\"#target\").getSiblings(true);\r\n   * \r\n   * el.forEach((sibling, i) => console.log(\"Sibling \" + i + \": \" + sibling));\r\n   */"
+  },
+  "ancestor": {
+    "__doc__": "/** \r\n   * Gets the element's ancestor (ancestor selected is based on the css selector) \r\n   * @opti\r\n   * @param selector The selector used to get the ancestor\r\n   * @returns The parent element\r\n   */"
+  },
+  "$": {
+    "__doc__": "/** @deprecated */"
+  },
+  "$$": {
+    "__doc__": "/** @deprecated */"
+  },
+  "cut": {},
+  "Element": {
+    "hasText": {
+      "__doc__": "/**\r\n   * Returns a boolean based on whether the elements text contains the text specified or matches the regex provided\r\n   * @opti\r\n   * @param text The text to search for or the regex to match\r\n   * @example\r\n   * const el = document.$(\"#target\");\r\n   * \r\n   * if (el.containsText(\"new\")) {\r\n   *   el.addClass(\"new\");\r\n   * }\r\n   */"
+    },
+    "addClass": {
+      "__doc__": "/**\r\n   * Adds a class to the element\r\n   * @param elClass The class to add\r\n   * @opti\r\n   * @example\r\n   * const el = document.$(\"#target\");\r\n   * el.addClass(\"classy\")\r\n   */"
+    },
+    "removeClass": {
+      "__doc__": "/**\r\n   * Removes a class from the element\r\n   * @param elClass The class to remove\r\n   * @opti\r\n   * @example\r\n   * const el = document.$(\"#target\");\r\n   * el.removeClass(\"classy\")\r\n   */"
+    },
+    "toggleClass": {
+      "__doc__": "/**\r\n   * Toggles the class on the element\r\n   * @param elClass The class to toggle\r\n   * @opti\r\n   * @example\r\n   * const el = document.$(\"#target\");\r\n   * el.toggleClass(\"classy\")\r\n   */"
+    },
+    "hasClass": {
+      "__doc__": "/**\r\n   * Detects whether the element has the class specified\r\n   * @param elClass The class to toggle\r\n   * @opti\r\n   * @example\r\n   * const el = document.$(\"#target\");\r\n   * if (el.hasClass(\"classy\")) {\r\n   *   console.log(\"It's really classy! (Get it? XD)\");\r\n   * }\r\n   */"
+    },
+    "txt": {
+      "__doc__": "/**\r\n   * Modifies and/or returns the text of the element\r\n   * @opti\r\n   * @note Putting only \"textContent\" as a parameter references the previous textContent\r\n   * @example\r\n   * const el = document.$(\"#target\");\r\n   * el.txt(\"textContent\", \"Yelp\")\r\n   * \r\n   * console.log(el.txt());\r\n   */"
+    },
+    "html": {
+      "__doc__": "/**\r\n   * Gets and sets the elements html\r\n   * @opti\r\n   * @notice use HTMLElement.{@link text} instead if you are not inserting raw html\r\n   * @param input The html to insert in place of the old html\r\n   * @example\r\n   * const el = document.$(\"target\");\r\n   * const html = el.html();\r\n   * \r\n   * el.html(html + \"<a href='example.com'>Link</a>\");\r\n   */"
+    },
+    "copy": {}
+  },
+  "hasText": {
+    "__doc__": "/**\r\n   * Returns a boolean based on whether the elements text contains the text specified or matches the regex provided\r\n   * @opti\r\n   * @param text The text to search for or the regex to match\r\n   * @example\r\n   * const el = document.$(\"#target\");\r\n   * \r\n   * if (el.containsText(\"new\")) {\r\n   *   el.addClass(\"new\");\r\n   * }\r\n   */"
+  },
+  "addClass": {
+    "__doc__": "/**\r\n   * Adds a class to the elements\r\n   * @param elClass The class to add\r\n   * @opti\r\n   * @example\r\n   * const el = document.$$(\"#target\");\r\n   * el.addClass(\"classy\")\r\n   */"
+  },
+  "removeClass": {
+    "__doc__": "/**\r\n   * Removes a class from the elements\r\n   * @param elClass The class to remove\r\n   * @opti\r\n   * @example\r\n   * const el = document.$$(\"#target\");\r\n   * el.removeClass(\"classy\")\r\n   */"
+  },
+  "toggleClass": {
+    "__doc__": "/**\r\n   * Toggles the class on the elements\r\n   * @param elClass The class to toggle\r\n   * @opti\r\n   * @example\r\n   * const el = document.$$(\"#target\");\r\n   * el.toggleClass(\"classy\")\r\n   */"
+  },
+  "hasClass": {
+    "__doc__": "/**\r\n   * Detects whether the element has the class specified\r\n   * @param elClass The class to toggle\r\n   * @opti\r\n   * @example\r\n   * const el = document.$(\"#target\");\r\n   * if (el.hasClass(\"classy\")) {\r\n   *   console.log(\"It's really classy! (Get it? XD)\");\r\n   * }\r\n   */"
+  },
+  "txt": {
+    "__doc__": "/**\r\n   * Modifies and/or returns the text of the element\r\n   * @opti\r\n   * @note Putting only \"textContent\" as a parameter references the previous textContent\r\n   * @example\r\n   * const el = document.$(\"#target\");\r\n   * el.txt(\"textContent\", \"Yelp\")\r\n   * \r\n   * console.log(el.txt());\r\n   */"
+  },
+  "html": {
+    "__doc__": "/**\r\n   * Gets and sets the elements html\r\n   * @opti\r\n   * @notice use HTMLElement.{@link text} instead if you are not inserting raw html\r\n   * @param input The html to insert in place of the old html\r\n   * @example\r\n   * const el = document.$(\"target\");\r\n   * const html = el.html();\r\n   * \r\n   * el.html(html + \"<a href='example.com'>Link</a>\");\r\n   */"
+  },
+  "copy": {},
+  "HTMLElement": {
+    "css": {
+      "__doc__": "/** \r\n   * Adds inline css to the element. Using the boolean value `true` as the first argument returns the element's computed styles as well\r\n   * @opti\r\n   * @example\r\n   * const el = document.$(\"#target\");\r\n   * \r\n   * el.css(\"background-color\", \"red\");\r\n   * el.css({\r\n   *   visibility: \"visible\",\r\n   *   backgroundColor: \"blue\"\r\n   * })\r\n   * \r\n   * console.log(el.css());\r\n   */"
+    },
+    "tag": {
+      "__doc__": "/**\r\n   * Gets the elements tag name\r\n   * @opti\r\n   * @example\r\n   * const el = document.$(\"#target\");\r\n   * \r\n   * console.log(el.tag()); // Logs tag name\r\n   */"
+    },
+    "show": {
+      "__doc__": "/**\r\n   * Shows an element\r\n   * @opti\r\n   * @example\r\n   * const el = document.$(\"#target\");\r\n   * el.show();\r\n   */"
+    },
+    "hide": {
+      "__doc__": "/**\r\n   * Hides an element\r\n   * @opti\r\n   * @param layout If the layout should shift when the element is hidden\r\n   * @example\r\n   * const el = document.$(\"#target\");\r\n   * el.hide(true);\r\n   */"
+    },
+    "toggle": {
+      "__doc__": "/**\r\n   * Toggles the visibility of a element\r\n   * @opti\r\n   * @param layout If the layout should shift when the element's visibility is changed\r\n   * @example\r\n   * const el = document.$(\"#target\");\r\n   * el.toggle(true);\r\n   */"
+    }
+  },
+  "tag": {
+    "__doc__": "/**\r\n   * Gets the elements tag name\r\n   * @opti\r\n   * @example\r\n   * const el = document.$(\"#target\");\r\n   * \r\n   * console.log(el.tag()); // Logs tag name\r\n   */"
+  },
+  "show": {
+    "__doc__": "/**\r\n   * Shows an element\r\n   * @opti\r\n   * @example\r\n   * const el = document.$(\"#target\");\r\n   * el.show();\r\n   */"
+  },
+  "hide": {
+    "__doc__": "/**\r\n   * Hides an element\r\n   * @opti\r\n   * @param layout If the layout should shift when the element is hidden\r\n   * @example\r\n   * const el = document.$(\"#target\");\r\n   * el.hide(true);\r\n   */"
+  },
+  "toggle": {
+    "__doc__": "/**\r\n   * Toggles the visibility of a element\r\n   * @opti\r\n   * @param layout If the layout should shift when the element's visibility is changed\r\n   * @example\r\n   * const el = document.$(\"#target\");\r\n   * el.toggle(true);\r\n   */"
+  },
+  "HTMLFormElement": {
+    "serialize": {}
+  },
+  "serialize": {},
+  "HTMLInputElement": {
+    "val": {}
+  },
+  "val": {},
+  "NodeList": {
+    "addClass": {
+      "__doc__": "/**\r\n   * Adds a class to the elements\r\n   * @param elClass The class to add\r\n   * @opti\r\n   * @example\r\n   * const el = document.$$(\"#target\");\r\n   * el.addClass(\"classy\")\r\n   */"
+    },
+    "removeClass": {
+      "__doc__": "/**\r\n   * Removes a class from the elements\r\n   * @param elClass The class to remove\r\n   * @opti\r\n   * @example\r\n   * const el = document.$$(\"#target\");\r\n   * el.removeClass(\"classy\")\r\n   */"
+    },
+    "toggleClass": {
+      "__doc__": "/**\r\n   * Toggles the class on the elements\r\n   * @param elClass The class to toggle\r\n   * @opti\r\n   * @example\r\n   * const el = document.$$(\"#target\");\r\n   * el.toggleClass(\"classy\")\r\n   */"
+    }
+  },
+  "HTMLCollection": {
+    "addClass": {
+      "__doc__": "/**\r\n   * Adds a class to the elements\r\n   * @param elClass The class to add\r\n   * @opti\r\n   * @example\r\n   * const el = document.$$(\"#target\");\r\n   * el.addClass(\"classy\")\r\n   */"
+    },
+    "removeClass": {
+      "__doc__": "/**\r\n   * Removes a class from the elements\r\n   * @param elClass The class to remove\r\n   * @opti\r\n   * @example\r\n   * const el = document.$$(\"#target\");\r\n   * el.removeClass(\"classy\")\r\n   */"
+    },
+    "toggleClass": {
+      "__doc__": "/**\r\n   * Toggles the class on the elements\r\n   * @param elClass The class to toggle\r\n   * @opti\r\n   * @example\r\n   * const el = document.$$(\"#target\");\r\n   * el.toggleClass(\"classy\")\r\n   */"
+    }
+  },
+  "DateConstructor": {
+    "at": {
+      "__doc__": "/** \r\n   * Returns an absolute number of time from January 1, 1970 \r\n   * @opti\r\n   */"
+    },
+    "fromTime": {
+      "__doc__": "/**\r\n   * Returns a date object by using a time object\r\n   * @opti\r\n   * @param time The time object\r\n   * @param year The year to use\r\n   * @param monthIndex The month to use, by index\r\n   * @param date The date, by number\r\n   * @example\r\n   * const time = new Time();\r\n   * const newDate = Date.fromTime(time, 2025, 4, 28);\r\n   */"
+    }
+  },
+  "at": {
+    "__doc__": "/** \r\n   * Returns an absolute number of time from January 1, 1970 \r\n   * @opti\r\n   */"
+  },
+  "fromTime": {
+    "__doc__": "/**\r\n   * Returns a date object by using a time object\r\n   * @opti\r\n   * @param time The time object\r\n   * @param year The year to use\r\n   * @param monthIndex The month to use, by index\r\n   * @param date The date, by number\r\n   * @example\r\n   * const time = new Time();\r\n   * const newDate = Date.fromTime(time, 2025, 4, 28);\r\n   */"
+  },
+  "Math": {
+    "random": {
+      "__doc__": "/** \r\n   * Returns a pseudorandom number between 0 and max.\r\n   * @opti\r\n   * @param max the maximum random number \r\n   */"
+    }
+  },
+  "random": {
+    "__doc__": "/** \r\n   * Returns a pseudorandom number between 0 and max.\r\n   * @opti\r\n   * @param max the maximum random number \r\n   */"
+  },
+  "ObjectConstructor": {
+    "clone": {
+      "__doc__": "/**\r\n   * Clones an object\r\n   * @opti\r\n   * @param object The object to clone\r\n   * @param deep Wether the clone should be deep or not\r\n   * @example\r\n   * class Example {\r\n   *   exampleVal = 2;\r\n   *   run() { console.log(\"Running...\") }\r\n   *   static walk() { console.log(\"Walking...\") }\r\n   * }\r\n   * \r\n   * const oldObj = new Example();\r\n   * const newObj = Object.clone(oldObj);\r\n   *\r\n   * newObj.exampleVal = 4;\r\n   * newObj.run(); // Running...\r\n   * console.log(oldObj.exampleVal); // 2\r\n   */"
+    },
+    "forEach": {
+      "__doc__": "/**\r\n   * Performs the specified action for each element in an array.\r\n   * @opti\r\n   * @param iterator The function that runs on each iteration of the object. Gives the key: value pair for the current value in the object\r\n   * @example\r\n   * Object.forEach({ val1: 1, val2: \"Yes\" }, ([key, value]) => {\r\n   *  console.log(`Key: ${key}, Value: ${value}`);\r\n   * });\r\n   */"
+    }
+  },
+  "clone": {
+    "__doc__": "/**\r\n   * Clones an object\r\n   * @opti\r\n   * @param object The object to clone\r\n   * @param deep Wether the clone should be deep or not\r\n   * @example\r\n   * class Example {\r\n   *   exampleVal = 2;\r\n   *   run() { console.log(\"Running...\") }\r\n   *   static walk() { console.log(\"Walking...\") }\r\n   * }\r\n   * \r\n   * const oldObj = new Example();\r\n   * const newObj = Object.clone(oldObj);\r\n   *\r\n   * newObj.exampleVal = 4;\r\n   * newObj.run(); // Running...\r\n   * console.log(oldObj.exampleVal); // 2\r\n   */"
+  },
+  "forEach": {
+    "__doc__": "/**\r\n   * Performs the specified action for each element in an array.\r\n   * @opti\r\n   * @param iterator The function that runs on each iteration of the object. Gives the key: value pair for the current value in the object\r\n   * @example\r\n   * Object.forEach({ val1: 1, val2: \"Yes\" }, ([key, value]) => {\r\n   *  console.log(`Key: ${key}, Value: ${value}`);\r\n   * });\r\n   */"
+  },
+  "Number": {
+    "repeat": {
+      "__doc__": "/**\r\n   * Repeats the iterator the amount of times as the Number\r\n   * @opti\r\n   * @param iterator the function to run on each iteration\r\n   * @example\r\n   * const times = 5;\r\n   * times.repeat(i => {\r\n   *   console.log(\"Time \" + (i + 1));\r\n   * });\r\n   */"
+    }
+  },
+  "repeat": {
+    "__doc__": "/**\r\n   * Repeats the iterator the amount of times as the Number\r\n   * @opti\r\n   * @param iterator the function to run on each iteration\r\n   * @example\r\n   * const times = 5;\r\n   * times.repeat(i => {\r\n   *   console.log(\"Time \" + (i + 1));\r\n   * });\r\n   */"
+  },
+  "Array": {
+    "unique": {
+      "__doc__": "/**\r\n   * Makes all values in an array unique\r\n   * @opti\r\n   * @example\r\n   * const newArr = [1, 2, 3, 3, 4].unique();\r\n   * console.log(newArr); // [1, 2, 3, 4]\r\n   */"
+    },
+    "chunk": {
+      "__doc__": "/**\r\n   * Separates an array into an array of arrays, with each subarray of a defined size\r\n   * @opti\r\n   * @param size The size of the sub-arrays\r\n   * @example\r\n   * const newArr = [1, 2, 3, 3, 4].chunk(2);\r\n   * console.log(newArr); // [[1, 2], [3, 3], [4]]\r\n   */"
+    },
+    "pluck": {
+      "__doc__": "/**\r\n   * Takes a found value out of an array and returns it.\r\n   * @opti\r\n   * @param finder The finder function to find the value to remove\r\n   */"
+    },
+    "pluckLast": {},
+    "relocate": {
+      "__doc__": "/**\r\n   * Relocates an item in an array by a set amount\r\n   * @param index The item to move\r\n   * @param offset The offset to move it by\r\n   * @returns The new location of the item\r\n   */"
+    },
+    "relocateTo": {},
+    "insert": {
+      "__doc__": "/**\r\n   * An array-altering method that inserts item(s) as the specified index\r\n   * @opti\r\n   * @param index The index to insert the item(s) at\r\n   * @param values The values to insert\r\n   * @example\r\n   * const arr = [1, 2, 3, 5];\r\n   * \r\n   * arr.insert(2, 4); // arr is now [1, 2, 3, 4, 5]\r\n   */"
+    },
+    "replace": {
+      "__doc__": "/**\r\n   * Replaces a value in an array and returns the new value\r\n   * @opti\r\n   * @param replaceIndex The index to replace\r\n   * @param finder The function that searches for the right value to replace\r\n   * @param newVal The new value to put in place of the old removed value\r\n   */"
+    },
+    "replaceLast": {
+      "__doc__": "/**\r\n   * Replaces the last value in an array and returns the new value\r\n   * @opti\r\n   * @param finder The function that searches for the right value to replace\r\n   * @param newVal The new value to put in place of the old removed value\r\n   */"
+    },
+    "sort": {
+      "__doc__": "/**\r\n   * Sorts an array by a specific type of sorting\r\n   * @opti\r\n   * @param order The order to sort in. Options are `random`, `alpha`, `alpha-reverse`, `increasing`,`decreasing`, `earlier` and `later`\r\n   */"
+    }
+  },
+  "unique": {
+    "__doc__": "/**\r\n   * Makes all values in an array unique\r\n   * @opti\r\n   * @example\r\n   * const newArr = [1, 2, 3, 3, 4].unique();\r\n   * console.log(newArr); // [1, 2, 3, 4]\r\n   */"
+  },
+  "chunk": {
+    "__doc__": "/**\r\n   * Separates an array into an array of arrays, with each subarray of a defined size\r\n   * @opti\r\n   * @param size The size of the sub-arrays\r\n   * @example\r\n   * const newArr = [1, 2, 3, 3, 4].chunk(2);\r\n   * console.log(newArr); // [[1, 2], [3, 3], [4]]\r\n   */"
+  },
+  "pluck": {
+    "__doc__": "/**\r\n   * Takes a found value out of an array and returns it.\r\n   * @opti\r\n   * @param finder The finder function to find the value to remove\r\n   */"
+  },
+  "pluckLast": {},
+  "relocate": {
+    "__doc__": "/**\r\n   * Relocates an item in an array by a set amount\r\n   * @param index The item to move\r\n   * @param offset The offset to move it by\r\n   * @returns The new location of the item\r\n   */"
+  },
+  "relocateTo": {},
+  "insert": {
+    "__doc__": "/**\r\n   * An array-altering method that inserts item(s) as the specified index\r\n   * @opti\r\n   * @param index The index to insert the item(s) at\r\n   * @param values The values to insert\r\n   * @example\r\n   * const arr = [1, 2, 3, 5];\r\n   * \r\n   * arr.insert(2, 4); // arr is now [1, 2, 3, 4, 5]\r\n   */"
+  },
+  "replace": {
+    "__doc__": "/**\r\n   * Replaces a value in an array and returns the new value\r\n   * @opti\r\n   * @param replaceIndex The index to replace\r\n   * @param finder The function that searches for the right value to replace\r\n   * @param newVal The new value to put in place of the old removed value\r\n   */"
+  },
+  "replaceLast": {
+    "__doc__": "/**\r\n   * Replaces the last value in an array and returns the new value\r\n   * @opti\r\n   * @param finder The function that searches for the right value to replace\r\n   * @param newVal The new value to put in place of the old removed value\r\n   */"
+  },
+  "sort": {
+    "__doc__": "/**\r\n   * Sorts an array by a specific type of sorting\r\n   * @opti\r\n   * @param order The order to sort in. Options are `random`, `alpha`, `alpha-reverse`, `increasing`,`decreasing`, `earlier` and `later`\r\n   */"
+  },
+  "String": {
+    "remove": {
+      "__doc__": "/**\r\n   * Removes text in a string, using a regular expression or search string.\r\n   * @opti\r\n   * @param finder The searching string or regular expression\r\n   * @example \r\n   * const oldString = \"Hello! World!\";\r\n   * const newString = oldString.remove(\"!\") // Hello World!\r\n   * const evenNewerString = newString.remove(/\\s\\w+/) // Hello!\r\n   */"
+    },
+    "removeCaptured": {
+      "__doc__": "/**\r\n   * Removes the captured text in a string, using a regular expression or search string.\r\n   * @opti\r\n   * @param finder The searching string or regular expression\r\n   * @example \r\n   * const oldString = \"Hello! World!\";\r\n   * const newString = oldString.remove(/(!)/) // Hello World\r\n   * const evenNewerString = newString.remove(/(\\s)\\w+/) // HelloWorld\r\n   */"
+    },
+    "capitalize": {
+      "__doc__": "/**\r\n   * Capitalizes the first character in a string\r\n   * @opti\r\n   * @example\r\n   * const myString = \"hello world\";\r\n   * console.log(myString.capitalize()); // \"Hello world\"\r\n   */"
+    },
+    "matches": {
+      "__doc__": "/**\r\n   * Finds the first substring match in a regular expression search.\r\n   * @param searcher An object which supports searching within a string.\r\n   */"
+    },
+    "toCase": {}
+  },
+  "remove": {
+    "__doc__": "/**\r\n   * Removes text in a string, using a regular expression or search string.\r\n   * @opti\r\n   * @param finder The searching string or regular expression\r\n   * @example \r\n   * const oldString = \"Hello! World!\";\r\n   * const newString = oldString.remove(\"!\") // Hello World!\r\n   * const evenNewerString = newString.remove(/\\s\\w+/) // Hello!\r\n   */"
+  },
+  "removeCaptured": {
+    "__doc__": "/**\r\n   * Removes the captured text in a string, using a regular expression or search string.\r\n   * @opti\r\n   * @param finder The searching string or regular expression\r\n   * @example \r\n   * const oldString = \"Hello! World!\";\r\n   * const newString = oldString.remove(/(!)/) // Hello World\r\n   * const evenNewerString = newString.remove(/(\\s)\\w+/) // HelloWorld\r\n   */"
+  },
+  "capitalize": {
+    "__doc__": "/**\r\n   * Capitalizes the first character in a string\r\n   * @opti\r\n   * @example\r\n   * const myString = \"hello world\";\r\n   * console.log(myString.capitalize()); // \"Hello world\"\r\n   */"
+  },
+  "matches": {
+    "__doc__": "/**\r\n   * Finds the first substring match in a regular expression search.\r\n   * @param searcher An object which supports searching within a string.\r\n   */"
+  },
+  "toCase": {},
+  "Function": {
+    "memo": {},
+    "debounce": {},
+    "throttle": {}
+  },
+  "FunctionConstructor": {
+    "memo": {},
+    "debounce": {},
+    "throttle": {}
+  },
+  "memo": {},
+  "debounce": {},
+  "throttle": {}
 }

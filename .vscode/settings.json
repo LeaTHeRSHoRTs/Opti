@@ -7,15 +7,31 @@
   "code-runner.executorMap": {
     "typescript": "node scripts/ts-node.cjs $fullFileName",
   },
-  "jest.jestCommandLine": "npm run test",
+  "jest.jestCommandLine": "npx jest --config jest.config.cjs",
   "files.exclude": {
     "**/coverage": true,
+    "**/node_modules": false
   },
   "cSpell.words": [
+    "basicnodes",
     "broski",
     "constructableobjects",
     "flowclass",
+    "icss",
     "optijs",
     "unsync"
+  ],
+  "json.schemas": [
+    {
+      "fileMatch": ["**/assets/*.json"],
+      "schema": {
+        "additionalItems": {
+          "__doc__": "string",
+          "additionalItems": {
+            "type": "string"
+          }
+        }
+      }
+    }
   ]
 }
