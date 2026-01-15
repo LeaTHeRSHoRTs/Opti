@@ -1,16 +1,16 @@
 # Node
-/node_modules
+**/node_modules
 .env
 
 # Generated
-/dist
-/bin
+**/dist
+**/bin
 
 # Vscode
-.vscode/
+**/.vscode
 
 # Logs
-*.log
+**/*.log
 
 # Ideas
-_future.*
+**/_future.*
