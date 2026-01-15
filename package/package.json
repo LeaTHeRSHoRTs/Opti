@@ -1,0 +1,103 @@
+{
+  "name": "optijs",
+  "type": "module",
+  "version": "0.0.4",
+  "private": false,
+  "description": "Lightweight DOM manipulation, styling, and utility extension for native JavaScript objects — without wrappers.",
+  "bin": "./bin/opti.js",
+  "exports": {
+    "opti": {
+      "types": "./types/opti.lib.d.ts"
+    },
+    "opti/crafty": {
+      "types": "./types/Crafty/crafty.lib.d.ts"
+    },
+    "opti/unsync": {
+      "types": "./types/Unsync/unsync.lib.d.ts"
+    },
+    "opti/query": {
+      "types": "./types/Query/query.lib.d.ts"
+    },
+    "opti/flow": {
+      "types": "./types/Flow/flow.lib.d.ts"
+    },
+    "opti/requests": {
+      "types": "./types/Requests/requests.lib.d.ts"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LeaTHeRSHoRTs/Opti.git"
+  },
+  "scripts": {
+    "opti": "node cli/opti.ts",
+    "opti:bin": "node cli/opti.js",
+    "build": "npx webpack --config config/webpack.config.cjs",
+    "build:cli": "tsc --project ./src/cli/tsconfig.cli.json",
+    "test": "npx jest --config ./config/jest.config.cjs --verbose --passWithNoTests --detectOpenHandles",
+    "git-push": "ts-node scripts/push.ts",
+    "genCliJson": "ts-node scripts/build-dts-map.ts",
+    "prepublishOnly": "npm run build:cli && npm run build && npm run check && npm run test && npm run git-push"
+  },
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ]
+  },
+  "keywords": [
+    "dom",
+    "javascript",
+    "opti",
+    "optijs",
+    "utility",
+    "dom-manipulation",
+    "native",
+    "library",
+    "web",
+    "frontend"
+  ],
+  "author": "LeaTHeR_SHoRTs",
+  "license": "CC-BY-NC-SA-4.0",
+  "bugs": {
+    "url": "https://github.com/LeaTHeRSHoRTs/Opti/issues"
+  },
+  "homepage": "https://github.com/LeaTHeRSHoRTs/Opti",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "files": [
+    "types",
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "devDependencies": {
+    "@babel/preset-env": "^7.27.1",
+    "@babel/preset-typescript": "^7.27.1",
+    "@jest/transform": "^30.2.0",
+    "@types/glob": "^8.1.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^24.0.15",
+    "@types/webpack": "^5.28.5",
+    "@typescript-eslint/eslint-plugin": "^8.49.0",
+    "@typescript-eslint/parser": "^8.49.0",
+    "babel-jest": "^30.2.0",
+    "cross-env": "^7.0.3",
+    "eslint": "^9.30.0",
+    "expect-type": "^1.2.2",
+    "fork-ts-checker-webpack-plugin": "^9.1.0",
+    "glob": "^11.0.3",
+    "jest": "^30.2.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "jsdom": "^27.4.0",
+    "node": "~22.12.0",
+    "thread-loader": "^3.0.4",
+    "ts-jest": "^29.4.5",
+    "ts-loader": "^9.5.4",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3",
+    "webpack": "^5.103.0",
+    "webpack-cli": "^6.0.1"
+  }
+}
