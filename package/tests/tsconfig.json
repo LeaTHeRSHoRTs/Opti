@@ -1,0 +1,20 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["vitest/globals"],
+    "paths": {
+      "opti/crafty":  ["../src/Crafty/crafty.ts"],
+      "opti/query":   ["../src/Query/query.ts"],
+      "opti/request": ["../src/Requests/requests.ts"],
+      "opti/unsync":  ["../src/Unsync/unsync.ts"],
+      "opti/flow":    ["../src/Flow/flow.ts"],
+      "opti":         ["../src/Core/opti.ts"]
+    }
+  },
+  "include": [
+    "./**/*.test.ts",
+    "../types/**/*.d.ts",
+    "fakes.d.ts",
+    "vitest.d.ts"
+  ]
+}

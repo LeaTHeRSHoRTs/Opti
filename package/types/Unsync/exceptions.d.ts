@@ -1,0 +1,2 @@
+interface InvalidRegistrationException extends Exception {}
+interface InvalidRegistrationExceptionConstructor extends ExceptionConstructor<InvalidRegistrationException> {}

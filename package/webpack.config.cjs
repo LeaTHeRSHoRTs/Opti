@@ -1,6 +1,4 @@
-/** @typedef {import('jest').Config} JestConfig */
 /** @typedef {import("webpack").Configuration} WebpackConfig */
-/** @typedef {import("ts-jest").ConfigSet} TSJestConfig */
 
 const path = require('path');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
@@ -16,7 +14,7 @@ const requireProject = (keyParam) => {
   if (keyParam === "opti") {
     key = "opti";
   } else {
-    dir = keyParam[0].toUpperCase() + keyParam.slice(1);
+    dir = keyParam[0]?.toUpperCase() + keyParam.slice(1);
   }
 
   return {
@@ -42,6 +40,9 @@ const requireProject = (keyParam) => {
     },
     resolve: {
       extensions: [".ts", ".tsx", ".js"],
+      alias: {
+        "@lib": false
+      }
     },
     module: {
       rules: [{
@@ -59,7 +60,7 @@ const requireProject = (keyParam) => {
     },
     plugins: [
       new ForkTsCheckerWebpackPlugin()
-    ]
+    ],
   };
 };
 

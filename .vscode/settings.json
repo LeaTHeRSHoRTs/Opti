@@ -1,24 +1,28 @@
 {
-  "typescript.tsdk": "./node_modules/typescript/lib",
-  "jest.runMode": {
-    "runAllTestsOnStartup": true,
-    "type": "on-demand"
-  },
-  "code-runner.executorMap": {
-    "typescript": "node scripts/ts-node.cjs $fullFileName",
-  },
-  "jest.jestCommandLine": "npx jest --config jest.config.cjs",
   "files.exclude": {
     "**/coverage": true,
     "**/node_modules": false
   },
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/.hg/store/**": true,
+    "**/dist/**": true,
+    "**/node_modules/**": true
+  },
   "cSpell.words": [
     "basicnodes",
     "broski",
+    "canvastext",
     "constructableobjects",
+    "evented",
+    "flowback",
     "flowclass",
     "icss",
+    "mprescripts",
     "optijs",
+    "requestfunc",
+    "TSES",
     "unsync"
   ],
   "json.schemas": [
@@ -33,5 +37,8 @@
         }
       }
     }
-  ]
+  ],
+  "js/ts.tsdk.path": "node_modules\\typescript\\lib",
+  "js/ts.tsserver.automaticTypeAcquisition.enabled": false,
+  "js/ts.validate.enabled": true
 }

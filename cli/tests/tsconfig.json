@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "es2018",
+    "types": ["node", "vitest/globals"],
+    "noEmit": true,
+    "esModuleInterop": true,
+    "lib": ["ES2018"],
+    "paths": {
+      "cli": ["../src/opti.ts"]
+    }
+  },
+  "include": [
+    "./**/*.test.ts"
+  ],
+  "exclude": [
+    "../../cli/*.ts"
+  ]
+}

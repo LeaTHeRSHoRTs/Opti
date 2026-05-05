@@ -3,16 +3,17 @@
     "target": "ES2022",
     "module": "esnext",
     "moduleResolution": "bundler",
-    "baseUrl": ".",
     "outDir": "./dist",
-    "downlevelIteration": true,
+    "rootDir": "./",
+    
+    "incremental": true,
+    "disableSizeLimit": true,
 
     // Type Checking
     "strict": true,
     "noImplicitThis": true,
     "exactOptionalPropertyTypes": true,
     "useUnknownInCatchVariables": true,
-    "skipLibCheck": true,
     "noUncheckedIndexedAccess": true,
     "forceConsistentCasingInFileNames": true,
     
@@ -22,16 +23,21 @@
     "esModuleInterop": true,
 
     // Features and Emit
+    "noEmit": true,
     "noEmitOnError": true,
     "emitDecoratorMetadata": false,
     "useDefineForClassFields": true,
     "experimentalDecorators": true,
-    "verbatimModuleSyntax": true,
 
     // Libs
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "types": [],
-    "typeRoots": ["./node_modules/@types"],
+    "typeRoots": [
+      "./node_modules/@types", 
+      "../node_modules/@types",
+      "./node_modules", 
+      "../node_modules"
+    ]
   },
   "exclude": [
     "node_modules"

@@ -1,0 +1,27 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "skipLibCheck": true,
+    "tsBuildInfoFile": "./.tsbuildinfo",
+    "skipDefaultLibCheck": false,
+    "rootDir": "../"
+  },
+  "include": [
+    "./types/**/*.d.ts",
+    "src/**/*.ts",
+    "types/**/*.d.ts",
+    "**/*.ts",
+    "**/*.js",
+    "**/*.d.ts", "../vitest.functions.ts",
+  ],
+  "exclude": [
+    "node_modules",
+    "**/node_modules/*/**",
+    "../vitest.base.ts",
+    "dist",
+    "out",
+    "build",
+    "**/.git/**"
+  ]
+}

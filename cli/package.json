@@ -1,0 +1,35 @@
+{
+  "name": "optijs-cli",
+  "type": "commonjs",
+  "version": "0.0.1",
+  "private": false,
+  "description": "Opti command-line interface",
+  "bin": {
+    "optijs-cli": "bin/opti.js"
+  },
+  "scripts": {},
+  "keywords": [
+    "dom",
+    "javascript",
+    "opti",
+    "optijs",
+    "utility",
+    "dom-manipulation",
+    "native",
+    "library",
+    "web",
+    "frontend"
+  ],
+  "author": "LeaTHeR_SHoRTs",
+  "license": "CC-BY-NC-SA-4.0",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "dependencies": {
+    "node": ">=14.0.0",
+    "optijs": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.17"
+  }
+}

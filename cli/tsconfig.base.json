@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "outDir": "./dist",
+    "ignoreDeprecations": "6.0",
+    "downlevelIteration": true,
+    "incremental": true,
+    "disableSizeLimit": true,
+
+    // Type Checking
+    "strict": true,
+    "noImplicitThis": true,
+    "exactOptionalPropertyTypes": true,
+    "useUnknownInCatchVariables": true,
+    "noUncheckedIndexedAccess": true,
+    "forceConsistentCasingInFileNames": true,
+    
+    // JS Interop
+    "checkJs": true,
+    "allowJs": true,
+    "esModuleInterop": true,
+
+    // Features and Emit
+    "noEmit": false,
+    "noEmitOnError": true,
+    "emitDecoratorMetadata": false,
+    "useDefineForClassFields": true,
+    "experimentalDecorators": true,
+
+    // Libs
+    "lib": [],
+    "types": ["node"],
+    "typeRoots": ["./node_modules/@types"]
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}

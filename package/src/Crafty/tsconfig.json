@@ -1,0 +1,9 @@
+{
+  "extends": "../tsconfig.src.json",
+  "include": [
+    "./*.ts", 
+    "../../types/Core/opti.lib.d.ts",
+    "../../types/Crafty/crafty.lib.d.ts",
+    "../../types/secrets.d.ts"
+  ]
+}
