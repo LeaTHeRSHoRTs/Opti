@@ -1,9 +1,8 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
+    "target": "ES2020",
     "module": "esnext",
     "moduleResolution": "bundler",
-    "outDir": "./dist",
     "rootDir": "./",
     
     "incremental": true,
@@ -18,8 +17,8 @@
     "forceConsistentCasingInFileNames": true,
     
     // JS Interop
-    "checkJs": true,
     "allowJs": true,
+    "checkJs": true,
     "esModuleInterop": true,
 
     // Features and Emit
@@ -40,6 +39,7 @@
     ]
   },
   "exclude": [
-    "node_modules"
+    "**/node_modules",
+    "**/dist"
   ]
 }

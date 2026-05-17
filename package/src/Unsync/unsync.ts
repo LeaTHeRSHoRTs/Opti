@@ -1,19 +1,20 @@
-import { OptiModuleError } from "../helpers/helpers";
+import { createModuleError } from "../helpers";
 import * as Class from "./class";
-import * as Evented from "./events";
+import * as Events from "./events";
+import * as Listeners from "./listeners";
 
 (function() {
-  if (!Opti) throw new OptiModuleError("evented");
+  if (!Opti) throw createModuleError("evented");
 
   globalThis.Opti.unsync = true; 
   globalThis.Unsync = Class.Unsync;
-  globalThis.Emitter = Evented.Emitter;
-  globalThis.SetEmitter = Evented.SetEmitter;
+  globalThis.Emitter = Events.Emitter;
+  globalThis.SetEmitter = Events.SetEmitter;
 
-  HTMLCollection.prototype.addEventListener = Evented.addEventListenerEnum;
-  NodeList.prototype.addEventListener = Evented.addEventListenerEnum;
-  EventTarget.prototype.addConditionalListener = Evented.addConditionalListener;
-  EventTarget.prototype.addEventListeners = Evented.addEventListeners;
-  EventTarget.prototype.delegateEventListener = Evented.delegateEventListener;
-  EventTarget.prototype.addEventController = Evented.addEventController;
+  HTMLCollection.prototype.addEventListener = Listeners.addEventListenerEnum;
+  NodeList.prototype.addEventListener = Listeners.addEventListenerEnum;
+  EventTarget.prototype.addConditionalListener = Listeners.addConditionalListener;
+  EventTarget.prototype.addEventListeners = Listeners.addEventListeners;
+  EventTarget.prototype.delegateEventListener = Listeners.delegateEventListener;
+  EventTarget.prototype.addEventController = Listeners.addEventController;
 })();

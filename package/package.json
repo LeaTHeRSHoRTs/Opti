@@ -30,6 +30,7 @@
   },
   "scripts": {
     "lint": "npx eslint . --no-cache",
+    "lit:types": "Get-ChildItem -Recurse -Filter 'tsconfig*.json' | Where-Object { $_.FullName -notmatch 'node_modules|dist|build' } | ForEach-Object { npx tsc -p $_.FullName --noEmit }",
     "test": "npx vitest --watch",
     "test:ui": "npx vitest --ui",
     "build": "npx webpack --config config/webpack.config.cjs",

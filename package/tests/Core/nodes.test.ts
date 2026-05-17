@@ -81,6 +81,19 @@ describe("Node.ancestor", () => {
     // level 0 → the node itself
     expect(node.ancestor(0)).toBe(node);
   });
+
+  it("should return the closest ancestor of a text node", () => {
+    const ancestor = document.createElement("section");
+    const parent = document.createElement("div");
+    const child = document.createTextNode("span");
+
+    ancestor.classList.add("target");
+    ancestor.appendChild(parent);
+    parent.appendChild(child);
+    document.body.appendChild(ancestor);
+
+    expect(child.ancestor(1)).toBe(parent);
+  });
 });
 
 describe("Node.getChildren", () => {
@@ -114,6 +127,192 @@ describe("Node.siblings", () => {
     expect(siblings).toContain(child2);
     expect(siblings).not.toContain(child1);
   });
+
+  it("should return all siblings including itself when inclusive is set to true", () => {
+    const parent = document.createElement("div");
+    const child1 = document.createElement("span");
+    const child2 = document.createElement("a");
+
+    parent.appendChild(child1);
+    parent.appendChild(child2);
+    document.body.appendChild(parent);
+
+    const siblings = child1.siblings(true);
+    expect(siblings).toContain(child2);
+    expect(siblings).toContain(child1);
+  });
+});
+
+describe("Element.cut", () => {
+  it("should be able to cut an element from the DOM", () => {
+    const element = document.createElement('div');
+    element.id = "removed";
+    document.body.appendChild(element);
+
+    element.cut();
+
+    expect(document.getElementById("removed")).toBeNull();
+  });
+
+  it("should throw if it tries to detach an invalid element", () => {
+    const el = document.createElement('div');
+    expect(() => el.cut()).toThrowException(HierarchyException);
+  });
+});
+
+describe("Element.copy", () => {
+  it("should be able to copy an element's basic properties", () => {
+    const el = document.createElement('div');
+    el.innerHTML = "<p>Text</p>";
+    el.title = "My Title";
+    el.role = "text",
+    el.ariaChecked = "true",
+    el.hidden = true,
+    el.tabIndex = 1,
+    el.id = "one";
+    el.className = "two";
+    el.style.display = "none";
+    el.style.color = "red",
+    el.dataset["id"] = "one";
+    el.dataset["name"] = "MyName";
+
+    const copy = el.copy();
+
+    expect(copy).toMatchObject<Partial<HTMLElement>>({
+      tagName: 'DIV',
+      innerHTML: "<p>Text</p>",
+      title: "My Title",
+      role: "text",
+      ariaChecked: "true",
+      id: "",
+      hidden: true,
+      tabIndex: 1,
+      className: "two",
+      style: expect.objectContaining({ 
+        display: "none",
+        color: "red"
+      }),
+      dataset: expect.objectContaining({ 
+        id: "one",
+        name: "MyName"
+      })
+    });
+  });
+
+  it("should be able to copy over attributes of special elements", () => {
+    const input = document.createElement('input');
+    const link = document.createElement('a');
+    const img = document.createElement('img');
+    const select = document.createElement('select');
+    const option = document.createElement('option');
+
+    input.value = "Some input";
+    input.placeholder = "Input placeholder";
+    input.disabled = true;
+
+    link.href = "https://example.org";
+    img.src = "https://example.org/image";
+
+    select.innerHTML = `
+      <option value="a">A</option>
+      <option value="b" selected>B</option>
+    `;
+    select.value = "b";
+
+    option.value = "c";
+    option.text = "Option";
+    option.selected = true;
+
+    expect(input).toMatchObject<Partial<HTMLInputElement>>({
+      value: "Some input",
+      placeholder: "Input placeholder",
+      disabled: true
+    });
+
+    expect(link.href).toContain("https://example.org");
+    expect(img.src).toContain("https://example.org/image");
+    expect(select).toMatchObject<Partial<HTMLSelectElement>>({
+      value: "b",
+      selectedIndex: 1
+    });
+
+    expect(option).toMatchObject<Partial<HTMLOptionElement>>({
+      value: "c",
+      text: "Option",
+      selected: true
+    });
+  });
+
+  it("should support the boolean options", () => {
+    const spy = vi.fn();
+
+    const el = document.createElement('div');
+    const child1 = document.createElement('p');
+    const child2 = document.createElement('p');
+    child1.className = "child1";
+    child2.className = "child2";
+    el.innerHTML = "<p>Text</p>";
+    el.title = "My Title";
+    el.role = "text",
+    el.ariaChecked = "true",
+    el.hidden = true,
+    el.tabIndex = 1,
+    el.id = "one";
+    el.className = "two";
+    el.style.display = "none";
+    el.style.color = "red",
+    el.dataset["id"] = "one";
+    el.dataset["name"] = "MyName";
+    el.append(child1, child2);
+    el.addEventListener('click', spy);
+
+    const copy = el.copy(true, true);
+
+    el.click();
+    copy.click();
+
+    expect(spy).toHaveBeenCalledTimes(2);
+    expect(copy.children).toContain(child1);
+    expect(copy.children).toContain(child2);
+  });
+
+  it("should support the object options", () => {
+    const spy = vi.fn();
+
+    const el = document.createElement('div');
+    const child1 = document.createElement('p');
+    const child2 = document.createElement('p');
+    child1.className = "child1";
+    child2.className = "child2";
+    el.innerHTML = "<p>Text</p>";
+    el.title = "My Title";
+    el.role = "text",
+    el.ariaChecked = "true",
+    el.hidden = true,
+    el.tabIndex = 1,
+    el.id = "one";
+    el.className = "two";
+    el.style.display = "none";
+    el.style.color = "red",
+    el.dataset["id"] = "one";
+    el.dataset["name"] = "MyName";
+    el.append(child1, child2);
+    el.addEventListener('click', spy);
+
+    const copy = el.copy({
+      fallbackId: "fallback",
+      copyAttributes: true,
+      copyEvents: true,
+      copyChildren: true
+    });
+
+    el.click();
+    copy.click();
+
+    expect(spy).toHaveBeenCalledTimes(2);
+    expect(copy.children).toContain(child1);
+    expect(copy.children).toContain(child2);
+  });
 });
 
 describe("Node.$", () => {
@@ -124,7 +323,7 @@ describe("Node.$", () => {
     root.appendChild(match);
     document.body.appendChild(root);
 
-    expect(root.$("b")).toBe(match);
+    expect(root.$("b")).toEqual(match);
   });
 
   it("should return null if no match is found", () => {

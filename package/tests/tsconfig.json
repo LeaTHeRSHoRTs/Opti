@@ -1,20 +1,22 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "types": ["vitest/globals"],
+    "types": ["vitest", "vitest/globals"],
     "paths": {
-      "opti/crafty":  ["../src/Crafty/crafty.ts"],
-      "opti/query":   ["../src/Query/query.ts"],
-      "opti/request": ["../src/Requests/requests.ts"],
-      "opti/unsync":  ["../src/Unsync/unsync.ts"],
-      "opti/flow":    ["../src/Flow/flow.ts"],
-      "opti":         ["../src/Core/opti.ts"]
+      "opti/crafty":  ["../types/Crafty/crafty.lib.d.ts"],
+      "opti/query":   ["../types/Query/query.lib.d.ts"],
+      "opti/request": ["../types/Requests/requests.lib.d.ts"],
+      "opti/unsync":  ["../types/Unsync/unsync.lib.d.ts"],
+      "opti/flow":    ["../types/Flow/flow.lib.d.ts"],
+      "opti":         ["../types/Core/opti.lib.d.ts"]
     }
   },
+  "exclude": [
+    "**/node_modules",
+    "**/coverage"
+  ],
   "include": [
-    "./**/*.test.ts",
-    "../types/**/*.d.ts",
-    "fakes.d.ts",
-    "vitest.d.ts"
+    "**/*.test.ts",
+    "./vitest.d.ts"
   ]
 }

@@ -34,18 +34,3 @@ export function Enum<T extends readonly string[]>(...values: T): EnumInstance<T>
 
   return obj;
 }
-
-function deepFreeze<T>(obj: T): Readonly<T> {
-  // Only freeze objects or arrays
-  if (obj && typeof obj === "object") {
-    Object.getOwnPropertyNames(obj).forEach((prop) => {
-      const value = obj[prop as keyof T];
-      // Recursively freeze nested objects
-      if (value && typeof value === "object" && !Object.isFrozen(value)) {
-        deepFreeze(value);
-      }
-    });
-    return Object.freeze(obj) as Readonly<T>;
-  }
-  return obj;
-}

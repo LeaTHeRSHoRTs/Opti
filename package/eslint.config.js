@@ -1,10 +1,8 @@
-//@ts-check
-import { defineConfig } from 'eslint/config';
 import globals from 'globals';
-const { node: nodeGlobals, browser: browserGlobals } = globals;
-import { parser as tsParser, plugin as typescriptEslint } from 'typescript-eslint';
 import stylistic from '@stylistic/eslint-plugin';
 import createTestResolutionPlugin from './plugins/eslint-test-plugin.cjs';
+import { defineConfig } from 'eslint/config';
+import { parser as tsParser, plugin as typescriptEslint } from 'typescript-eslint';
 
 
 /** @type {import('eslint').Linter.RulesRecord} */
@@ -126,10 +124,14 @@ const eslintConfiguration = (regex, rules, node, plugins) => ({
     ecmaVersion: 2022,
     parser: tsParser,
     parserOptions: {
-      projectService: true,
+      sourceType: "module",
+      projectService: {
+        allowDefaultProject: ['*.js'],
+        defaultProject: 'tsconfig.json',
+      },
       tsconfigRootDir: import.meta.dirname,
     },
-    globals: node ? nodeGlobals : browserGlobals,
+    globals: node ? globals.node : globals.browser,
   },
   plugins: {
     "@typescript-eslint": typescriptEslint,

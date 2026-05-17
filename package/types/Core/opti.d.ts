@@ -21,14 +21,22 @@ type Stringed<T> = Extract<T, string>;
 /** Construct a type with a set of properties K of type T, all of which are optional */
 type PartialRecord<K extends Key, T> = Partial<Record<K, T>>;
 
-/** Supported case conventions for the `String.toCase` function */
-type CaseConventions = "camel" | "kebab" | "pascal" | "snake" | "train" | "dot";
+type WritableOnly<T> = Pick<T, Object.Writable<T>>;
 
-/** Flattens array types like `T[][]` and others */
-type Flatten<T extends readonly unknown[]> =
-  T extends readonly (infer U extends readonly unknown[])[]
-  ? Flatten<U>
-  : T;
+/** Filters an object `U` by type `T` */
+type Only<T, U> = { [K in keyof T as T[K] extends U ? K : never]: T[K] };
+
+/** Makes a raw type defined. Does not make object values not undefined */
+type Defined<T> = Exclude<T, undefined>;
+
+/** Objects that have a `size` or `length` property */
+type Sized = { size: number } | { length: number };
+
+type Broadcaster<T> = {
+  [K in keyof T]: T[K] extends (...args: unknown[]) => infer R
+    ? (...args: Parameters<T[K]>) => Broadcaster<R>
+    : never;
+};
 
 /** Unboxes Object types to primitives */
 type Unboxed<T> =
@@ -41,36 +49,6 @@ type Unboxed<T> =
       : T extends BooleanConstructor | typeof Boolean ? boolean
       : T extends SymbolConstructor | typeof Symbol ? symbol
       : T;
-
-type GetterKeys<T> = {
-  [K in keyof T]-?: T[K] extends Func ? never : (
-    { -readonly [P in K]: T[K] } extends { [P in K]: T[K] } ? K : never
-  )
-}[keyof T];
-
-type SetterKeys<T> = {
-  [K in keyof T]-?: T[K] extends Func ? never : (
-    { -readonly [P in K]: T[K] } extends { [P in K]: T[P] } ? K : never
-  )
-}[keyof T];
-
-type WritableKeys<T> = {
-  [K in keyof T]-?:
-  { -readonly [P in K]: T[K] } extends { [P in K]: T[K] } ? K : never
-}[keyof T];
-
-type WritableOnly<T> = Pick<T, WritableKeys<T>>;
-
-/** Filters an object `U` by type `T` */
-type Only<T, U> = { [K in keyof T as T[K] extends U ? K : never]: T[K] };
-
-type AccessorKeys<T> = GetterKeys<T> | SetterKeys<T>;
-
-/** Makes a raw type defined. Does not make object values not undefined */
-type Defined<T> = Exclude<T, undefined>;
-
-/** Objects that have a `size` or `length` property */
-type Sized = { size: number } | { length: number };
 
 /** 
  * Used for widening type literals to their respective parent types 
@@ -108,7 +86,6 @@ type TypeOf<T extends string> =
   never;
 
 type ValueQueries<T> = T extends Func ? FuncTesters<T>
-  : T extends unknown[] ? ArrayTesters<T>
   : T extends Sized ? SizedObjectTesters<T> 
   : BaseValueQueries<T>;
 
@@ -116,21 +93,14 @@ type ValueQueries<T> = T extends Func ? FuncTesters<T>
 /** Represents a HTML tag in string form */
 type HTMLTag = keyof HTMLElementTagNameMap;
 
+/** Represents a HTML tag that cannot contain children in string format */
+type VoidHTMLTag = "area" | "base" | "br" | "col" | "embed" | "hr" | "img" | "input" | "link" | "meta" | "param" | "source" | "track" | "wbr";
+
 /** Represents a SVG tag in string form */
 type SVGTag = keyof SVGElementTagNameMap;
 
 /** Represents a MathML tag in string form */
 type MathMLTag = keyof MathMLElementTagNameMap;
-
-type PropertiesOf<T> = {
-  [K in keyof T]: T[K] extends Func ? never : K;
-}[keyof T];
-
-type Broadcaster<T> = {
-  [K in keyof T]: T[K] extends (...args: unknown[]) => infer R
-    ? (...args: Parameters<T[K]>) => Broadcaster<R>
-    : never;
-};
 
 /** Gets the type of a `HTMLElement` from a string */
 type HTMLElementOf<T extends string> =
@@ -182,7 +152,7 @@ type EventMapOf<T> =
   T extends SVGElement ? SVGElementEventMap :
   T extends ShadowRoot ? ShadowRootEventMap :
   T extends Document ? DocumentEventMap :
-  T extends Window & typeof globalThis ? WindowEventMap :
+  T extends Window & GlobalThis ? WindowEventMap :
   T extends Worker ? WorkerEventMap :
   T extends ServiceWorker ? ServiceWorkerEventMap :
   T extends ServiceWorkerRegistration ? ServiceWorkerRegistrationEventMap :
@@ -211,7 +181,7 @@ type EventMapOf<T> =
   T extends MediaRecorder ? MediaRecorderEventMap :
   T extends MediaSource ? MediaSourceEventMap :
   T extends MessagePort ? MessagePortEventMap :
-  T extends MessageEventTarget<unknown> ? MessageEventTargetEventMap :
+  T extends MessageEventTarget<_> ? MessageEventTargetEventMap :
   T extends BroadcastChannel ? BroadcastChannelEventMap :
   T extends WebSocket ? WebSocketEventMap :
   T extends NavigationHistoryEntry ? NavigationHistoryEntryEventMap :

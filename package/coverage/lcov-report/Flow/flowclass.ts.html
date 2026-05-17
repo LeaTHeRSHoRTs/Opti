@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>3/3</span>
+                <span class='fraction'>0/14</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>2/2</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>2/2</span>
+                <span class='fraction'>0/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>3/3</span>
+                <span class='fraction'>0/13</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -80,39 +80,81 @@
 <a name='L15'></a><a href='#L15'>15</a>
 <a name='L16'></a><a href='#L16'>16</a>
 <a name='L17'></a><a href='#L17'>17</a>
-<a name='L18'></a><a href='#L18'>18</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/// &lt;reference path="../../../types/modules/Flow/flow.lib.d.ts" /&gt;
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">export class _InternalFlow {
+<span class="fstat-no" title="function not covered" >  static #checker&lt;T&gt;(v</span>al: T): val is NonNullable&lt;T&gt; {
+<span class="cstat-no" title="statement not covered" >    return val !== null &amp;&amp; val !== undefined;</span>
+  }
 &nbsp;
-export class Internal_Flow {
-  static flows(fn: Flow.Checkable): boolean;
-  static flows&lt;T extends Flow.Checkable&gt;(fn: T, flowback: T): boolean;
-  static flows&lt;T extends Flow.Checkable&gt;(fn: T, flowback?: T): boolean {
-    if (!fn) {
-      return false;
+  public static <span class="fstat-no" title="function not covered" >flows(v</span>al: unknown): boolean {
+<span class="cstat-no" title="statement not covered" >    if (this.#checker(val)) {</span>
+<span class="cstat-no" title="statement not covered" >      return true;</span>
     }
-    return true;
+<span class="cstat-no" title="statement not covered" >    return false;</span>
   }
-  static flowback(file: string): boolean;
-  static flowback(test: FlowbackTest): void;
-  static flowback(fileOrTest: string | FlowbackTest): boolean | void {
 &nbsp;
+  public static <span class="fstat-no" title="function not covered" >always&lt;T&gt;(v</span>al: T, flowback: NonNullable&lt;T&gt;): [NonNullable&lt;T&gt;, boolean] {
+<span class="cstat-no" title="statement not covered" >    if (this.#checker(val)) {</span>
+<span class="cstat-no" title="statement not covered" >      return [val, false];</span>
+    }
+<span class="cstat-no" title="statement not covered" >    return [flowback, true];</span>
   }
+&nbsp;
+  public static globals = <span class="cstat-no" title="statement not covered" >{</span>
+<span class="fstat-no" title="function not covered" >    always&lt;K extends keyof GlobalThis&gt;(v</span>al: K, flowback: NonNullable&lt;GlobalThis[K]&gt;): boolean {
+      const checked = <span class="cstat-no" title="statement not covered" >globalThis[val];</span>
+<span class="cstat-no" title="statement not covered" >      if (_InternalFlow.#checker(checked)) <span class="cstat-no" title="statement not covered" >return false;</span></span>
+<span class="cstat-no" title="statement not covered" >      globalThis[val] = flowback;</span>
+<span class="cstat-no" title="statement not covered" >      return true;</span>
+    },
+<span class="fstat-no" title="function not covered" >    flows&lt;K extends keyof GlobalThis&gt;(v</span>al: K): boolean {
+<span class="cstat-no" title="statement not covered" >      return _InternalFlow.#checker(globalThis[val]);</span>
+    }
+  };
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -121,7 +163,7 @@ export class Internal_Flow {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-05T20:48:56.917Z
+                at 2026-05-16T03:23:05.347Z
             </div>
         <script src="../prettify.js"></script>
         <script>

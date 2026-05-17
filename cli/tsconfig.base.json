@@ -3,7 +3,6 @@
     "target": "ES2022",
     "module": "nodenext",
     "moduleResolution": "nodenext",
-    "outDir": "./dist",
     "ignoreDeprecations": "6.0",
     "downlevelIteration": true,
     "incremental": true,
@@ -28,13 +27,12 @@
     "emitDecoratorMetadata": false,
     "useDefineForClassFields": true,
     "experimentalDecorators": true,
+    "declaration": false,
 
     // Libs
     "lib": [],
     "types": ["node"],
     "typeRoots": ["./node_modules/@types"]
   },
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

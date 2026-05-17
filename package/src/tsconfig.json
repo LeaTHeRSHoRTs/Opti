@@ -2,7 +2,7 @@
   "extends": "../tsconfig.base.json",
   "include": [
     "**/*.ts",
-    "../types/secrets.d.ts",
-    "../types/**/*.d.ts"
+    "../types/Core/opti.lib.d.ts",
+    "../types/secrets.d.ts"
   ]
 }

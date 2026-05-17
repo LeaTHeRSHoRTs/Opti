@@ -20,7 +20,7 @@ describe("Document.ready", () => {
 });
 
 describe("Document.leaving", () => {
-  it("should run when the user attempts to leave", async () => {
+  it("should run when the user attempts to leave using beforeunload", async () => {
     const promise = new Promise<void>((resolve) => {
       document.leaving(() => {
         expect(true).toBeTruthy();
@@ -30,6 +30,34 @@ describe("Document.leaving", () => {
 
     // Simulate leaving the document
     window.dispatchEvent(new Event("beforeunload"));
+
+    await promise;
+  }, 10_000);
+
+  it("should run when the user attempts to leave using pagehide", async () => {
+    const promise = new Promise<void>((resolve) => {
+      document.leaving(() => {
+        expect(true).toBeTruthy();
+        resolve();
+      });
+    });
+
+    // Simulate leaving the document
+    window.dispatchEvent(new Event("pagehide"));
+
+    await promise;
+  }, 10_000);
+
+  it("should run when the user attempts to leave using visibilitychange", async () => {
+    const promise = new Promise<void>((resolve) => {
+      document.leaving(() => {
+        expect(true).toBeTruthy();
+        resolve();
+      });
+    });
+
+    // Simulate leaving the document
+    document.dispatchEvent(new Event("visibilitychange"));
 
     await promise;
   }, 10_000);
@@ -67,58 +95,11 @@ describe("Document.css", () => {
     expect(document.css("div.target")).toHaveProperty("color");
     expect(document.css("div.target").color).toBe("red");
   });
-});
 
-describe("Document.createElements", () => {
-  it("debug check", () => {
-    console.log('Available keys:', Object.keys(Document.prototype));
-    expect(document.createElements).toBeDefined();
-  });
-
-  it("should create an element cascade and append to the body", () => {
-    const el = document.createElements({ 
-      tag: "div", 
-      children: { tag: "a" }
-    });
-
-    document.body.appendChild(el);
-
-    const divs = document.body.getElementsByTagName("div");
-    expect(divs).toHaveLength(1);
-
-    const anchors = divs[0]?.getElementsByTagName("a");
-    expect(anchors).toHaveLength(1);
-
-    // Optional: check if the created div is actually a child of body
-    expect(document.body.contains(el)).toBeTruthy();
-  });
-  
-  it("should be able to add keyed properties", () => {
+  it("should throw if no selector is specified", () => {
     expect(() => {
-      document.createElements({ 
-        tag: "div", 
-        "data-href": "32",
-        children: { 
-          tag: "a",
-          "data-style": "position: absolute;"
-        }
-      });
-    }).not.toThrow();
-  });
-
-  it("should not be able to add keyed properties if they aren't a string", () => {
-    expect(() => {
-      document.createElements({ 
-        tag: "div", 
-        "data-href": "32",
-        children: { 
-          tag: "a",
-          "data-style": { 
-            position: "absolute"
-          }
-        }
-      });
-    }).toThrow();
+      document.css("");
+    }).toThrowException(SyntaxException);
   });
 });
 

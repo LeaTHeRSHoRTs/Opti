@@ -1,4 +1,5 @@
 /// <reference path="../../types/Unsync/unsync.lib.d.ts" />
+import { camelToDash, dashToCamel, isEventTarget, parseUnit } from "../helpers";
 
 export function addClass(this: Element, elClass: string): void {
   this.classList.add(elClass);
@@ -14,21 +15,6 @@ export function toggleClass(this: Element, elClass: string): void {
 
 export function hasClass(this: Element, elClass: string): boolean {
   return this.classList.contains(elClass);
-}
-
-function parseUnit(unit: string): string | number {
-  if (/^0[^.]?/.test(unit)) return 0;
-  if (!isNaN(Number(unit))) return Number(unit);
-  return unit;
-}
-
-function dashToCamel(str: string): string {
-  return str.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
-}
-
-// camelCase ("backgroundColor") → dash-case ("background-color")
-function camelToDash(str: string): string {
-  return str.replace(/[A-Z]/g, m => '-' + m.toLowerCase());
 }
 
 export function css(this: HTMLElement): CSS.Object;
@@ -133,19 +119,12 @@ export function text(this: Element, internalText?: string | ((oldText: string) =
   if (internalText !== undefined) {
     if (typeof internalText === "string") {
       input.unshift(internalText); // Add the text parameter to the beginning of the input array
-      const joined = input.join(" "); // Join all the strings with a space
-
-      // Replace "textContent" if it's found in the joined string (optional logic)
-      this.textContent = joined.includes("textContent")
-        ? joined.replace("textContent", this.textContent ?? "")
-        : joined;
+      this.textContent = input.join(" ");
     } else {
-      this.textContent = internalText(this.textContent ?? "");
+      this.textContent = internalText(this.textContent);
     }
   }
-
-  // Return the current textContent if no arguments are passed
-  return this.textContent ?? "";
+  return this.textContent;
 };
 
 export function show(this: HTMLElement): void {
@@ -204,13 +183,12 @@ export function serialize(this: HTMLFormElement): string {
     .join('&');
 };
 
-export function cut<T extends Node>(this: T): T {
+export function cut<T extends Node>(this: T): void {
   if (!this.parentNode) throw new HierarchyException("Element cannot be cut out of the DOM because it has no parent");
   this.parentNode.removeChild(this);
-  return this;
 }
 
-const defaultCopy: Required<Element.CopyOptions> = {
+const defaultCopy: Required<Omit<Element.CopyOptions, 'fallbackId'>> = {
   copyAll: false,
   copyAttributes: true,
   copyChildren: false,
@@ -218,20 +196,13 @@ const defaultCopy: Required<Element.CopyOptions> = {
   copyStyles: true
 };
 
-function isEventTarget(obj: Partial<EventTarget>): obj is EventTarget {
-  return (obj && 
-         typeof obj.addEventListener === "function" &&
-         typeof obj.removeEventListener === "function" &&
-         typeof obj.dispatchEvent === "function");
-}
-
 type _EventsRecord<T extends EventTarget> = { [K in keyof EventMapOf<T>]?: EventListenerInfo<T, K>[] };
 
 export function copy<T extends Element>(this: T, object: Element.CopyOptions): T;
 export function copy<T extends Element>(this: T, children?: boolean, events?: boolean): T;
 export function copy<T extends Element>(this: T, childrenOrObject?: boolean | Element.CopyOptions, events?: boolean): T;
 export function copy<T extends Element>(this: T, childrenOrObject: boolean | Element.CopyOptions = true, events: boolean = false): T {
-  let options: Required<Element.CopyOptions>;
+  let options: Element.CopyOptions;
   if (typeof childrenOrObject === "boolean") {
     options = { 
       ...defaultCopy, 
@@ -249,12 +220,26 @@ export function copy<T extends Element>(this: T, childrenOrObject: boolean | Ele
 
   if (options.copyAttributes || options.copyAll) {
     for (const attr of Array.from(this.attributes)) {
+      if (attr.name === "id" && attr.value !== "") {
+        if (!options.fallbackId) {
+          console.warn("Fallback ID is not set. Skipping application of ID");
+          continue;
+        } else {
+          this.id = options.fallbackId;
+        }
+      }
+      
       clone.setAttribute(attr.name, attr.value);
     }
   }
 
   if (options.copyChildren || options.copyAll) {
     for (const child of Array.from(this.childNodes)) {
+      if ('id' in child && child.id !== "") {
+        console.warn("Child node has ID. Duplicate node IDs possible, skipping copy of IDs...");
+        child.id = "";
+      }
+
       clone.appendChild(child.cloneNode(true));
     }
   }

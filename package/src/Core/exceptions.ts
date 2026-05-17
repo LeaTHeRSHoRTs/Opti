@@ -3,7 +3,7 @@ export class Exception extends Error {
   #cause: string;
   #internalStack: string;
 
-  constructor(message?: string, cause?: string, name?: string) {
+  constructor(message?: string, cause?: string) {
     super();
     this.name = this.constructor.name;
 
@@ -38,16 +38,17 @@ export class Exception extends Error {
     return `${this.constructor.name}: ${this.#message}\r\n${this.#internalStack}`;
   }
 
-  public static isException(ctor: Class): ctor is ExceptionConstructor {
-    return ctor instanceof Exception;
+  public static isException(val: unknown): val is Exception {
+    return val instanceof Exception;
   }
 
-  public static isAnyException(ctor: Class): ctor is ExceptionConstructor | RuntimeExceptionConstructor {
-    return ctor instanceof Exception || ctor instanceof RuntimeException; 
+  public static isAnyException(val: unknown): val is Exception | RuntimeException {
+    return val instanceof Exception || val instanceof RuntimeException; 
   }
 }
 
 export class RuntimeException {
+  name: "RuntimeException" = "RuntimeException";
   #message: string;
   #cause: string;
   #stack: string;
@@ -58,8 +59,8 @@ export class RuntimeException {
     this.#stack = new Error().stack ?? "";
   }
 
-  public get name(): "RuntimeException" {
-    return "RuntimeException";
+  public getName(): 'RuntimeException' {
+    return 'RuntimeException';
   }
 
   public getMessage(): string {
@@ -71,7 +72,7 @@ export class RuntimeException {
   }
 
   public toString(): string {
-    return `RuntimeException: ${this.#message}`;
+    return `RuntimeException${this.#message ? ": " + this.#message : ""}`;
   }
 
   public getStackTrace(): string {

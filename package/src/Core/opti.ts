@@ -1,6 +1,4 @@
-/// <reference path="../../types/Core/opti.lib.d.ts" />
-
-import { OptiInitError, setGetter, setNotEnumerable, setReadOnly } from "../helpers/helpers";
+import { setGetter, setReadOnly } from "../helpers";
 import * as Classes from "./constructableobjects";
 import * as Doc from "./document";
 import * as Elements from "./nodes";
@@ -8,17 +6,14 @@ import * as Exceptions from "./exceptions";
 import * as Globals from "./globals";
 import * as Lists from "./collections";
 import * as Arrays from "./arrays";
-import * as Events from "./events";
 import * as Misc from "./misc";
 import * as Reg from "./registry";
 
-console.log('Window type:', typeof window);
-
 if (typeof window === "undefined" || typeof document === "undefined") {
-  throw new OptiInitError("Opti requires a browser environment.");
+  throw new Error("Opti requires a browser environment.");
 }
 
-type __Unsafe<T = GlobalThis> = T & Record<string, unknown>;
+type __Unsafe<T> = T & Record<string, unknown>;
 
 globalThis.Opti = {
   crafty: false,
@@ -34,7 +29,7 @@ globalThis.Future = Promise;
 globalThis.InternalRegistries = Reg.InternalRegistries;
 globalThis.Registries = Reg.Registries;
 
-(globalThis as __Unsafe).Exception = Exceptions.Exception;
+(globalThis as __Unsafe<GlobalThis>).Exception = Exceptions.Exception;
 globalThis.SyntaxException = Exceptions.SyntaxException;
 globalThis.TypeException = Exceptions.TypeException;
 globalThis.CloneException = Exceptions.CloneException;
@@ -51,7 +46,6 @@ globalThis.HierarchyException = Exceptions.HierarchyException;
 globalThis.IncorrectDecoratorPlacementException = Exceptions.IncorrectDecoratorPlacementException;
 globalThis.RuntimeException = Exceptions.RuntimeException;
 
-setReadOnly(globalThis as __Unsafe, "Missing", Symbol("Missing"));
 setReadOnly(globalThis, "f", <T, P extends unknown[], R>(
   iife: Func<T, P, R>, 
   args?: P, 
@@ -71,7 +65,6 @@ globalThis.Tuple = Classes.Tuple;
 [HTMLDocument, Document].forEach(el => el.prototype.ready = Doc.ready);
 [HTMLDocument, Document].forEach(el => el.prototype.leaving = Doc.leaving);
 [HTMLDocument, Document].forEach(el => el.prototype.css = Doc.documentCss);
-[HTMLDocument, Document].forEach(el => el.prototype.createElements = Doc.createElements);
 
 Node.prototype.$ = Elements.$;
 Node.prototype.$$ = Elements.$$;
@@ -106,9 +99,6 @@ NodeList.prototype.toggleClass = Lists.toggleClassList;
 HTMLCollection.prototype.addClass = Lists.addClassList;
 HTMLCollection.prototype.removeClass = Lists.removeClassList;
 HTMLCollection.prototype.toggleClass = Lists.toggleClassList;
-
-EventTarget.prototype.addEventListener = Events.addEventListener;
-setNotEnumerable(EventTarget.prototype as unknown as { _events: unknown }, "_events", {});
 
 String.prototype.remove = Misc.remove;
 String.prototype.matches = Misc.matches;

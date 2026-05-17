@@ -11,20 +11,6 @@
 /// <reference path="./classes.d.ts" />
 /// <reference path="./interfaces.d.ts" />
 
-//-------------------------------------      Symbols      -------------------------------------
-
-/**
- * `Missing` is used when a value is not present.
- * 
- * The new array methods return a `Missing` when a value is not found, so that they support `null` and `undefined` arrays.
- * 
- * @opti
- * @readonly
- * @since 1.0.0
- */
-declare const Missing: unique symbol;
-type Missing = typeof Missing;
-
 //------------------------------------- Global Functions  -------------------------------------
 
 /** 
@@ -366,20 +352,6 @@ declare var Future: FutureConstructor;
  */
 declare var Opti: Opti;
 
-//-------------------------------------    Decorators     -------------------------------------
-
-/** @decorator */
-declare function Abstract<T>(
-  target: unknown, 
-  propertyKey: string | symbol, 
-  descriptor: TypedPropertyDescriptor<T>
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-): void | TypedPropertyDescriptor<any>;
-declare function Abstract<T extends Class>(clazz: T): T;
-
-/** @decorator */
-declare function Final<T extends Class>(clazz: T): T | void;
-
 //-------------------------------------   Augmentations   -------------------------------------
 
 interface Document {
@@ -435,37 +407,9 @@ interface Document {
    * })
    */
   leaving(callback: (this: Document, ev: Event) => void): void;
-
-  /**
-   * Creates an element tree to create trees of HTML
-   * @opti
-   * @param node The html element(s)
-   * @example
-   * const content = Elements.createTree({
-   *   tag: "div",
-   *   class: "current-class",
-   *   children: [
-   *     {
-   *       tag: "div",
-   *       class: "class-name",
-   *       children: [
-   *         {
-   *           tag: "a",
-   *           attrs: {
-   *             href: "https://example.com",
-   *             target: "_blank",
-   *           },
-   *           text: "To example.com",
-   *         }
-   *       ]
-   *     }
-   *   ]
-   * });
-   */
-  createElements<T extends HTMLElement>(node: Element.NodeObject): T;
 }
 
-interface ChildNode {
+interface Node {
   /** 
    * Gets the parent of the node
    * @opti
@@ -484,17 +428,19 @@ interface ChildNode {
    * @param level The amount of levels to go up
    * @returns The ancestor node
    * @example
-   * const el = document("#child");
-   * const target = el.getAncestor(3);
-   * 
-   * console.log("Target: " + target);
+   * const el = document.$("#child");
+   * const text = document.createTextNode("Element Text");
+   * const text = el.getAncestor(1);
    */
-  ancestor(this: ChildNode, level: number): ParentNode | null;
+  ancestor(this: Node, level: number): ParentNode | null;
   /** 
-   * Gets the element's ancestor (ancestor selected is based on the css selector) 
+   * Gets the element's ancestor based on a css selector
    * @opti
    * @param selector The selector used to get the ancestor
    * @returns The parent element
+   * @example
+   * const el = document.$("#child");
+   * const target = el.getAncestor("#parent");
    */
   ancestor<T extends Element>(this: Element, selector: string): T | null;
 
@@ -557,7 +503,7 @@ interface Node {
   $$<K extends keyof HTMLElementDeprecatedTagNameMap>(selectors: K): HTMLElementDeprecatedTagNameMap[K][];
   $$<E extends Element = HTMLElement>(selectors: string): E[];
 
-  cut<T extends Node>(this: T): T;
+  cut<T extends Node>(this: T): void;
 }
 
 interface Element {
@@ -893,9 +839,9 @@ interface Array<T> {
    * @opti
    * @param finder The finder function to find the value to remove
    */
-  pluck(finder: (v: T) => boolean): T | Missing;
+  pluck(finder: (v: T) => boolean): T | null;
 
-  pluckLast(finder: (v: T) => boolean): T | Missing;
+  pluckLast(finder: (v: T) => boolean): T | null;
 
   /**
    * Relocates an item in an array by a set amount
@@ -926,8 +872,8 @@ interface Array<T> {
    * @param finder The function that searches for the right value to replace
    * @param newVal The new value to put in place of the old removed value
    */
-  replace(this: T[], replaceIndex: number, newVal: T): T | Missing;
-  replace(this: T[], finder: (val: T) => boolean, newVal: T): T | Missing;
+  replace(this: T[], replaceIndex: number, newVal: T): T | null;
+  replace(this: T[], finder: (val: T) => boolean, newVal: T): T | null;
 
   /**
    * Sorts an array by a specific type of sorting
@@ -976,7 +922,7 @@ interface String {
    */
   matches(regexp: string | RegExp): boolean;
 
-  toCase(format: CaseConventions): string;
+  toCase(format: String.Case): string;
 }
 
 interface FunctionConstructor {
@@ -1002,5 +948,5 @@ interface FunctionConstructor {
    * @param func The function to use to create the throttled function
    * @param ms The throttle time, in milliseconds
    */
-  throttle<T, A extends unknown[], R>(func: Func<T, A, R>, ms: number): Func<T, A, R | Missing>;
+  throttle<T, A extends unknown[], R>(func: Func<T, A, R>, ms: number): Func<T, A, R | null>;
 }

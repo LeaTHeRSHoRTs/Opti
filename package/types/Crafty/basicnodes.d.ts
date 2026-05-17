@@ -28,12 +28,17 @@ declare namespace Crafty {
     wrap<U extends HTMLTag>(tag: U): HTMLElement<U, {}>;
     wrap<N extends Namespace, U extends TagFromNamespace<N>>(namespace: N, tag: U): Element<N, U, {}>;
     clone(): this;
+
+    html(): string;
+    txt(): string;
+    txt(text: string): void;
+    txt(fn: (original: string) => string): void;
   }
 
   interface Parent<T extends Node = Node> {
     children: T[];
-    append(child: T): this;
-    prepend(child: T): this;
+    append(child: T): void;
+    prepend(child: T): void;
   }
 
   interface Fragment extends Node, Parent {
@@ -50,12 +55,6 @@ declare namespace Crafty {
     txt(fn: (origin: string) => string): void;
 
     normalize(onMount?: (node: globalThis.Text) => void): globalThis.Text;
-  }
-
-  interface Unknown extends Node {
-    kind: 'unknown';
-    readonly contents: string | globalThis.Element | undefined;
-    normalize(onMount?: (node: globalThis.Node) => void): never;
   }
 
   interface Comment extends Node, Parent<Text> {

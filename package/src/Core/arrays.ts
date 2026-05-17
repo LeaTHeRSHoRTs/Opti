@@ -1,28 +1,30 @@
+import { arrType } from "../helpers";
+
 export function unique<T>(this: T[]): T[] {
   return [...new Set(this)];
 };
 
-export function pluck<T>(this: T[], finder: (v: T) => boolean): T | Missing {
+export function pluck<T>(this: T[], finder: (v: T) => boolean): T | null {
   const res = this.findIndex(finder);
 
-  if (res === -1) return Missing;
+  if (res === -1) return null;
 
   const [item] = this.splice(res, 1);
-  return item ?? Missing;
+  return item ?? null;
 }
 
-export function pluckLast<T>(this: T[], finder: (v: T) => boolean): T | Missing {
+export function pluckLast<T>(this: T[], finder: (v: T) => boolean): T | null {
   const index = this.map(finder).lastIndexOf(true);
 
-  if (index === -1) return Missing;
+  if (index === -1) return null;
 
   const [item] = this.splice(index, 1);
-  return item ?? Missing;
+  return item ?? null;
 }
 
 export function relocate<T>(this: T[], index: number, offset: number): number | null {
-  const value = this.splice(index, 1)[0] ?? Missing;
-  if (value !== Missing) {
+  const value = this.splice(index, 1)[0];
+  if (value !== undefined) {
     this.splice(index + offset, 0, value);
     return index + offset;
   } else {
@@ -31,24 +33,11 @@ export function relocate<T>(this: T[], index: number, offset: number): number | 
 }
 
 export function relocateTo<T>(this: T[], index: number, location: number): number | null {
-  const value = this.splice(index, 1)[0] ?? Missing;
-  if (value !== Missing) {
+  const value = this.splice(index, 1)[0];
+  if (value !== undefined) {
     this.splice(location, 0, value);
     return location;
   } else return null;
-}
-
-function arrType<T extends Class.Constructor | StringConstructor | NumberConstructor | BooleanConstructor | SymbolConstructor>(
-  array: unknown[],
-  type: T
-): array is Unboxed<T>[] {
-  return array.every(v =>
-    type === String ? typeof v === "string" :
-      type === Number ? typeof v === "number" :
-        type === Boolean ? typeof v === "boolean" :
-          type === Symbol ? typeof v === "symbol" :
-            v instanceof type
-  );
 }
 
 const originalSort = Array.prototype.sort;
@@ -80,20 +69,20 @@ export function sortBy<T>(this: T[], order?: SortMode<T> | ((a: T, b: T) => numb
   return copy.sort();
 }
 
-export function replace<T>(this: T[], index: number | ((value: T) => boolean), newVal: T): T | Missing {
+export function replace<T>(this: T[], index: number | ((value: T) => boolean), newVal: T): T | null {
   if (typeof index === "number") {
     const oldVal = this[index];
     this[index] = newVal;
 
-    return oldVal ?? Missing;
+    return oldVal ?? null;
   } else {
     const i = this.findIndex(index);
-    if (i === -1) return Missing;
+    if (i === -1) return null;
 
     const oldVal = this[i];
     this[i] = newVal;
 
-    return oldVal ?? Missing;
+    return oldVal ?? null;
   }
 }
 

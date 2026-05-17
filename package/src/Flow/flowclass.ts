@@ -1,17 +1,31 @@
-/// <reference path="../../../types/modules/Flow/flow.lib.d.ts" />
+export class _InternalFlow {
+  static #checker<T>(val: T): val is NonNullable<T> {
+    return val !== null && val !== undefined;
+  }
 
-export class Internal_Flow {
-  static flows(fn: Flow.Checkable): boolean;
-  static flows<T extends Flow.Checkable>(fn: T, flowback: T): boolean;
-  static flows<T extends Flow.Checkable>(fn: T, flowback?: T): boolean {
-    if (!fn) {
-      return false;
+  public static flows(val: unknown): boolean {
+    if (this.#checker(val)) {
+      return true;
     }
-    return true;
+    return false;
   }
-  static flowback(file: string): boolean;
-  static flowback(test: FlowbackTest): void;
-  static flowback(fileOrTest: string | FlowbackTest): boolean | void {
 
+  public static always<T>(val: T, flowback: NonNullable<T>): [NonNullable<T>, boolean] {
+    if (this.#checker(val)) {
+      return [val, false];
+    }
+    return [flowback, true];
   }
+
+  public static globals = {
+    always<K extends keyof GlobalThis>(val: K, flowback: NonNullable<GlobalThis[K]>): boolean {
+      const checked = globalThis[val];
+      if (_InternalFlow.#checker(checked)) return false;
+      globalThis[val] = flowback;
+      return true;
+    },
+    flows<K extends keyof GlobalThis>(val: K): boolean {
+      return _InternalFlow.#checker(globalThis[val]);
+    }
+  };
 }

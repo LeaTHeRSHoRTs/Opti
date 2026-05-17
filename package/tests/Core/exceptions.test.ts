@@ -7,6 +7,27 @@ describe("Exception", () => {
     }).toThrow();
   });
 
+  it("should have a static method that can check if an object is an exception", () => {
+    expect(Exception.isException(new Exception)).toBeTruthy();
+    expect(Exception.isException(new Error)).toBeFalsy();
+    expect(Exception.isException(new SyntaxException)).toBeTruthy();
+    expect(Exception.isException(new SyntaxError)).toBeFalsy();
+    expect(Exception.isException(new AssertionException)).toBeTruthy();
+    expect(Exception.isException(new TypeError)).toBeFalsy();
+    expect(Exception.isException(new class extends Exception { })).toBeTruthy();
+  });
+
+  it("should have a static method that can check if an object is an exception or runtime exception", () => {
+    expect(Exception.isAnyException(new Exception)).toBeTruthy();
+    expect(Exception.isAnyException(new Error)).toBeFalsy();
+    expect(Exception.isAnyException(new SyntaxException)).toBeTruthy();
+    expect(Exception.isAnyException(new SyntaxError)).toBeFalsy();
+    expect(Exception.isAnyException(new AssertionException)).toBeTruthy();
+    expect(Exception.isAnyException(new TypeError)).toBeFalsy();
+    expect(Exception.isAnyException(new RuntimeException)).toBeTruthy();
+    expect(Exception.isAnyException(new class extends RuntimeException { })).toBeTruthy();
+  });
+
   const exceptions: { name: string, instance: ExceptionConstructor }[] = [{
     name: "Exception",
     instance: Exception
@@ -57,6 +78,7 @@ describe("Exception", () => {
 
     it("should have the right name", () => {
       expect(normalInstance.name).toBe(name);
+      expect(normalInstance.getName()).toBe(name);
     });
 
     it("should have the right message", () => {
@@ -84,7 +106,7 @@ describe("Exception", () => {
 
       try {
         throw new instance;
-      } catch(e) {
+      } catch (e) {
         if (e instanceof instance) {
           expect(e.getStackTrace()).toBe("MOCK_STACK");
         }
@@ -94,11 +116,57 @@ describe("Exception", () => {
 });
 
 describe("RuntimeException", () => {
-  const runtime = new RuntimeException();
+  const normalInstance = new RuntimeException;
+  const instanceWithMessage = new RuntimeException("myMessage");
+  const instanceWithCause = new RuntimeException(undefined, "throwing");
+  const instanceWithAll = new RuntimeException("myMessage", "throwing");
 
-  it("should do the same thing as exceptions", () => {
-    expect(runtime.name).toBe("RuntimeException");
-    expect(runtime.getMessage()).toBe("");
+  it("should not be a subclass of Exception", () => {
+    expect(normalInstance).not.toBeInstanceOf(Exception);
+  });
+
+  it("should have the right name", () => {
+    expect(normalInstance.name).toBe("RuntimeException");
+    expect(normalInstance.getName()).toBe("RuntimeException");
+    expect(normalInstance.toString()).toBe("RuntimeException");
+  });
+
+  it("should have the right message", () => {
+    expect(normalInstance.getMessage()).toBe("");
+    expect(instanceWithMessage.getMessage()).toBe("myMessage");
+    expect(instanceWithMessage.toString()).toBe("RuntimeException: myMessage");
+  });
+
+  it("should be have the right cause", () => {
+    expect(instanceWithCause.getCause()).toBe("throwing");
+  });
+
+  it("should be have the right message and cause", () => {
+    expect(instanceWithAll.getMessage()).toBe("myMessage");
+    expect(instanceWithAll.getCause()).toBe("throwing");
+  });
+
+  it("should be throwable again using the throw method", () => {
+    expect(() => {
+      normalInstance.throw();
+    }).toThrow(RuntimeException);
+  });
+
+  it.skip("should give the right stack trace", () => {
+    Error.prototype.stack = "MOCK_STACK";
+
+    try {
+      throw new RuntimeException;
+    } catch (e) {
+      if (e instanceof RuntimeException) {
+        (e as any).stack = "MOCK_STACK";
+        expect(e.getStackTrace()).toBe("MOCK_STACK");
+      } else {
+        expect.fail("Error was not a RuntimeException");
+      }
+    }
+
+    expect.fail("RuntimeException was not caught");
   });
 
   it("should not be catch-able using the exception class or Error class", () => {
@@ -106,9 +174,9 @@ describe("RuntimeException", () => {
       throw new RuntimeException();
     } catch (e) {
       if (e instanceof Error || e instanceof Exception) {
-        fail();
+        expect.fail("Error was not instance of Error or Exception");
       } else if (!(e instanceof RuntimeException)) {
-        fail();
+        expect.fail("Error was not a runtime exception");
       }
     }
   });

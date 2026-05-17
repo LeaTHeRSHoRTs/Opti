@@ -1,8 +1,8 @@
-import { OptiModuleError } from "../helpers/helpers";
+import { createModuleError } from "../helpers";
 import * as Impl from "./requestfunc";
 
 (function() {
-  if (!Opti) throw new OptiModuleError("requests");
+  if (!Opti) throw createModuleError("requests");
 
   globalThis.request = Impl.request;
 })();

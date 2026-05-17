@@ -1,8 +1,8 @@
 import { execSync } from 'child_process';
-import { readFileSync } from 'fs';
+import fs from 'fs';
 
 // Read the version from package.json
-const { version } = JSON.parse(readFileSync('./package.json', 'utf8'));
+const { version } = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
 
 try {
   // Commit changes (if any)
@@ -12,14 +12,13 @@ try {
 
   // Push changes to the repository
   console.log('Pushing changes to remote repository...');
-  execSync('git push origin master', { stdio: 'inherit' }); // Adjust 'main' if your branch name is different
+  execSync('git push origin master', { stdio: 'inherit' });
   
   console.log(`Successfully pushed changes for version ${version}!`);
 } catch (error) {
-  if (error instanceof Error) {
-    console.error('Error during git push:', error.message);
-  } else {
-    console.error('Error during git push:', error);
-  }
-  process.exit(1); // Exit with failure code if push fails
+
+  if (error instanceof Error) console.error('Error during git push:', error.message);
+  else console.error('Error during git push:', error);
+
+  process.exit(1);
 }

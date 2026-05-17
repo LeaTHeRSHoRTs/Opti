@@ -1,4 +1,4 @@
-import { dashToCamel, parseUnit } from "../helpers/helpers";
+import { dashToCamel, parseUnit } from "../helpers";
 
 export class Internal_QueryPseudoElement<T extends Element> {
   #parent: T;

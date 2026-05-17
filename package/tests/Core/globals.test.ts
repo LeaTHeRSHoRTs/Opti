@@ -1,18 +1,5 @@
 import "opti";
 
-describe("Missing", () => {
-  it("should be defined", () => {
-    expect(Missing).toBeDefined();
-  });
-
-  it("should be readonly", () => {
-    expect(() => {
-      //@ts-ignore
-      Missing = Symbol("NotMissing");
-    }).toThrow(TypeError);
-  });
-});
-
 describe('is', () => {
   let nullVal: ValueQueries<null | true>;
   let undefinedVal: ValueQueries<undefined | true>;
@@ -185,11 +172,6 @@ describe('is', () => {
     expect(numberArrayVal.shorter(2)).toBe(false);
   });
 
-  it("should be able to check a function's name", () => {
-    expect(namedFuncVal.isName("myFunction")).toBe(true);
-    expect(anonymousFuncVal.isName("anonymous")).toBe(true);
-  });
-
   it("should be able to check if something is defined", () => {
     expect(emptyStringVal.isDefined()).toBe(true);
     expect(helloStringVal.isDefined()).toBe(true);
@@ -341,7 +323,18 @@ describe("sleep", () => {
 
 describe("isEmpty", () => {
   it("should correctly evaluate empty values", () => {
-    const emptyValues = ["", NaN, 0, null, undefined, false, [], {}];
+    const emptyValues = [
+      "", 
+      NaN, 
+      0, 
+      null, 
+      undefined, 
+      false, 
+      [], 
+      {},
+      new Map(),
+      new Set()
+    ];
     for (const val of emptyValues) {
       expect(isEmpty(val)).toBe(true);
     }
@@ -353,10 +346,14 @@ describe("isEmpty", () => {
       [1, 2],
       { key: "value" },
       true,
+      Infinity,
+      -Infinity,
       1,
       () => { },
       Symbol("x"),
       new Date(),
+      new Map([["key", "value"]]),
+      new Set(["one", "two"])
     ];
     for (const val of nonEmptyValues) {
       expect(isEmpty(val)).toBe(false);

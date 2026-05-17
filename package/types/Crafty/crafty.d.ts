@@ -1,6 +1,4 @@
 declare namespace Crafty {
-  type Children = Node[];
-
   type NodeKind = 'element' | HTMLTag | 'text' | 'fragment' | 'comment' | 'unknown';
 
   type Namespace = "html" | "svg" | "mathml" | "xml";

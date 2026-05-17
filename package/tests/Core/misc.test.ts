@@ -1,4 +1,4 @@
-import "opti";
+import 'opti';
 
 describe("Date.at", () => {
   it("should return a number that is the same as the milliseconds since `DateOrigin`", () => {
@@ -28,7 +28,7 @@ describe("Math.randomRange", () => {
 });
 
 describe("Number.repeat", () => {
-  it("should iterate the amount of thimes as the number", () => {
+  it("should iterate the amount of times as the number", () => {
     let i = 0;
 
     (5).repeat(() => {
@@ -40,7 +40,7 @@ describe("Number.repeat", () => {
 });
 
 describe("Object.clone", () => {
-  it("should make a clone of primative objects", () => {
+  it("should make a clone of primitive objects", () => {
     expect(Object.clone(42)).toBe(42);
     expect(Object.clone('hello')).toBe('hello');
     expect(Object.clone(null)).toBe(null);
@@ -93,7 +93,7 @@ describe("Object.clone", () => {
 });
 
 describe("Object.forEach", () => {
-  it("should iterate over a primative object's values", () => {
+  it("should iterate over a primitive object's values", () => {
     const obj = {
       a: 12,
       b: "forty-two",
@@ -120,6 +120,15 @@ describe("Object.forEach", () => {
 describe("String.capitalize", () => {
   it("should capitalize the first letter in the string", () => {
     expect("helloworld".capitalize()).toBe("Helloworld");
+  });
+
+  it("should handle whitespace", () => {
+    expect("  helloworld  ".capitalize()).toBe("  Helloworld  ");
+  });
+
+  it("should handle strings that are already capitalised", () => {
+    const str = "Helloworld";
+    expect(str.capitalize()).toBe(str);
   });
 });
 

@@ -1,13 +1,11 @@
-/// <reference path="../../../types/modules/Flow/flow.lib.d.ts" />
-
-import { OptiModuleError, setNameOfGlobalThisProp } from "../helpers/helpers";
+import { createModuleError, setNameOfGlobalThisProp } from "../helpers";
 
 import * as Flow from "./flowclass";
 
 (function() {
-  if (!Opti) throw new OptiModuleError("flow");
+  if (!Opti) throw createModuleError("flow");
 
   globalThis.Opti.flow = true;
-  globalThis.Flow = Flow.Internal_Flow;
+  globalThis.Flow = Flow._InternalFlow;
   setNameOfGlobalThisProp("Flow");
 })();

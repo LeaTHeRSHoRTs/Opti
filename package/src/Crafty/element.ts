@@ -1,5 +1,5 @@
-import { Internal_ChildrenNotAllowedException } from "./exceptions";
-import Internal_Node from "./node";
+import { _InternalChildrenNotAllowedException } from "./exceptions";
+import _InternalNode from "./node";
 import Internal_Text from "./text";
 
 const NamespaceMap = {
@@ -9,11 +9,11 @@ const NamespaceMap = {
   mathml: "http://www.w3.org/1998/Math/MathML",
 } as const;
 
-export class Internal_Element<
+export class _InternalElement<
   N extends Crafty.Namespace = Crafty.Namespace,
   T extends Crafty.TagFromNamespace<N> = Crafty.TagFromNamespace<N>,
   P extends Crafty.Props<T> = Crafty.Props<T>,
-> extends Internal_Node implements Crafty.Element<N, T, P> {
+> extends _InternalNode implements Crafty.Element<N, T, P> {
   public readonly namespaceURI: N;
   public readonly kind: "element" | HTMLTag = "element";
   public readonly tag: T;
@@ -21,7 +21,7 @@ export class Internal_Element<
   public id: P["id"] | undefined;
   public classList: P["classes"] | [];
   
-  constructor(namespace: N, tag: T, props: P = {} as P, children?: Crafty.Children) {
+  constructor(namespace: N, tag: T, props: P = {} as P, children?: Crafty.Node[]) {
     super(...(children ?? []));
     this.namespaceURI = namespace;
     this.tag = tag;
@@ -81,20 +81,40 @@ export class Internal_Element<
   }
 
   addClass(cls: string): void {
-    this.#props.classes?.push(cls);
-  } 
+    if (this.#props.classes) {
+      this.#props.classes.push(cls);
+    }
+  }
 
-  static [Symbol.hasInstance](inst: unknown): inst is Internal_Element {
+  removeClass(cls: string): void {
+    if (this.#props.classes) {
+      const index = this.#props.classes.indexOf(cls);
+      delete this.#props.classes[index];
+    }
+  }
+
+  toggleClass(cls: string): void {
+    if (this.#props.classes) {
+      const index = this.#props.classes.indexOf(cls);
+      if (index !== -1) {
+        delete this.#props.classes[index];
+      } else {
+        this.#props.classes.push(cls);
+      }
+    }
+  }
+
+  static [Symbol.hasInstance](inst: unknown): inst is _InternalElement {
     return Function.prototype[Symbol.hasInstance].call(this, inst);
   }
 };
 
-export class Internal_HTMLElement<
+export class _InternalHTMLElement<
   T extends HTMLTag,
   P extends Crafty.Props<T> = Crafty.Props<T>,
-> extends Internal_Element<"html", T, P> implements Crafty.HTMLElement<T, P> {
+> extends _InternalElement<"html", T, P> implements Crafty.HTMLElement<T, P> {
 
-  constructor(tag: T, props?: P, children?: Crafty.Children) {
+  constructor(tag: T, props?: P, children?: Crafty.Node[]) {
     super("html", tag, props, children);
   }
   public kind: T = this.tag;
@@ -110,20 +130,25 @@ export class Internal_HTMLElement<
     return super.normalize() as HTMLElementOf<T>;
   }
 
-  static [Symbol.hasInstance](inst: unknown): inst is Internal_HTMLElement<HTMLTag> {
+  static [Symbol.hasInstance](inst: unknown): inst is _InternalHTMLElement<HTMLTag> {
     return Function.prototype[Symbol.hasInstance].call(this, inst);
   }
 };
 
-export class Internal_VoidHTMLElement<T extends HTMLTag, P extends Crafty.Props<T> = Crafty.Props<T>> extends Internal_HTMLElement<T, P> implements Crafty.VoidHTMLElement<T, P> {
-  append(_: Crafty.Node): never {
-    throw new Internal_ChildrenNotAllowedException("VoidHTMLElements are auto closing elements and therefore cannot have children");
-  }
-  prepend(_: Crafty.Node): never {
-    throw new Internal_ChildrenNotAllowedException("VoidHTMLElements are auto closing elements and therefore cannot have children");
+export class _InternalVoidHTMLElement<T extends HTMLTag, P extends Crafty.Props<T> = Crafty.Props<T>> extends _InternalHTMLElement<T, P> implements Crafty.VoidHTMLElement<T, P> {
+
+  constructor(tag: T, props?: P) {
+    super(tag, props, []);
   }
 
-  static [Symbol.hasInstance](inst: unknown): inst is Internal_VoidHTMLElement<HTMLTag> {
+  append(_: Crafty.Node): never {
+    throw new _InternalChildrenNotAllowedException("VoidHTMLElements are auto closing elements and therefore cannot have children");
+  }
+  prepend(_: Crafty.Node): never {
+    throw new _InternalChildrenNotAllowedException("VoidHTMLElements are auto closing elements and therefore cannot have children");
+  }
+
+  static [Symbol.hasInstance](inst: unknown): inst is _InternalVoidHTMLElement<HTMLTag> {
     return Function.prototype[Symbol.hasInstance].call(this, inst);
   }
 }

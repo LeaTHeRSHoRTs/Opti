@@ -1,7 +1,7 @@
-import Internal_Node from "./node";
+import _InternalNode from "./node";
 
-export default class Internal_Text extends Internal_Node implements Crafty.Text {
-  public kind: "text" = "text";
+export default class Internal_Text extends _InternalNode implements Crafty.Text {
+  public readonly kind: "text" = "text";
   #text: string;
   public get length(): number {
     return this.#text.length;
@@ -22,6 +22,10 @@ export default class Internal_Text extends Internal_Node implements Crafty.Text 
     } else {
       this.#text = textOrFn(this.#text);
     }
+  }
+
+  html(): string {
+    return this.txt();
   }
 
   normalize(onMount?: (node: globalThis.Text) => void): globalThis.Text {

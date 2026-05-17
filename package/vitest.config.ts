@@ -6,15 +6,20 @@ export default defineConfig({
     root: import.meta.dirname,
     coverage: {
       provider: 'v8',
-      reporter: ['lcov', 'text'],
+      reporter: ['lcov'],
       include: ["src/**/*.ts"],
-      exclude: ["src/**/_*.ts", "src/_*/*.ts"]
+      exclude: [
+        "src/**/_*.ts", 
+        "src/_*/*.ts",
+        "src/**/helpers.ts",
+        "src/Core/registry.ts"
+      ]
     },
     globals: true,
-    isolate: false,
+    isolate: true,
     environment: 'jsdom',
     include: ["tests/**/*.test.ts"],
-    setupFiles: [path.resolve(import.meta.dirname, "../vitest.functions.ts")]
+    setupFiles: [path.resolve(import.meta.dirname, "../vitest.setup.ts")]
   },
   resolve: {
     alias: [

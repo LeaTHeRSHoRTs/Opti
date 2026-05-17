@@ -2,10 +2,9 @@ declare namespace Unsync {
   type Callbacks<L extends unknown[]> = ((...args: Unboxed<L>) => void)[];
 
   interface EventController {
-    on?(): void;
-    off?(): void;
-    del?(): void;
-    exists(): this is { on(): void, off(): void, del(): void };
+    on(): void;
+    off(): void;
+    get applied(): boolean;
   }
 
   interface SetEmitter<T extends Record<string, Class[]> = {}> {
@@ -14,7 +13,7 @@ declare namespace Unsync {
       callback: (...args: L) => void
     ): void;
     off<K extends keyof T>(ev: K): void;
-    emit<K extends keyof T>(ev: K, ...args: T[K]): void;
+    emit<K extends keyof T>(ev: K, ...args: Unboxed<T[K]>): void;
   }
 
   interface EventEmitter<T extends Record<string, unknown[]> = {}> {

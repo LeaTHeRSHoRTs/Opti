@@ -1,4 +1,9 @@
+/// <reference types="./node_modules/@types/node">
+/// <reference types="./package/types/Core/classes.d.ts">
 import { expect, type MatcherState } from 'vitest';
+import { execSync } from 'child_process';
+
+execSync("tsc --noEmit", { stdio: 'inherit' });
 
 expect.extend({
   toThrowException(

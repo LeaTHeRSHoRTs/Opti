@@ -67,11 +67,116 @@ describe("EventTarget.addEventListeners", () => {
   });
 });
 
-// describe("EventTarget.addEventController", () => {
-//   it("should attach an event listener to the EventTarget", () => {
+describe("EventTarget.addEventController", () => {
+  let el: HTMLButtonElement;
 
-//   });
-// });
+  beforeAll(() => {
+    el = document.createElement("button");
+    document.body.append(el);
+  });
+
+  afterAll(() => document.body.innerHTML = ""); 
+
+  it("should attach an event listener to the EventTarget", () => {
+    let flag = false;
+    el.addEventController("click", () => flag = true);
+    el.click();
+
+    expect(flag).toBeTruthy();
+  });
+
+  it("should be abe to be turned off", () => {
+    let flag = 1;
+
+    const controller = el.addEventController('click', () => flag++);
+    el.click();
+
+    expect(flag).toBe(2);
+    controller.off();
+
+    el.click();
+    expect(flag).toBe(2);
+  });
+
+  it("should be able to return the status of the listener", () => {
+    let flag = 1;
+
+    const controller = el.addEventController('click', () => flag++);
+    expect(controller.applied).toBeTruthy();
+    controller.off();
+    expect(controller.applied).toBeFalsy();
+    controller.on();
+    expect(controller.applied).toBeTruthy();
+  });
+
+  it("should be able to handle an already true status", () => {
+    expect(() => {
+      const controller = el.addEventController('click', () => {});
+      expect(controller.applied).toBeTruthy();
+      controller.off();
+      controller.off();
+      expect(controller.applied).toBeFalsy();
+    }).not.toThrow();
+  });
+});
+
+describe("EventTarget.addConditionalListener", () => {
+  let el: HTMLButtonElement;
+
+  beforeAll(() => {
+    el = document.createElement("button");
+    document.body.append(el);
+  });
+
+  afterAll(() => document.body.innerHTML = ""); 
+
+  it("should attach an event listener to the EventTarget", () => {
+    let flag = false;
+    el.addConditionalListener("click", () => flag = true, 2);
+    el.click();
+
+    expect(flag).toBeTruthy();
+  });
+
+  it("should be removed after a certain amount of activations", () => {
+    let flag = 0;
+
+    el.addConditionalListener('click', () => flag++, 3);
+
+    el.click();
+    expect(flag).toBe(1);
+
+    el.click();
+    expect(flag).toBe(2);
+
+    el.click();
+    expect(flag).toBe(3);
+    
+    el.click();
+    expect(flag).toBe(3);
+  });
+
+  it("should be removed after the condition returns true", () => {
+    let flag = false;
+    let incr = 0;
+
+    el.addConditionalListener('click', () => incr++, () => flag === true);
+
+    el.click();
+    expect(incr).toBe(1);
+
+    el.click();
+    expect(incr).toBe(2);
+
+    flag = true;
+    el.click();
+    expect(incr).toBe(2);
+
+    flag = false;
+    el.click();
+    expect(incr).toBe(2);
+  });
+});
 
 describe("NodeList.addEventListener", () => {
   let nodeList: NodeList;

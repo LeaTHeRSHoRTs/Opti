@@ -100,6 +100,8 @@ declare class Exception {
   getStackTrace(): string;
   throw(): never;
   toString(): string;
+  static isException(val: unknown): val is Exception;
+  static isAnyException(val: unknown): val is Exception | RuntimeException;
 }
 
 interface BaseExceptionConstructor extends ExceptionConstructor<Exception> {
@@ -117,6 +119,7 @@ interface ExceptionConstructor<Inst extends Exception = Exception> {
 // ------------------------------
 interface RuntimeException {
   readonly name: "RuntimeException";
+  getName(): 'RuntimeException';
   getMessage(): string;
   getCause(): string;
   getStackTrace(): string;

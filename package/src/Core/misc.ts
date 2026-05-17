@@ -1,14 +1,14 @@
 //* Function
-export function throttle<T, A extends unknown[], R>(func: Func<T, A, R>, ms: number): Func<T, A, R | Missing> {
+export function throttle<T, A extends unknown[], R>(func: Func<T, A, R>, ms: number): Func<T, A, R | null> {
   let timer: ReturnType<typeof setTimeout> | null = null;
   let storedArgs: A | null = null;
   let context: T | null = null;
 
-  return function (this: T, ...rest: A): R | Missing {
+  return function (this: T, ...rest: A): R | null {
     if (timer) {
       storedArgs = rest;
       context = this;
-      return Missing;
+      return null;
     }
 
     // Leading execution
@@ -163,16 +163,27 @@ export function remove(this: string, finder: string | RegExp): string {
   return this.replace(finder, "");
 };
 
+
+
 export function capitalize(this: string): string {
-  const i = this.search(/[a-z]/);
-  return i === -1 ? this : this.slice(0, i) + this.charAt(i).toUpperCase() + this.slice(i + 1);
+  const m = this.match(/^(\s*)([a-z])/);
+  if (
+    !m || 
+    m[0] === undefined || 
+    m[1] === undefined || 
+    m[2] === undefined
+  ) {
+    return this;
+  }
+
+  return m[1] + m[2].toUpperCase() + this.slice(m[0].length);
 };
 
 export function matches(this: String, regexp: string | RegExp): boolean {
   return this.search(regexp) !== -1;
 };
 
-export function toCase(this: string, format: CaseConventions): string {
+export function toCase(this: string, format: String.Case): string {
   const regex = /([\s_-]+)(\S)/g;
   const charRegex = /[\s]+/g;
 

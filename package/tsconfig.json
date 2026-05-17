@@ -1,27 +1,20 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "types": ["node"],
-    "skipLibCheck": true,
-    "tsBuildInfoFile": "./.tsbuildinfo",
-    "skipDefaultLibCheck": false,
-    "rootDir": "../"
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "lib": ["ESNext"],
+    "types": ["node"]
   },
   "include": [
-    "./types/**/*.d.ts",
-    "src/**/*.ts",
-    "types/**/*.d.ts",
     "**/*.ts",
-    "**/*.js",
-    "**/*.d.ts", "../vitest.functions.ts",
+    "**/*.js"
   ],
   "exclude": [
-    "node_modules",
-    "**/node_modules/*/**",
-    "../vitest.base.ts",
-    "dist",
-    "out",
-    "build",
-    "**/.git/**"
+    "src",
+    "tests",
+    "types",
+    "coverage",
+    "dist"
   ]
 }

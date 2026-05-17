@@ -12,7 +12,6 @@
   },
   "cSpell.words": [
     "basicnodes",
-    "broski",
     "canvastext",
     "constructableobjects",
     "evented",
@@ -22,21 +21,7 @@
     "mprescripts",
     "optijs",
     "requestfunc",
-    "TSES",
     "unsync"
-  ],
-  "json.schemas": [
-    {
-      "fileMatch": ["**/assets/*.json"],
-      "schema": {
-        "additionalItems": {
-          "__doc__": "string",
-          "additionalItems": {
-            "type": "string"
-          }
-        }
-      }
-    }
   ],
   "js/ts.tsdk.path": "node_modules\\typescript\\lib",
   "js/ts.tsserver.automaticTypeAcquisition.enabled": false,

@@ -55,7 +55,7 @@ describe("Array.pluck", () => {
 
   it("should gracefully handle errors when the value isn't available", () => {
     const val = arr.pluck(v => typeof v === "function" && v === true);
-    expect(val).toBe(Missing);
+    expect(val).toBe(null);
     expect(arr).toContain(true);
   });
 });
@@ -75,9 +75,8 @@ describe("Array.pluckLast", () => {
 
   it("should return null when the item is not found", () => {
     const val = arr.pluckLast(v => v === 7);
-    expect(val).toBe(Missing);
+    expect(val).toBe(null);
     expect(arr).toStrictEqual([1, true, 3, 4, false, 5]);
-    
   });
 });
 
@@ -116,6 +115,13 @@ describe("Array.relocateTo", () => {
     const arr = ["A", "B", "D", "C"];
     arr.relocateTo(3, 2);
     expect(arr).toStrictEqual(["A", "B", "C", "D"]);
+  });
+
+  it("should return null if it could not find the index specified", () => {
+    const arr = [1, 2, 3, 4];
+    const location = arr.relocateTo(4, 2);
+    expect(arr).toStrictEqual([1, 2, 3, 4]);
+    expect(location).toBe(null);
   });
 });
 

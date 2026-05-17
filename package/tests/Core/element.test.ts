@@ -16,6 +16,12 @@ describe("Element.txt", () => {
     element.textContent = "Hello";
     expect(element.txt()).toBe("Hello");
   });
+
+  it("should be able to set the content based on a function", () => {
+    element.textContent = "Hello";
+    element.txt(original => original + "_World");
+    expect(element.textContent).toBe("Hello_World");
+  });
 });
 
 describe("Element.html", () => {
@@ -28,6 +34,11 @@ describe("Element.html", () => {
   it("should set inner HTML content", () => {
     element.html('<p>Hello</p>');
     expect(element.innerHTML).toBe('<p>Hello</p>');
+  });
+
+  it("should be able to get html content", () => {
+    element.innerHTML = "<p>Hello</p>";
+    expect(element.html()).toBe("<p>Hello</p>");
   });
 });
 
@@ -134,32 +145,29 @@ describe("HTMLElement.css", () => {
   });
 
   it("should be able to handle values that could be 0 accordingly", () => {
-    element.style.fontWeight = "0";
+    element.style.opacity = "0";
     element.style.width = "0px";
 
-    expect(element.css("fontWeight")).toBe(0);
+    expect(element.css("opacity")).toBe(0);
     expect(element.css("width")).toBe(0);
   });
 
   it("should be able to handle invalid cases", () => {
-    const originalComputed = { ...window.getComputedStyle(element) };
-
-    element.css("accentColor", "nothing");
-    element.css("color", 12);
-
+    const original = window.getComputedStyle(element);
+    element.css('accentColor', "nothing");
+    element.css('color', 12);
     const computed = window.getComputedStyle(element);
-
-    expect(computed.accentColor).toBeAnyOf("", undefined, originalComputed.accentColor);
-    expect(computed.color).toBeAnyOf("", undefined, originalComputed.color);
+    expect(computed.accentColor).toBeEither(original.accentColor, "rgba(0, 0, 0, 0)");
+    expect(computed.color).toBeEither(original.color, "rgba(0, 0, 0, 0)");
   });
 
   it("should be able to return computed styles as well", () => {
-    element.style.color = "red";
+    element.style.color = "rgb(254,0,0)";
     element.style.width = "100px";
 
     const styles = element.css(true);
 
-    expect(styles.color).toBe("red");
+    expect(styles.color).toBe("rgb(254, 0, 0)");
     expect(styles.width).toBe("100px");
     expect(styles.display).toBe("block");
   });

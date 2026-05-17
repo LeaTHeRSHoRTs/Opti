@@ -2,51 +2,21 @@ export function ready(callback: (this: Document, ev: Event) => unknown): void {
   document.addEventListener("DOMContentLoaded", callback);
 }
 
+let called = false;
 export function leaving(callback: (this: Document, ev: Event) => unknown): void {
-  const handler = (e: Event) => {
-    // Ensure it only runs once per "leave" action
-    callback.call(document, e);
-  };
+  if (called) return;
 
-  window.addEventListener("beforeunload", handler);
-  window.addEventListener("pagehide", handler);
-  window.addEventListener("unload", handler);
+  function handler(e: Event) {
+    try { callback.call(document, e); }
+    finally { called = true; }
+  }
+
+  if ('onbeforeunload' in window) window.addEventListener('beforeunload', handler, { once: true });
+  if ('onpagehide' in window) window.addEventListener('pagehide', handler, { once: true });
+  document.addEventListener('visibilitychange', (e) => {
+    if (document.visibilityState === 'hidden') handler(e);
+  }, { once: true });
 }
-
-// export function bindShortcut (
-//   shortcut: Shortcut,
-//   callback: (event: ShortcutEvent) => void
-// ): void {
-//   document.addEventListener('keydown', (event: Event) => {
-//     const keyboardEvent = event as ShortcutEvent;
-//     keyboardEvent.keys = shortcut.split("+") as [KeyboardEventKey, KeyboardEventKey, KeyboardEventKey?, KeyboardEventKey?, KeyboardEventKey?];
-
-//     const keys = shortcut
-//       .trim()
-//       .toLowerCase()
-//       .split("+");
-
-//     // Separate out the modifier keys and the actual key
-//     const modifiers = keys.slice(0, -1);
-//     const finalKey = keys[keys.length - 1];
-
-//     const modifierMatch = modifiers.every((key: any) => {
-//       if (key === 'ctrl' || key === 'control') return keyboardEvent.ctrlKey;
-//       if (key === 'alt') return keyboardEvent.altKey;
-//       if (key === 'shift') return keyboardEvent.shiftKey;
-//       if (key === 'meta' || key === 'windows' || key === 'command') return keyboardEvent.metaKey;
-//       return false;
-//     });
-
-//     // Check that the pressed key matches the final key
-//     const keyMatch = finalKey === keyboardEvent.key.toLowerCase();
-
-//     if (modifierMatch && keyMatch) {
-//       callback(keyboardEvent);
-//     }
-//   });
-// }
-
 
 export function documentCss(
   element: keyof HTMLElementTagNameMap
@@ -125,53 +95,4 @@ export function documentCss(
   } catch (err) {
     console.error("Failed to insert CSS rule:", err, { selector, styleString });
   }
-}
-
-export function createElements<T extends HTMLElement>(node: Element.NodeObject): T {
-  const el = document.createElement(node.tag);
-
-  // Add class if provided
-  if (node.class) el.className = node.class;
-
-  // Add text content if provided
-  if (node.text) el.textContent = node.text;
-
-  // Add inner HTML if provided
-  if (node.html) el.innerHTML = node.html;
-
-  // Handle styles, ensure it’s an object
-  if (node.style && typeof node.style === 'object') {
-    for (const [prop, val] of Object.entries(node.style)) {
-      el.style.setProperty(prop, val.toString());
-    }
-  }
-
-  // Handle other attributes (excluding known keys)
-  for (const [key, val] of Object.entries(node)) {
-    if (
-      key !== 'tag' &&
-      key !== 'class' &&
-      key !== 'text' &&
-      key !== 'html' &&
-      key !== 'style' &&
-      key !== 'children'
-    ) {
-      if (typeof val === 'string' && typeof key === "string") {
-        el.setAttribute(key, val);
-      } else throw new globalThis.TypeException("Custom parameters must be of type 'string'");
-    }
-  }
-
-  // Handle children (ensure it's an array or a single child)
-  if (node.children) {
-    if (Array.isArray(node.children)) {
-      node.children.forEach(child => {
-        el.appendChild(createElements(child));
-      });
-    } else {
-      el.appendChild(createElements(node.children)); // Support for a single child node
-    }
-  }
-
-  return el as T;
 }

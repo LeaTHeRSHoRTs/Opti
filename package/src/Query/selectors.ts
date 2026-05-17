@@ -1,4 +1,4 @@
-import { supportsStyles, camelToDash } from "../helpers/helpers";
+import { supportsStyles, camelToDash } from "../helpers";
 import { Internal_QueryPseudoElement } from "./styleElement";
 
 const SIMPLE  = Symbol("SIMPLE");
