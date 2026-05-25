@@ -12,16 +12,21 @@
   },
   "cSpell.words": [
     "basicnodes",
+    "browserlist",
     "canvastext",
     "constructableobjects",
+    "documentalias",
     "evented",
     "flowback",
     "flowclass",
+    "htmlelement",
     "icss",
     "mprescripts",
     "optijs",
     "requestfunc",
-    "unsync"
+    "TSES",
+    "unsync",
+    "voidhtmlelement"
   ],
   "js/ts.tsdk.path": "node_modules\\typescript\\lib",
   "js/ts.tsserver.automaticTypeAcquisition.enabled": false,

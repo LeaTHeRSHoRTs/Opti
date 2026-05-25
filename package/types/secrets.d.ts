@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface EventTarget {
   /** @internal */
-  _events: Record<string, EventListenerInfo<any, any>[]>;
+  _events: Record<string, EventListenerInfo<EventTarget, any>[]>;
 }
 
 /** @internal */

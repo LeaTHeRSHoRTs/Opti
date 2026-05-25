@@ -2,32 +2,28 @@
 ///<reference path="./basicnodes.d.ts" />
 ///<reference path="./elements.d.ts" />
 ///<reference path="./exceptions.d.ts" />
+///<reference path="./documentalias.d.ts" />
 
 interface Crafty {
-  /**
-   * Crafts a HTMLElement that cannot have children
-   */
-  craft<T extends VoidHTMLTag, U extends Crafty.Props<T> = {}>(el: T, props?: U, children?: Crafty.Node[] ): Crafty.VoidHTMLElement<T, U>;
-
-  /**
-   * Crafts a HTMLElement that can have children
-   */
-  craft<T extends Exclude<HTMLTag, VoidHTMLTag>, U extends Crafty.Props<T> = {}>(el: T, props?: U, children?: Crafty.Node[] ): Crafty.HTMLElement<T, U>;
-
-  /**
-   * Crafts an Element from any of the namespaces
-   */
-  craft<N extends Crafty.Namespace, T extends Crafty.TagFromNamespace<N>, U extends Crafty.Props<T> = {}>(namespace: N, el: T, props?: U, children?: Crafty.Node[] ): Crafty.Element<N, T, U>;
-
-  /**
-   * Crafts a Fragment
-   */
-  craft(...children: Crafty.Node[] ): Crafty.Fragment;
-
-  /**
-   * Crafts a Text node
-   */
-  craft(str: string): Crafty.Text;
+  craft<T extends VoidHTMLTag, U extends Crafty.Props<T> = {}>(
+    el: T, 
+    props?: U
+  ): Crafty.VoidHTMLElement<T, U>;
+  craft<T extends Crafty.NormalHTMLTag, U extends Crafty.Props<T> = {}>(
+    el: T, 
+    props?: U, 
+    children?: Crafty.Node[]
+  ): Crafty.HTMLElement<T, U>;
+  craft<N extends Crafty.Namespace, T extends Crafty.TagFromNamespace<N>, U extends Crafty.Props<T> = {}>(
+    namespace: N, 
+    el: T, 
+    props?: U, 
+    children?: Crafty.Node[]
+  ): Crafty.Element<N, T, U>;
+  craft(...children: Arr.Present<Crafty.Node> ): Crafty.Fragment;
+  craft(type: Crafty.TEXT, str: string): Crafty.Text;
+  craft(type: typeof Crafty.HTML, html: string): Crafty.HTML;
+  craft(type: Crafty.COMMENT, comment: string) : Crafty.Comment;
 
   /**
    * Crafts a Node from a HTML string
@@ -60,6 +56,10 @@ interface Crafty {
   Exception: Crafty.ExceptionConstructor;
   ChildrenNotAllowedException: Crafty.ChildrenNotAllowedExceptionConstructor;
   NormalizationException: Crafty.NormalizationExceptionConstructor;
+  
+  readonly COMMENT: unique symbol;
+  readonly TEXT: unique symbol;
+  readonly HTML: unique symbol;
 }
 
 declare var Crafty: Crafty;

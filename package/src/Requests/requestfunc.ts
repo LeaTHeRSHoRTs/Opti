@@ -1,5 +1,3 @@
-/// <reference path="../../../types/modules/Requests/requests.lib.d.ts" />
-
 const _request: RequestFunction = <T = unknown>(typeOrUrl: RequestType | string, urlOrData: string | unknown, dataOrOptions: unknown | RequestInit, options?: RequestInit): Promise<T> => {
   throw new globalThis.NotImplementedException();
 };

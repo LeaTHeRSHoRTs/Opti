@@ -163,8 +163,6 @@ export function remove(this: string, finder: string | RegExp): string {
   return this.replace(finder, "");
 };
 
-
-
 export function capitalize(this: string): string {
   const m = this.match(/^(\s*)([a-z])/);
   if (

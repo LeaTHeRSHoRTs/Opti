@@ -8,9 +8,9 @@ declare namespace Unsync {
   }
 
   interface SetEmitter<T extends Record<string, Class[]> = {}> {
-    on<K extends keyof T, L extends Unboxed<T[K]>>(
+    on<K extends keyof T>(
       ev: K,
-      callback: (...args: L) => void
+      callback: (...args: Unboxed<T[K]>) => void
     ): void;
     off<K extends keyof T>(ev: K): void;
     emit<K extends keyof T>(ev: K, ...args: Unboxed<T[K]>): void;

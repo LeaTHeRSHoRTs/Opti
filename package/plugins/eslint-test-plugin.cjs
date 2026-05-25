@@ -1,4 +1,4 @@
-//@ts-check
+//@ts-ignore
 
 const { AST_NODE_TYPES } = require('@typescript-eslint/utils');
 const fs = require('fs');

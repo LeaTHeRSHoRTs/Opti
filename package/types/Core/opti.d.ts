@@ -3,7 +3,7 @@ type _ = unknown;
 
 /** Used as a placeholder type */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type placeholder = any;
+type placeholder<T = _, U = _, V = _, W = _, X = _, Y = _, Z = _> = any;
 
 /** Represents a key in a key-value object */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -94,7 +94,7 @@ type ValueQueries<T> = T extends Func ? FuncTesters<T>
 type HTMLTag = keyof HTMLElementTagNameMap;
 
 /** Represents a HTML tag that cannot contain children in string format */
-type VoidHTMLTag = "area" | "base" | "br" | "col" | "embed" | "hr" | "img" | "input" | "link" | "meta" | "param" | "source" | "track" | "wbr";
+type VoidHTMLTag = "area" | "base" | "br" | "col" | "embed" | "hr" | "img" | "input" | "link" | "meta" | "source" | "track" | "wbr";
 
 /** Represents a SVG tag in string form */
 type SVGTag = keyof SVGElementTagNameMap;

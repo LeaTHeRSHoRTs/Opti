@@ -102,6 +102,12 @@ declare namespace Boolean {
   type Truthy<T = string | number | boolean | object | symbol | null | undefined> = Exclude<T, Falsy<T>>;
 }
 
+type Tuple<T, L extends number, R extends unknown[] = []> = R['length'] extends L
+  ? R
+  : R['length'] extends 40 // Higher limit for modern TS
+    ? T[] 
+    : Tuple<T, L, [T, ...R]>;
+
 /**
  * The type-only `Tuple` namespace holds Tuple-related utility types 
  * 
@@ -228,4 +234,9 @@ declare namespace Element {
     style?: Record<string, string | number>;
     data?: Record<string, string | number>;
   }
+}
+
+type Arr<T> = [T, ...T[]] | null;
+declare namespace Arr {
+  type Present<T = unknown> = [T, ...T[]];
 }

@@ -1,16 +1,4 @@
 declare namespace Crafty {
-  interface ElementStatic {
-    [Symbol.hasInstance](inst: unknown): inst is Crafty.Element; 
-  }
-
-  interface HTMLElementStatic {
-    [Symbol.hasInstance](inst: unknown): inst is Crafty.HTMLElement; 
-  }
-
-  interface VoidHTMLElementStatic {
-    [Symbol.hasInstance](inst: unknown): inst is Crafty.VoidHTMLElement;
-  }
-
   interface Element<
     N extends Namespace = Namespace, 
     T extends TagFromNamespace<N> = TagFromNamespace<N>, 
@@ -40,7 +28,7 @@ declare namespace Crafty {
     normalize(onMount?: (node: HTMLElementOf<T>) => void): HTMLElementOf<T>;
   }
 
-  interface VoidHTMLElement<T extends HTMLTag = HTMLTag, P extends Props<T> = Props<T>> extends HTMLElement<T, P> {
+  interface VoidHTMLElement<T extends VoidHTMLTag = VoidHTMLTag, P extends Props<T> = Props<T>> extends HTMLElement<T, P> {
     kind: T;
     append(child: Node): never;
     prepend(child: Node): never;

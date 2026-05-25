@@ -1,5 +1,5 @@
 /// <reference path="../../types/Unsync/unsync.lib.d.ts" />
-import { camelToDash, dashToCamel, isEventTarget, parseUnit } from "../helpers";
+import { camelToDash, dashToCamel, isEventTarget, parseUnit, parseTime } from "../helpers";
 
 export function addClass(this: Element, elClass: string): void {
   this.classList.add(elClass);
@@ -219,8 +219,8 @@ export function copy<T extends Element>(this: T, childrenOrObject: boolean | Ele
   const clone = document.createElementNS(this.namespaceURI, this.tagName) as T;
 
   if (options.copyAttributes || options.copyAll) {
-    for (const attr of Array.from(this.attributes)) {
-      if (attr.name === "id" && attr.value !== "") {
+    for (const attribute of Array.from(this.attributes)) {
+      if (attribute.name === "id" && attribute.value !== "") {
         if (!options.fallbackId) {
           console.warn("Fallback ID is not set. Skipping application of ID");
           continue;
@@ -229,7 +229,7 @@ export function copy<T extends Element>(this: T, childrenOrObject: boolean | Ele
         }
       }
       
-      clone.setAttribute(attr.name, attr.value);
+      clone.setAttribute(attribute.name, attribute.value);
     }
   }
 
@@ -284,14 +284,6 @@ export function isVisible(this: HTMLElement): boolean {
   );
 }
 
-function parseTime(value: string) {
-  const [h, m, s] = value.split(":");
-  const [sec, ms] = (s ?? "0").split(".");
-  const date = new Date();
-  date.setHours(+(h || 0), +(m || 0), +(sec || 0), +(ms || 0));
-  return date;
-}
-
 export function val(this: HTMLInputElement): HTMLInputElement.ValueAccessor {
   const self = this;
 
@@ -331,3 +323,8 @@ export function val(this: HTMLInputElement): HTMLInputElement.ValueAccessor {
     }
   };
 };
+
+export function attr<T extends Element, K extends keyof T>(this: T, key: K, value?: T[K]): T[K] | void {
+  if (value)  this[key] = value;
+  else return this[key];
+}

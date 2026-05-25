@@ -1,16 +1,16 @@
 import { dashToCamel, parseUnit } from "../helpers";
 
-export class Internal_QueryPseudoElement<T extends Element> {
-  #parent: T;
+export class _InternalQueryPseudoElement {
+  #parent: Element;
   #type: '::before' | '::after';
 
-  constructor(parent: T, type: '::before' | '::after') {
+  constructor(parent: Element, type: '::before' | '::after') {
     this.#parent = parent;
     this.#type = type;
   }
 
   css(): CSS.Object;
-  css(ket: CSS.PropertyName): string | number | undefined;
+  css(key: CSS.PropertyName): string | number | undefined;
   css(key?: CSS.PropertyName): string | number | undefined | CSS.Object {
     const styles = window.getComputedStyle(this.#parent, this.#type);
 
@@ -38,4 +38,4 @@ export class Internal_QueryPseudoElement<T extends Element> {
   }
 }
 
-Object.defineProperty(Internal_QueryPseudoElement, "name", { value: "QueryStyleElement" });
+Object.defineProperty(_InternalQueryPseudoElement, "name", { value: "QueryStyleElement" });

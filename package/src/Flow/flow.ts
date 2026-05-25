@@ -1,5 +1,5 @@
+import "@flow";
 import { createModuleError, setNameOfGlobalThisProp } from "../helpers";
-
 import * as Flow from "./flowclass";
 
 (function() {

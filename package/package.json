@@ -24,47 +24,18 @@
       "types": "./types/Requests/requests.lib.d.ts"
     }
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/LeaTHeRSHoRTs/Opti.git"
-  },
-  "scripts": {
-    "lint": "npx eslint . --no-cache",
-    "lit:types": "Get-ChildItem -Recurse -Filter 'tsconfig*.json' | Where-Object { $_.FullName -notmatch 'node_modules|dist|build' } | ForEach-Object { npx tsc -p $_.FullName --noEmit }",
-    "test": "npx vitest --watch",
-    "test:ui": "npx vitest --ui",
-    "build": "npx webpack --config config/webpack.config.cjs",
-    "build:cli": "tsc --project ./src/cli/tsconfig.cli.json",
-    "git-push": "ts-node scripts/push.ts",
-    "genCliJson": "ts-node scripts/build-dts-map.ts",
-    "prepublishOnly": "npm run build:cli && npm run build && npm run check && npm run test && npm run git-push"
-  },
-  "babel": {
-    "presets": [
-      "@babel/preset-env"
-    ]
-  },
+  "babel": { "presets": ["@babel/preset-env"] },
   "keywords": [
     "dom",
     "javascript",
     "opti",
     "optijs",
     "utility",
-    "dom-manipulation",
-    "native",
+    "dom manipulation",
     "library",
     "web",
     "frontend"
   ],
-  "author": "LeaTHeR_SHoRTs",
-  "license": "CC-BY-NC-SA-4.0",
-  "bugs": {
-    "url": "https://github.com/LeaTHeRSHoRTs/Opti/issues"
-  },
-  "homepage": "https://github.com/LeaTHeRSHoRTs/Opti",
-  "engines": {
-    "node": ">=14.0.0"
-  },
   "files": [
     "types",
     "dist",
@@ -72,16 +43,10 @@
     "README.md"
   ],
   "devDependencies": {
-    "@stylistic/eslint-plugin": "^5.7.1",
-    "@typescript-eslint/eslint-plugin": "^8.49.0",
-    "@typescript-eslint/parser": "^8.49.0",
     "cross-env": "^7.0.3",
     "eslint": "^9.30.0",
     "fork-ts-checker-webpack-plugin": "^9.1.0",
-    "jiti": "^2.6.1",
     "jsdom": "^27.4.0",
-    "thread-loader": "^3.0.4",
-    "ts-loader": "^9.5.4",
     "tsx": "^4.20.3"
   }
 }

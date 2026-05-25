@@ -178,7 +178,18 @@ declare function Tuple<T extends unknown[]>(...values: T): T;
  * @extends Error
  * @since 1.0.0
  */
-declare var Exception: Exception;
+declare class Exception {
+  constructor(message?: string, cause?: string, name?: string);
+  readonly name: string;
+  getName(): string;
+  getMessage(): string;
+  getCause(): string;
+  getStackTrace(): string;
+  throw(): never;
+  toString(): string;
+  static isException(val: unknown): val is Exception;
+  static isAnyException(val: unknown): val is Exception | RuntimeException;
+}
 
 /**
  * Exception that cannot be caught using `instanceof Exception` or `instanceof Error`
@@ -574,10 +585,23 @@ interface Element {
    * 
    * el.html(html + "<a href='example.com'>Link</a>");
    */
-  html(input?: string): string;
+  html(input: string): void;
+  html(): string;
 
   copy<T extends Element>(this: T, children?: boolean, events?: boolean): T;
   copy<T extends Element>(this: T, options: Element.CopyOptions): T;
+
+  /**
+   * Gets and sets the attributes of an element
+   * @opti
+   * @param key The attribute to get or set
+   * @example
+   * const element = document.$("#target");
+   * const id = element.attr('id');
+   * element.attr('href', "https://example.org");
+   */
+  attr<K extends keyof this>(this: Element, key: K): this[K];
+  attr<K extends keyof this>(this: Element, key: K, value: this[K]): void;
 }
 
 interface HTMLElement {
@@ -596,9 +620,9 @@ interface HTMLElement {
    * console.log(el.css());
    */
   css(key: CSS.PropertyName, value: string | number | null): void;
-  css(key: CSS.PropertyName): string | number;
+  css(key: CSS.PropertyName): string | number | null;
+  css(key: string): string | number | null;
   css(key: CSS.Object): void;
-  css(computed: true): CSS.Object;
   css(): CSS.Object;
 
   /**

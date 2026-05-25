@@ -1,12 +1,12 @@
 export class SetEmitter<T extends Record<string, Class[]>> {
-  #eventMap: { [K in keyof T]?: ((...args: never[]) => void)[] } = {};
+  #eventMap: { [K in keyof T]?: ((...args: Unboxed<T[K]>) => void)[] } = {};
   #restricted: T;
 
   constructor(obj: T) {
     this.#restricted = obj;
   }
 
-  on<K extends keyof T, L extends Unboxed<T[K]>>(ev: K, callback: (...args: L) => void): void {
+  on<K extends keyof T>(ev: K, callback: (...args: Unboxed<T[K]>) => void): void {
     if (!this.#restricted[ev]) throw new Unsync.InvalidRegistrationException(`Cannot register event ${ev.toString()}, as it does not exist in the event map.`);
     const list = this.#eventMap[ev] ?? [];
     list.push(callback);

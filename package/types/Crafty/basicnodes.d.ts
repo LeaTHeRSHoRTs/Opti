@@ -1,26 +1,4 @@
 declare namespace Crafty {
-  // Statics
-  interface NodeStatic {
-    [Symbol.hasInstance](inst: unknown): inst is Crafty.Node;
-  }
-
-  interface FragmentStatic {
-    [Symbol.hasInstance](inst: unknown): inst is Crafty.Fragment;
-  }
-
-  interface TextStatic {
-    [Symbol.hasInstance](inst: unknown): inst is Crafty.Text;
-  }
-
-  interface UnknownStatic {
-    [Symbol.hasInstance](inst: unknown): inst is Crafty.Unknown;
-  }
-
-  interface CommentStatic {
-    [Symbol.hasInstance](inst: unknown): inst is Crafty.Comment;
-  }
-
-  // Instance types
   interface Node {
     readonly kind: Crafty.NodeKind;
     parent(): Node | null;
@@ -28,15 +6,13 @@ declare namespace Crafty {
     wrap<U extends HTMLTag>(tag: U): HTMLElement<U, {}>;
     wrap<N extends Namespace, U extends TagFromNamespace<N>>(namespace: N, tag: U): Element<N, U, {}>;
     clone(): this;
-
-    html(): string;
     txt(): string;
     txt(text: string): void;
     txt(fn: (original: string) => string): void;
   }
 
   interface Parent<T extends Node = Node> {
-    children: T[];
+    children(): T[];
     append(child: T): void;
     prepend(child: T): void;
   }
@@ -47,7 +23,11 @@ declare namespace Crafty {
     isEmpty(): this is Fragment & { children: [] };
   }
 
-  interface Text extends Node {
+  interface Html extends Node {
+    html(): string;
+  }
+
+  interface Text extends Html {
     readonly kind: 'text';
     readonly length: number;
     txt(): string;

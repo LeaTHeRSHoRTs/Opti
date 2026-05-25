@@ -1,3 +1,4 @@
+import "@query";
 import { createModuleError } from "../helpers";
 import { Internal_Query } from "./class";
 import * as QueryImpl from "./selectors";

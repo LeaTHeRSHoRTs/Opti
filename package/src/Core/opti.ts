@@ -81,6 +81,7 @@ Element.prototype.addClass = Elements.addClass;
 Element.prototype.removeClass = Elements.removeClass;
 Element.prototype.toggleClass = Elements.toggleClass;
 Element.prototype.hasClass = Elements.hasClass;
+Element.prototype.attr = Elements.attr;
 
 HTMLElement.prototype.css = Elements.css;
 HTMLElement.prototype.show = Elements.show;

@@ -1,11 +1,13 @@
+import _InternalHTML from "./html";
 import _InternalNode from "./node";
 
-export default class Internal_Text extends _InternalNode implements Crafty.Text {
-  public readonly kind: "text" = "text";
+export default class Internal_Text extends _InternalHTML implements Crafty.Text {
+  public override readonly kind: "text" = "text";
   #text: string;
   public get length(): number {
     return this.#text.length;
   };
+
   constructor(text: string) {
     super();
     this.#text = text;
@@ -28,13 +30,8 @@ export default class Internal_Text extends _InternalNode implements Crafty.Text 
     return this.txt();
   }
 
-  normalize(onMount?: (node: globalThis.Text) => void): globalThis.Text {
+  normalize(): globalThis.Text {
     const node = document.createTextNode(this.#text);
-    onMount?.(node);
     return node;
-  }
-
-  static [Symbol.hasInstance](inst: unknown): inst is Internal_Text {
-    return Function.prototype[Symbol.hasInstance].call(this, inst);
   }
 }

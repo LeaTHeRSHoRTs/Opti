@@ -1,3 +1,4 @@
+import "@request";
 import { createModuleError } from "../helpers";
 import * as Impl from "./requestfunc";
 

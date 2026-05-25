@@ -38,7 +38,6 @@ export function setNotEnumerable<T, K extends keyof T>(obj: T, prop: K, val: T[K
   });
 }
 
-
 export function setNameOfGlobalThisProp(cls: Stringed<keyof GlobalThis>): void {
   Object.defineProperty(globalThis[cls], "name", { value: cls });
 }
@@ -46,7 +45,6 @@ export function setNameOfGlobalThisProp(cls: Stringed<keyof GlobalThis>): void {
 export function setPropName<T, K extends Stringed<keyof T>>(cls: T, prop: K): void {
   Object.defineProperty(cls[prop], "name", { value: prop });
 }
-
 
 export function setGetter<T>(
   object: T,
@@ -84,6 +82,14 @@ export function dashToCamel(str: string): string {
 
 export function camelToDash(str: string): string {
   return str.replace(/[A-Z]/g, m => '-' + m.toLowerCase());
+}
+
+export function parseTime(value: string): Date {
+  const [h, m, s] = value.split(":");
+  const [sec, ms] = (s ?? "0").split(".");
+  const date = new Date();
+  date.setHours(+(h || 0), +(m || 0), +(sec || 0), +(ms || 0));
+  return date;
 }
 
 export function mixin<T extends Func>(

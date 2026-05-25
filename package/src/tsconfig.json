@@ -1,5 +1,14 @@
 {
-  "extends": "../tsconfig.base.json",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "paths": {
+      "@crafty":  ["../types/Crafty/crafty.lib.d.ts"],
+      "@query":   ["../types/Query/query.lib.d.ts"],
+      "@request": ["../types/Requests/requests.lib.d.ts"],
+      "@unsync":  ["../types/Unsync/unsync.lib.d.ts"],
+      "@flow":    ["../types/Flow/flow.lib.d.ts"]
+    }
+  },
   "include": [
     "**/*.ts",
     "../types/Core/opti.lib.d.ts",

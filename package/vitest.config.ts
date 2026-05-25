@@ -21,6 +21,7 @@ export default defineConfig({
     include: ["tests/**/*.test.ts"],
     setupFiles: [path.resolve(import.meta.dirname, "../vitest.setup.ts")]
   },
+  server: { fs: { allow: ["../"] } },
   resolve: {
     alias: [
       { find: 'opti/crafty', replacement: path.resolve(import.meta.dirname, './src/Crafty/crafty.ts') },

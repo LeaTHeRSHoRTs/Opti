@@ -89,21 +89,6 @@ interface Future<T, R extends Error | Exception = Error> extends Promise<T> {
 }
 
 //* Exceptions
-//@ts-ignore
-declare class Exception {
-  //@ts-ignore
-  constructor(message?: string, cause?: string, name?: string): Exception;
-  readonly name: string;
-  getName(): string;
-  getMessage(): string;
-  getCause(): string;
-  getStackTrace(): string;
-  throw(): never;
-  toString(): string;
-  static isException(val: unknown): val is Exception;
-  static isAnyException(val: unknown): val is Exception | RuntimeException;
-}
-
 interface BaseExceptionConstructor extends ExceptionConstructor<Exception> {
   isException(ctor: Class): ctor is ExceptionConstructor;
   isAnyException(ctor: Class): ctor is ExceptionConstructor | RuntimeExceptionConstructor;

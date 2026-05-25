@@ -5,16 +5,16 @@ export default class Internal_Fragment extends _InternalNode implements Crafty.F
   public kind: 'fragment' = "fragment";
 
   isEmpty(): this is Crafty.Fragment & { children: [] } {
-    return this.children.length <= 0;
+    return this._children.length <= 0;
   }
 
-  override wrap<U extends HTMLTag>(tag: U): Crafty.HTMLElement<U, {}>;
+  override wrap<U extends Exclude<HTMLTag, VoidHTMLTag>>(tag: U): Crafty.HTMLElement<U, {}>;
   override wrap<N extends Crafty.Namespace, U extends Crafty.TagFromNamespace<N>>(namespace: N, tag: U): Crafty.Element<N, U, {}>;
-  override wrap(nsOrTag: Crafty.Namespace | HTMLTag, tag?: string): Crafty.Element<Crafty.Namespace, string, {}> {
+  override wrap(nsOrTag: Crafty.Namespace | Exclude<HTMLTag, VoidHTMLTag>, tag?: string): Crafty.Element<Crafty.Namespace, string, {}> {
     if (isHTMLTag(nsOrTag)) {
-      return Crafty.craft(nsOrTag, {}, this.children);
+      return Crafty.craft(nsOrTag, {}, this._children);
     } else if (tag) {
-      return Crafty.craft(nsOrTag, tag, {}, this.children);
+      return Crafty.craft(nsOrTag, tag, {}, this._children);
     } else {
       throw new Crafty.Exception("parameter tag must be provided when wrapping");
     }
@@ -22,7 +22,7 @@ export default class Internal_Fragment extends _InternalNode implements Crafty.F
 
   normalize(): DocumentFragment {
     const frag = document.createDocumentFragment();
-    const subchildren = this.children.map(v => v.normalize());
+    const subchildren = this._children.map(v => v.normalize());
 
     for (const child of subchildren) {
       frag.append(child);

@@ -1,21 +1,35 @@
+import "@crafty";
 import { isHTMLTag, isVoidHTMLTag } from "./helpers";
 import _InternalException, { _InternalChildrenNotAllowedException, _InternalNormalizationError } from "./exceptions";
 import _InternalNode from "./node";
+import _InternalHtml from "./html";
 import _InternalText from "./text";
 import _InternalFragment from "./fragment";
 import _InternalComment from "./comment";
-import { _InternalElement, _InternalHTMLElement, _InternalVoidHTMLElement } from "./element";
+import _InternalElement from "./element";
+import _InternalHTMLElement from "./htmlelement";
+import _InternalVoidHTMLElement from "./voidhtmlelement";
 
 export class _InternalCrafty {
   private constructor() {}
-  public static craft(
-    first: string | Crafty.Node,
-    second?: string | Crafty.Props<string> | Crafty.Node,
-    third?: Crafty.Props<string> | Crafty.Node | Crafty.Node[],
-    ...fourth: Crafty.Node[]
-  ): Crafty.Node {
-    if (typeof first === 'string' && second === undefined) {
-      return new _InternalText(first);
+
+  public static craft<T extends VoidHTMLTag, U extends Crafty.Props<T> = {}>(el: T, props?: U, children?: Crafty.Node[] ): Crafty.VoidHTMLElement<T, U>;
+  public static craft<T extends Crafty.NormalHTMLTag, U extends Crafty.Props<T> = {}>(el: T, props?: U, children?: Crafty.Node[] ): Crafty.HTMLElement<T, U>;
+  public static craft<N extends Crafty.Namespace, T extends Crafty.TagFromNamespace<N>, U extends Crafty.Props<T> = {}>(namespace: N, el: T, props?: U, children?: Crafty.Node[] ): Crafty.Element<N, T, U>;
+  public static craft(...children: Arr.Present<Crafty.Node> ): Crafty.Fragment;
+  public static craft(type: Crafty.COMMENT, comment: string) : Crafty.Comment;
+  public static craft(type: Crafty.TEXT, str: string): Crafty.Text;
+  public static craft(type: Crafty.HTML, html: string): Crafty.Html;
+  public static craft(...args: unknown[]): Crafty.Node {
+    const first = args[0];
+    const second = args[1];
+    const third = args[2];
+    const fourth = args.splice(3) as Crafty.Node[];
+
+    switch (first) {
+      case Crafty.TEXT : return new _InternalText(second as string);
+      case Crafty.HTML : return new _InternalHtml(second as string);
+      case Crafty.COMMENT : return new _InternalComment(second as string);
     }
 
     // : Crafty.HTMLElement
@@ -45,7 +59,7 @@ export class _InternalCrafty {
 
     const rawNodes = [first, second, third, ...fourth];
     const cleanNodes = rawNodes.filter(
-      (v): v is Crafty.Node => v !== undefined && typeof v !== 'string' && !v.toString().includes('Object')
+      (v): v is Crafty.Node => v !== undefined && v !== null && typeof v !== 'string' && !v.toString().includes('Object')
     );
 
     return new _InternalFragment(...cleanNodes);
@@ -62,7 +76,7 @@ export class _InternalCrafty {
       frag.html();
       return frag;
     } else {
-      return (_InternalCrafty.craft as typeof Crafty.craft)();
+      return _InternalCrafty.craft(Crafty.TEXT, arg as string);
     }
   }
 

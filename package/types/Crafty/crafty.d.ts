@@ -15,5 +15,11 @@ declare namespace Crafty {
     id?: string,
     name?: string,
     css?: Partial<WritableOnly<Only<CSSStyleDeclaration, string | number>>>
-  } & Partial<Pick<HTMLElementOf<T>, AccessorKeys<HTMLElementOf<T>>>>;
+  } & Partial<Pick<HTMLElementOf<T>, Object.Properties<HTMLElementOf<T>>>>;
+
+  type COMMENT = typeof Crafty.COMMENT;
+  type TEXT = typeof Crafty.TEXT;
+  type HTML = typeof Crafty.HTML;
+
+  type NormalHTMLTag = Exclude<HTMLTag, VoidHTMLTag>;
 }

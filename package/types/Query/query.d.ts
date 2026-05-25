@@ -7,7 +7,7 @@ declare namespace Query {
 
     assert<T extends HTMLTag>(selector: string, tag: T): HTMLElementOf<T> | null;
 
-    query(): QueryBuilder;
+    query(): Query.Builder;
 
     tear<T extends HTMLTag>(selector: T): HTMLElementOf<T> | null;
     tear(selector: string): HTMLElement;
@@ -26,7 +26,7 @@ declare namespace Query {
 
     assert(selector: string): <T extends HTMLTag>(tag: T) => HTMLElementOf<T>[];
 
-    query(): QueryBuilder;
+    query(): Query.Builder;
 
     tear<T extends HTMLTag>(selector: T): HTMLElementOf<T>[];
     tear(selector: string): HTMLElement[];

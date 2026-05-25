@@ -1,6 +1,6 @@
 import { _InternalChildrenNotAllowedException } from "./exceptions";
 import _InternalNode from "./node";
-import Internal_Text from "./text";
+import _InternalText from "./text";
 
 const NamespaceMap = {
   html: null,
@@ -9,7 +9,7 @@ const NamespaceMap = {
   mathml: "http://www.w3.org/1998/Math/MathML",
 } as const;
 
-export class _InternalElement<
+export default class _InternalElement<
   N extends Crafty.Namespace = Crafty.Namespace,
   T extends Crafty.TagFromNamespace<N> = Crafty.TagFromNamespace<N>,
   P extends Crafty.Props<T> = Crafty.Props<T>,
@@ -17,23 +17,32 @@ export class _InternalElement<
   public readonly namespaceURI: N;
   public readonly kind: "element" | HTMLTag = "element";
   public readonly tag: T;
-  #props: P;
   public id: P["id"] | undefined;
   public classList: P["classes"] | [];
+
+  #props: P;
+  #children: Crafty.Node[];
   
   constructor(namespace: N, tag: T, props: P = {} as P, children?: Crafty.Node[]) {
-    super(...(children ?? []));
+    super();
     this.namespaceURI = namespace;
     this.tag = tag;
     this.classList = (props.classes ?? []) as P["classes"] | [];
+    this.#children = children ?? [];
     this.#props = props;
     if (!this.#props.classes) {
       this.#props.classes = [];
     }
-    assert(this.#props.classes !== undefined);
   }
 
-  attr<K extends keyof Omit<P, "css">>(prop: K): P[K] {
+  attr<K extends keyof Omit<P, "css">>(prop: K): P[K];
+  attr<K extends keyof Omit<P, "css">>(prop: K, value: P[K] | null): void;
+  attr<K extends keyof Omit<P, "css">>(prop: K, value?: P[K] | null): P[K] | void {
+    if (value) {
+      this.#props[prop] = value;
+      return;
+    }
+
     return this.#props[prop];
   }
 
@@ -42,24 +51,24 @@ export class _InternalElement<
   txt(fn: (origin: string) => string): void;
   txt(fnOrText?: ((origin: string) => string) | string): string | void {
     if (!fnOrText) {
-      return this.children
-        .filter(n => n instanceof Internal_Text)
+      return this.#children
+        .filter(n => n instanceof _InternalText)
         .map(n => n.txt())
         .join('');
     }
 
-    const current = this.children
-      .filter(n => n instanceof Internal_Text)
+    const current = this.#children
+      .filter(n => n instanceof _InternalText)
       .map(n => n.txt())
       .join('');
 
-    const next =typeof fnOrText === 'function'
+    const next = typeof fnOrText === 'function'
       ? fnOrText(current)
       : fnOrText;
 
-    this.children = this.children.filter(n => !(n instanceof Internal_Text));
+    this.#children = this.#children.filter(n => !(n instanceof _InternalText));
 
-    this.children.push(new Internal_Text(next));
+    this.#children.push(new _InternalText(next));
   }
 
   normalize(): Crafty.NamespaceElementOf<N> {
@@ -71,7 +80,7 @@ export class _InternalElement<
       }
     });
 
-    el.append(...(this.children.map(c => c.normalize())));
+    el.append(...(this.#children.map(c => c.normalize())));
 
     return el as Crafty.NamespaceElementOf<N>;
   }
@@ -104,51 +113,21 @@ export class _InternalElement<
     }
   }
 
-  static [Symbol.hasInstance](inst: unknown): inst is _InternalElement {
-    return Function.prototype[Symbol.hasInstance].call(this, inst);
+  append(...nodes: Arr.Present<_InternalNode>): void {
+    nodes.forEach(n => n._parent = this);
+    this.#children.push(...nodes);
+  }
+
+  prepend(...nodes: Arr.Present<_InternalNode>): void {
+    nodes.forEach(n => n._parent = this);
+    this.#children.unshift(...nodes);
+  }
+
+  children(): Crafty.Node[] {
+    return this.#children;
+  }
+
+  hasClass(cls: string): boolean {
+    return this.#props.classes?.includes(cls) ?? false;
   }
 };
-
-export class _InternalHTMLElement<
-  T extends HTMLTag,
-  P extends Crafty.Props<T> = Crafty.Props<T>,
-> extends _InternalElement<"html", T, P> implements Crafty.HTMLElement<T, P> {
-
-  constructor(tag: T, props?: P, children?: Crafty.Node[]) {
-    super("html", tag, props, children);
-  }
-  public kind: T = this.tag;
-
-  css(): P["css"];
-  css<K extends keyof P["css"]>(key: K): P["css"][K];
-  css<K extends keyof P["css"], V extends P["css"][K]>(key: K, value: V): void;
-  css<K extends keyof P["css"], V extends P["css"][K]>(key?: K, value?: V): void | P["css"] | P["css"][K] {
-    throw new NotImplementedException("Method not implemented.");
-  }
-
-  normalize(): HTMLElementOf<T> {
-    return super.normalize() as HTMLElementOf<T>;
-  }
-
-  static [Symbol.hasInstance](inst: unknown): inst is _InternalHTMLElement<HTMLTag> {
-    return Function.prototype[Symbol.hasInstance].call(this, inst);
-  }
-};
-
-export class _InternalVoidHTMLElement<T extends HTMLTag, P extends Crafty.Props<T> = Crafty.Props<T>> extends _InternalHTMLElement<T, P> implements Crafty.VoidHTMLElement<T, P> {
-
-  constructor(tag: T, props?: P) {
-    super(tag, props, []);
-  }
-
-  append(_: Crafty.Node): never {
-    throw new _InternalChildrenNotAllowedException("VoidHTMLElements are auto closing elements and therefore cannot have children");
-  }
-  prepend(_: Crafty.Node): never {
-    throw new _InternalChildrenNotAllowedException("VoidHTMLElements are auto closing elements and therefore cannot have children");
-  }
-
-  static [Symbol.hasInstance](inst: unknown): inst is _InternalVoidHTMLElement<HTMLTag> {
-    return Function.prototype[Symbol.hasInstance].call(this, inst);
-  }
-}
