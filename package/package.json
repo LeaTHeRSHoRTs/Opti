@@ -24,7 +24,11 @@
       "types": "./types/Requests/requests.lib.d.ts"
     }
   },
-  "babel": { "presets": ["@babel/preset-env"] },
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ]
+  },
   "keywords": [
     "dom",
     "javascript",
@@ -43,9 +47,12 @@
     "README.md"
   ],
   "devDependencies": {
+    "@stylistic/eslint-plugin": "^3.1.0",
+    "@testing-library/jest-dom": "^6.9.1",
     "cross-env": "^7.0.3",
     "eslint": "^9.30.0",
     "fork-ts-checker-webpack-plugin": "^9.1.0",
+    "globals": "^14.0.0",
     "jsdom": "^27.4.0",
     "tsx": "^4.20.3"
   }

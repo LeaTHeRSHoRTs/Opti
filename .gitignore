@@ -1,17 +1,16 @@
-# Node
+# Node & General
 **/node_modules
 .env
+/.idea
+/coverage
 
 # Generated
 **/dist
 **/bin
 
-# Vscode
-**/.vscode
-
 # Logs
 **/*.log
 
-# Ideas
+# Others
 **/_*.*
 _*/

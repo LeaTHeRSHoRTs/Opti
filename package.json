@@ -16,33 +16,36 @@
   ],
   "sideEffects": true,
   "devDependencies": {
-    "@stylistic/eslint-plugin": "^5.10.0",
+    "@stylistic/eslint-plugin": "^3.1.0",
     "@types/node": "^22.19.19",
     "@vitest/coverage-v8": "^4.1.3",
     "@vitest/ui": "^4.1.5",
     "eslint": "^10.2.0",
     "jsdom": "^29.1.1",
     "node": "^22.22.3",
+    "ts-loader": "^9.6.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.59.0",
     "vite-tsconfig-paths": "^6.1.1",
-    "vitest": "^4.1.3"
+    "vitest": "^4.1.3",
+    "webpack-cli": "^7.2.2"
   },
   "scripts": {
     "package:test": "vitest --watch --root package/tests",
     "package:lint": "cd package && npx eslint . --no-cache",
     "package:check": "tsc --noEmit -p ./package/src/tsconfig.json && tsc --noEmit -p ./package/tests/tsconfig.json && tsc --noEmit -p ./package/types/tsconfig.json && tsc --noEmit -p tsconfig.json",
-    "package:build": "webpack --config ./package/config/webpack.config.cjs",
-
+    "package:build": "webpack --config ./package/webpack.config.cjs",
     "cli:test": "",
     "cli:lint": "eslint cli --config cli/eslint.config.js --no-cache",
     "cli:build": "",
-
     "push": "node ./package/scripts/push.ts",
-    "prepublishOnly": "npm run build && npm run lint && npm run test && npm run git-push"
+    "prepublishOnly": "npm run package:build && npm run package:lint"
   },
   "engines": {
     "node": ">=23.0.0"
+  },
+  "dependencies": {
+    "@vitest/coverage-istanbul": "^4.1.10"
   }
 }

@@ -4,7 +4,8 @@
  * @version 1.0.0
  * All definition files use the `@opti` tag to represent things that were added by Opti
  */
-/// <reference path="./opti.d.ts" />
+/// <reference path="./types.d.ts" />
+/// <reference path="./type.d.ts" />
 /// <reference path="./namespaced.d.ts" />
 /// <reference path="./deprecation.d.ts" />
 /// <reference path="./alterations.d.ts" />
@@ -86,11 +87,11 @@ declare function assert(condition: boolean): asserts condition;
  * isEmpty([1, 2]); // false
  * ```
  */
+declare function isEmpty<T>(val: T[]): val is T[] & { length: 0 };
 declare function isEmpty(val: string): val is "";
 declare function isEmpty(val: number): boolean;
 declare function isEmpty(val: boolean): val is false;
 declare function isEmpty(val: null | undefined): true;
-declare function isEmpty<T>(val: T[]): val is T[] & { length: 0 };
 declare function isEmpty<K extends Key>(val: Record<K, unknown>): val is Record<K, never>;
 declare function isEmpty<K extends Key>(val: Map<K, unknown>): val is Map<K, never>;
 declare function isEmpty(val: Set<unknown>): val is Set<never>;
@@ -148,7 +149,7 @@ declare function sleep(ms: number): Future<void, NumberTooSmallException>;
  * }
  * ```
  */
-declare function Enum<const T extends readonly string[]>(...values: T): EnumInstance<T>;
+declare function Enum<const T extends Arr.ReadonlyPresent<string>>(...values: T): EnumInstance<T>;
 
 /**
  * Creates a tuple of values from a spread provided. Used for tuple inference where literal arrays are widened to `T[]` instead of inferring a tuple type.
@@ -166,7 +167,7 @@ declare function Enum<const T extends readonly string[]>(...values: T): EnumInst
  * myTuple[1] = 3;         // Valid
  * ```
  */
-declare function Tuple<T extends unknown[]>(...values: T): T;
+declare function Tuple<T extends Arr.Present>(...values: T): T;
 
 //-------------------------------------    Exceptions     -------------------------------------
 
@@ -180,14 +181,29 @@ declare function Tuple<T extends unknown[]>(...values: T): T;
  */
 declare class Exception {
   constructor(message?: string, cause?: string, name?: string);
+  /** The name of the exception */
   readonly name: string;
+  /** Gets the name of the exception */
   getName(): string;
+  /** Gets the exceptions's message, if any */
   getMessage(): string;
+  /** Gets the exception's cause, if any */
   getCause(): string;
+  /** Get the exception's stack trace */
   getStackTrace(): string;
+  /** Rethrows the exception */
   throw(): never;
+  /** Returns a string representation of the exception */
   toString(): string;
+  /** 
+   * Checks if an object is an exception 
+   * @param val The value to check
+   */
   static isException(val: unknown): val is Exception;
+  /** 
+   * Checks if an object is an exception or runtime exception
+   * @param val The value to check
+   */
   static isAnyException(val: unknown): val is Exception | RuntimeException;
 }
 
@@ -288,46 +304,6 @@ declare var NumberException: NumberExceptionConstructor;
 declare var NumberTooSmallException: NumberTooSmallExceptionConstructor;
 
 /**
- * Exception for all decorator-related errors
- * @opti
- * @extends Exception
- * @since 1.0.0
- */
-declare var DecoratorException: DecoratorExceptionConstructor;
-
-  /**
-   * Exception for all decorator-related errors
-   * @opti
-   * @extends DecoratorException
-   * @since 1.0.0
-   */
-  declare var IncorrectDecoratorPlacementException: IncorrectDecoratorPlacementExceptionConstructor;
-
-  /**
-   * Exception for all `@Abstract` decorator related errors
-   * @opti
-   * @extends DecoratorException
-   * @since 1.0.0
-   */
-  declare var AbstractException: AbstractExceptionConstructor;
-
-    /**
-     * Exception for when `@Abstract` marked classes are attempted to be constructed
-     * @opti
-     * @extends AbstractException
-     * @since 1.0.0
-     */
-    declare var AbstractInitializationException: AbstractInitializationExceptionConstructor;
-
-    /**
-     * Exception for when a `@Abstract` method is attempted to be invoked
-     * @opti
-     * @extends AbstractException
-     * @since 1.0.0
-     */
-    declare var AbstractMethodInvokedException: AbstractMethodInvokedExceptionConstructor;
-
-/**
  * Exception for when a fetch request fails unexpectedly (not handled in the .catch block of the returned promise)
  * @opti
  * @extends Exception
@@ -357,6 +333,8 @@ declare var Registries: RegistryManifest;
  */
 declare var Future: FutureConstructor;
 
+declare var Type: TypeStatic;
+
 /**
  * The `Opti` object provides information about the `opti` module
  * @property
@@ -368,6 +346,8 @@ declare var Opti: Opti;
 interface Document {
   /** 
    * Adds, edits and returns the element's css on the document stylesheet.
+   * @param selector The css selector
+   * @param object The object that sets the styles for the selector specified in `selector`
    * @opti
    * @example
    * document.css("#target", {
@@ -376,7 +356,7 @@ interface Document {
    * })
    */
   css(
-    element: keyof HTMLElementTagNameMap
+    selector: keyof HTMLElementTagNameMap
   ): Partial<Record<keyof CSSStyleDeclaration, string>>;
   css(
     element: keyof HTMLElementTagNameMap,
@@ -431,7 +411,7 @@ interface Node {
    * 
    * console.log("Target: " + target);
    */
-  parent(this: ChildNode): ParentNode | null;
+  getParent(this: ChildNode): ParentNode | null;
 
   /** 
    * Gets the ancestor of the node by the amount of levels specified
@@ -443,7 +423,7 @@ interface Node {
    * const text = document.createTextNode("Element Text");
    * const text = el.getAncestor(1);
    */
-  ancestor(this: Node, level: number): ParentNode | null;
+  getAncestor(this: Node, level: number): ParentNode | null;
   /** 
    * Gets the element's ancestor based on a css selector
    * @opti
@@ -453,21 +433,19 @@ interface Node {
    * const el = document.$("#child");
    * const target = el.getAncestor("#parent");
    */
-  ancestor<T extends Element>(this: Element, selector: string): T | null;
+  getAncestor<T extends Element>(this: Element, selector: string): T | null;
 
   /**
    * Gets the siblings of the node and, if 'inclusive' is true, includes itself in the list
    * @opti
-   * @param inclusive If the list should include itself
+   * @param inclusive If the list should include itself. Defaults to `false`
    * @example
    * const el = document.$("#target").getSiblings(true);
    * 
    * el.forEach((sibling, i) => console.log("Sibling " + i + ": " + sibling));
    */
-  siblings(this: Node, inclusive?: boolean): Node[];
-}
+  getSiblings(this: Node, inclusive?: boolean): Node[];
 
-interface ParentNode {
   /**
    * Gets all the children of the node
    * @opti
@@ -571,7 +549,7 @@ interface Element {
    * console.log(el.txt()); // Logs "textContent Yelp"
    */
   txt(modifier: (text: string) => string): void;
-  txt(newText: string, ...moreText: string[]): void;
+  txt(...newText: Arr.Present<string>): void;
   txt(): string;
 
   /**
@@ -588,7 +566,12 @@ interface Element {
   html(input: string): void;
   html(): string;
 
-  copy<T extends Element>(this: T, children?: boolean, events?: boolean): T;
+  /**
+   * Copies an element
+   * @param children Whether children should be copied as well
+   * @param options The options that determine what is copied
+   */
+  copy<T extends Element>(this: T, children?: boolean): T;
   copy<T extends Element>(this: T, options: Element.CopyOptions): T;
 
   /**
@@ -635,21 +618,6 @@ interface HTMLElement {
    */
   readonly tag: HTMLTag;
 
-  // /**
-  //  * Creates a HTML element animation that animates into the css properties specified
-  //  * @opti
-  //  * @param styles The css styles to ease into
-  //  * @param duration The amount of time the animation should take
-  //  * @param easing The easing to apply
-  //  * @param finished The function to run when the animation is done
-  //  * @example
-  //  * document.$("#target").animate({
-  //  *   paddingLeft: "+=75px",
-  //  *   width: "75%"
-  //  * }, 5000, "ease-out", () => console.log("Done!"));
-  //  */
-  // animate(styles: object, duration: number, easing?: AnimationEasing, finished: () => any): void;
-
   /**
    * Shows an element
    * @opti
@@ -688,10 +656,17 @@ interface HTMLElement {
 }
 
 interface HTMLFormElement {
+  /**
+   * Serializes all the form's data into a string
+   * @returns A string representation of the data in a form
+   */
   serialize(): string;
 }
 
 interface HTMLInputElement {
+  /**
+   * An object providing value parsing capabilities
+   */
   val: HTMLInputElement.ValueAccessor;
 }
 
@@ -761,28 +736,15 @@ interface HTMLCollection {
 
 interface DateConstructor {
   /** 
-   * Returns an absolute number of time from January 1, 1970 
+   * Returns the milliseconds from January 1, 1970 to the date specified
    * @opti
    */
   at(year: number, monthIndex: number, date?: number, hours?: number, minutes?: number, seconds?: number, ms?: number): number;
-
-  /**
-   * Returns a date object by using a time object
-   * @opti
-   * @param time The time object
-   * @param year The year to use
-   * @param monthIndex The month to use, by index
-   * @param date The date, by number
-   * @example
-   * const time = new Time();
-   * const newDate = Date.fromTime(time, 2025, 4, 28);
-   */
-  fromTime(this: DateConstructor, time: Time, year: number, monthIndex: number, date?: number): Date;
 }
 
 interface Math {
   /** 
-   * Returns a pseudorandom number between 0 and max.
+   * Returns a pseudorandom number between `min` and `max`. `min` is 0 if not specified
    * @opti
    * @param max the maximum random number 
    */
@@ -795,7 +757,7 @@ interface ObjectConstructor {
    * Clones an object
    * @opti
    * @param object The object to clone
-   * @param deep Wether the clone should be deep or not
+   * @param deep Whether the clone should be deep or not
    * @example
    * class Example {
    *   exampleVal = 2;
@@ -836,7 +798,7 @@ interface Number {
    *   console.log("Time " + (i + 1));
    * });
    */
-  repeat(iterator: (i: number) => void): void;
+  repeat(iterator: Func.Consumer<number>): void;
 }
 
 interface Array<T> {
@@ -847,7 +809,7 @@ interface Array<T> {
    * const newArr = [1, 2, 3, 3, 4].unique();
    * console.log(newArr); // [1, 2, 3, 4]
    */
-  unique(this: T[]): T[];
+  unique(): T[];
   /**
    * Separates an array into an array of arrays, with each subarray of a defined size
    * @opti
@@ -856,16 +818,19 @@ interface Array<T> {
    * const newArr = [1, 2, 3, 3, 4].chunk(2);
    * console.log(newArr); // [[1, 2], [3, 3], [4]]
    */
-  chunk(this: T[], size: number): T[][];
+  chunk(size: number): T[][];
 
   /**
-   * Takes a found value out of an array and returns it.
+   * Takes a value out of an array and returns it.
    * @opti
    * @param finder The finder function to find the value to remove
    */
-  pluck(finder: (v: T) => boolean): T | null;
+  pluck(finder: Func.Predicate<T> | number): T | null;
 
-  pluckLast(finder: (v: T) => boolean): T | null;
+  /**
+   * 
+   */
+  pluckLast(finder: Func.Predicate<T>): T | null;
 
   /**
    * Relocates an item in an array by a set amount
@@ -875,6 +840,10 @@ interface Array<T> {
    */
   relocate(index: number, offset: number): number | null;
 
+  /**
+   * Relocates in an item in the array to a position indicated by `location`
+   * @param index The index of the 
+   */
   relocateTo(index: number, location: number): number | null;
 
   /**
@@ -887,7 +856,7 @@ interface Array<T> {
    * 
    * arr.insert(2, 4); // arr is now [1, 2, 3, 4, 5]
    */
-  insert(this: T[], index: number, ...values: T[]): void;
+  insert(this: T[], index: number, ...values: Arr.Present<T>): void;
   
   /**
    * Replaces a value in an array and returns the new value
@@ -903,6 +872,7 @@ interface Array<T> {
    * Sorts an array by a specific type of sorting
    * @opti
    * @param order The order to sort in. Options are `random`, `alpha`, `alpha-reverse`, `increasing`,`decreasing`, `earlier` and `later`
+   * @param compareFn The function that decides where an item should be sorted
    */
   sort(mode: SortMode<T>): T[];
   sort(compareFn?: (a: T, b: T) => number): this;
@@ -921,13 +891,13 @@ interface String {
   remove(finder: string | RegExp): string;
 
   /**
-   * Removes the captured text in a string, using a regular expression or search string.
+   * Removes the captured regular expression group in a string (anything inside capturing groups).
    * @opti
    * @param finder The searching string or regular expression
    * @example 
    * const oldString = "Hello! World!";
-   * const newString = oldString.remove(/(!)/) // Hello World
-   * const evenNewerString = newString.remove(/(\s)\w+/) // HelloWorld
+   * const newString = oldString.removeCaptured(/(!)/g) // Hello World
+   * const evenNewerString = newString.removeCaptured(/(\s)\w+/) // HelloWorld
    */
   removeCaptured(finder: RegExp): string;
 
@@ -942,10 +912,17 @@ interface String {
 
   /**
    * Finds the first substring match in a regular expression search.
+   * @opti
    * @param searcher An object which supports searching within a string.
    */
   matches(regexp: string | RegExp): boolean;
 
+  /**
+   * Formats a string in the format selected in `format`
+   * @opti
+   * @param format The casing to format the string to
+   * @returns The same string, but formatted in the format specified in the `format` parameter
+   */
   toCase(format: String.Case): string;
 }
 

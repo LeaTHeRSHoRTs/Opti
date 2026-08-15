@@ -11,16 +11,17 @@ declare namespace Crafty {
     txt(fn: (original: string) => string): void;
   }
 
-  interface Parent<T extends Node = Node> {
-    children(): T[];
-    append(child: T): void;
-    prepend(child: T): void;
+  interface Parent {
+    children(): Crafty.Node[];
+    append(...child: Crafty.Node[]): void;
+    prepend(...child: Crafty.Node[]): void;
   }
 
   interface Fragment extends Node, Parent {
     readonly kind: 'fragment';
     normalize(onMount?: (node: globalThis.DocumentFragment) => void): globalThis.DocumentFragment;
     isEmpty(): this is Fragment & { children: [] };
+    html(): string;
   }
 
   interface Html extends Node {
@@ -37,7 +38,7 @@ declare namespace Crafty {
     normalize(onMount?: (node: globalThis.Text) => void): globalThis.Text;
   }
 
-  interface Comment extends Node, Parent<Text> {
+  interface Comment extends Node {
     readonly kind: 'comment';
     normalize(onMount?: (node: globalThis.Comment) => void): globalThis.Comment;
   }

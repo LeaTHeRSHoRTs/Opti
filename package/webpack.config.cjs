@@ -12,7 +12,7 @@ const requireProject = (keyParam) => {
   let key = keyParam;
   let dir = "";
   if (keyParam === "opti") {
-    key = "opti";
+    dir = "Core";
   } else {
     dir = keyParam[0]?.toUpperCase() + keyParam.slice(1);
   }
@@ -41,7 +41,7 @@ const requireProject = (keyParam) => {
     resolve: {
       extensions: [".ts", ".tsx", ".js"],
       alias: {
-        "@lib": false
+        "@*": false
       }
     },
     module: {
@@ -59,18 +59,17 @@ const requireProject = (keyParam) => {
       }]
     },
     plugins: [
-      new ForkTsCheckerWebpackPlugin()
+      new ForkTsCheckerWebpackPlugin({
+        typescript: {
+          configFile: "package/tsconfig.json"
+        }
+      })
     ],
   };
 };
 
 module.exports = [
-  requireProject("opti"),
-  requireProject("crafty"),
-  requireProject("query"),
-  requireProject("unsync"),
-  requireProject("requests"),
-  requireProject("flow"),
+  requireProject("opti")
 ];
 
 module.exports.parallelism = 2;

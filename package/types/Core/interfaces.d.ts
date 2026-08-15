@@ -1,10 +1,16 @@
 declare namespace HTMLInputElement {
   interface ValueAccessor {
+    /** Returns the value attribute as a string, or null otherwise */
     asString(): string;
+    /** Returns the value attribute as a number, or null otherwise */
     asNumber(): number | null;
+    /** Returns the value attribute as a boolean, or null otherwise */
     asBoolean(): boolean | null;
+    /** Returns the value attribute as a Date object instance, or null otherwise */
     asDate(): Date | null;
+    /** Returns the value attribute as a suitable type */
     inferred(): string | number | boolean | Date;
+    /** Gets the inferred type of the value attribute */
     get type(): string;
   }
 }

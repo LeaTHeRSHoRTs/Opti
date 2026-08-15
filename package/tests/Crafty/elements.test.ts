@@ -3,8 +3,8 @@ import "opti/crafty";
 
 describe("Element.txt", () => {
   it("should be retrievable", () => {
-    const el = Crafty.craft("b", {}, [Crafty.craft("Hello world!")]);
-    el.append(Crafty.craft("MORE!"));
+    const el = Crafty.craft("b", {}, [Crafty.craft(Crafty.TEXT, "Hello world!")]);
+    el.append(Crafty.craft(Crafty.TEXT, "MORE!"));
 
     expect(el.txt()).toContain('MORE!');
     expect(el.txt()).toContain('Hello world!');

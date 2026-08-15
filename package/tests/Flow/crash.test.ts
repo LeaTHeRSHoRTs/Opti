@@ -4,13 +4,16 @@ describe("Flow module", () => {
 
     try {
       vi.resetModules();
+      //@ts-expect-error
       await expect(import("opti/flow")).rejects.toThrow();
     } finally {
       vi.unstubAllGlobals();
       vi.resetModules();
     }
 
+    //@ts-expect-error
     await import('opti');
+    //@ts-expect-error
     await expect(import('opti/flow')).resolves.toEqual(expect.anything());
   });
 });

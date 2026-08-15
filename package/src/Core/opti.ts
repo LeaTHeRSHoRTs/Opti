@@ -8,6 +8,7 @@ import * as Lists from "./collections";
 import * as Arrays from "./arrays";
 import * as Misc from "./misc";
 import * as Reg from "./registry";
+import * as Type from "./type";
 
 if (typeof window === "undefined" || typeof document === "undefined") {
   throw new Error("Opti requires a browser environment.");
@@ -28,6 +29,7 @@ globalThis.RegistryException = Exceptions.RegistryException;
 globalThis.Future = Promise;
 globalThis.InternalRegistries = Reg.InternalRegistries;
 globalThis.Registries = Reg.Registries;
+globalThis.Type = Type.Type;
 
 (globalThis as __Unsafe<GlobalThis>).Exception = Exceptions.Exception;
 globalThis.SyntaxException = Exceptions.SyntaxException;
@@ -38,12 +40,9 @@ globalThis.NotImplementedException = Exceptions.NotImplementedException;
 globalThis.AccessException = Exceptions.AccessException;
 globalThis.UnknownException = Exceptions.UnknownException;
 globalThis.DebouncedException = Exceptions.DebouncedException;
-globalThis.AbstractMethodInvokedException = Exceptions.AbstractMethodInvokedException;
-globalThis.AbstractInitializationException = Exceptions.AbstractInitializationException;
 globalThis.AssertionException = Exceptions.AssertionException;
 globalThis.FetchException = Exceptions.FetchException;
 globalThis.HierarchyException = Exceptions.HierarchyException;
-globalThis.IncorrectDecoratorPlacementException = Exceptions.IncorrectDecoratorPlacementException;
 globalThis.RuntimeException = Exceptions.RuntimeException;
 
 setReadOnly(globalThis, "f", <T, P extends unknown[], R>(
@@ -69,13 +68,13 @@ globalThis.Tuple = Classes.Tuple;
 Node.prototype.$ = Elements.$;
 Node.prototype.$$ = Elements.$$;
 Node.prototype.cut = Elements.cut;
-(Node.prototype as __Unsafe<Node>).parent = Elements.getParent;        // ChildNode
-(Node.prototype as __Unsafe<Node>).ancestor = Elements.getAncestor;    // ChildNode
-(Node.prototype as __Unsafe<Node>).getChildren = Elements.getChildren; // ParentNode
-(Node.prototype as __Unsafe<Node>).siblings = Elements.getSiblings;    // ChildNode
+Node.prototype.getParent = Elements.getParent;      // ChildNode
+Node.prototype.getAncestor = Elements.getAncestor;  // ChildNode
+Node.prototype.getChildren = Elements.getChildren;  // ParentNode
+Node.prototype.getSiblings = Elements.getSiblings;  // ChildNode
 
 Element.prototype.copy = Elements.copy;
-Element.prototype.txt = Elements.text;
+Element.prototype.txt = Elements.txt;
 Element.prototype.html = Elements.html;
 Element.prototype.addClass = Elements.addClass;
 Element.prototype.removeClass = Elements.removeClass;

@@ -90,4 +90,8 @@ export class _InternalCrafty {
   static Exception: Crafty.ExceptionConstructor = _InternalException;
   static ChildrenNotAllowedException: Crafty.ChildrenNotAllowedExceptionConstructor = _InternalChildrenNotAllowedException;
   static NormalizationException: Crafty.NormalizationExceptionConstructor = _InternalNormalizationError;
+
+  static readonly HTML: unique symbol = Symbol("Crafty.HTML");
+  static readonly TEXT: unique symbol = Symbol("Crafty.TEXT");
+  static readonly COMMENT: unique symbol = Symbol("crafty.COMMENT");
 }

@@ -177,8 +177,12 @@ export function capitalize(this: string): string {
   return m[1] + m[2].toUpperCase() + this.slice(m[0].length);
 };
 
-export function matches(this: String, regexp: string | RegExp): boolean {
-  return this.search(regexp) !== -1;
+export function matches(this: string, regexp: string | RegExp): boolean {
+  if (regexp instanceof RegExp) {
+    return regexp.test(this);
+  } else {
+    return this.includes(regexp);
+  }
 };
 
 export function toCase(this: string, format: String.Case): string {

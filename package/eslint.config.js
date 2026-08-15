@@ -1,10 +1,9 @@
 //@ts-check
 import globals from 'globals';
-import stylistic from '@stylistic/eslint-plugin';
 import createTestResolutionPlugin from './plugins/eslint-test-plugin.cjs';
 import { defineConfig } from 'eslint/config';
-import { parser as tsParser, plugin as typescriptEslint } from 'typescript-eslint';
-import { typescriptRules, javascriptRules, definitionRules, testRules } from "../utils/eslint.js";
+import { parser, plugin as typescriptEslint } from 'typescript-eslint';
+import { typescriptRules, definitionRules, testRules } from "../utils/eslint.js";
 
 /**
  * 
@@ -20,7 +19,7 @@ const eslintConfiguration = (regex, rules, node, plugins) => ({
   languageOptions: {
     sourceType: "module",
     ecmaVersion: 2022,
-    parser: tsParser,
+    parser: parser,
     parserOptions: {
       sourceType: "module",
       projectService: true,
@@ -30,7 +29,6 @@ const eslintConfiguration = (regex, rules, node, plugins) => ({
   },
   plugins: {
     "@typescript-eslint": typescriptEslint,
-    "@stylistic": stylistic,
     ...plugins
   },
   rules: rules
@@ -44,7 +42,7 @@ export default defineConfig([
     "**/build/", 
     "**/coverage/", 
     "**/_*.ts"
-  ] },
+  ]},
   eslintConfiguration('**/*.{ts,tsx}',          typescriptRules, false),
   eslintConfiguration('**/*.d.ts',              definitionRules, false),
   eslintConfiguration('**/*.{test.js,test.ts}', testRules,       false, {

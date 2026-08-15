@@ -1,6 +1,7 @@
 import "opti";
 import "opti/crafty";
-import { _InternalElement, _InternalHTMLElement } from "../../src/Crafty/element";
+import _InternalElement from "../../src/Crafty/element";
+import _InternalHTMLElement from "../../src/Crafty/htmlelement";
 import _InternalText from "../../src/Crafty/text";
 import _InternalFragment from "../../src/Crafty/fragment";
 import _InternalNode from "../../src/Crafty/node";
@@ -16,28 +17,28 @@ describe("Crafty", () => {
       expect(Crafty.craft("h1")).toBeInstanceOf(_InternalElement);
       expect(Crafty.craft("div")).toBeInstanceOf(_InternalElement);
       expect(Crafty.craft("p")).toBeInstanceOf(_InternalElement);
-      expect(Crafty.craft("MyString")).toBeInstanceOf(_InternalElement);
+      expect(Crafty.craft('xml', "MyString")).toBeInstanceOf(_InternalElement);
     });
 
     it("should be able to make a HTMLElement", () => {
       expect(Crafty.craft('div')).toBeInstanceOf(_InternalHTMLElement);
       expect(Crafty.craft('div', { id: "div1" })).toBeInstanceOf(_InternalHTMLElement);
       expect(Crafty.craft('div', { classes: ["divs"] })).toBeInstanceOf(_InternalHTMLElement);
-      expect(Crafty.craft('div', { classes: ["divs"], id: "div3" }, [Crafty.craft("Text node")])).toBeInstanceOf(_InternalHTMLElement);
+      expect(Crafty.craft('div', { classes: ["divs"], id: "div3" }, [Crafty.craft(Crafty.TEXT, "Text node")])).toBeInstanceOf(_InternalHTMLElement);
     });
 
     it("should be able to make a Text", () => {
-      expect(Crafty.craft("text")).toBeInstanceOf(_InternalText);
+      expect(Crafty.craft(Crafty.TEXT, "text")).toBeInstanceOf(_InternalText);
     });
 
     it("should be able to make a Comment", () => {
-      expect(Crafty.craft("text")).toBeInstanceOf(_InternalText);
+      expect(Crafty.craft(Crafty.COMMENT, "text")).toBeInstanceOf(_InternalText);
     });
 
     it("should be able to make a Fragment", () => {
-      expect(Crafty.craft(Crafty.craft("text node 1"), Crafty.craft("Text node 2"), Crafty.craft("Text node 3"))).toBeInstanceOf(_InternalFragment);
-      expect(Crafty.craft(Crafty.craft(Crafty.craft('h1'), Crafty.craft('h2'), Crafty.craft("Text node 3")))).toBeInstanceOf(_InternalFragment);
-      expect(Crafty.craft(Crafty.craft(Crafty.craft('MyElement')))).toBeInstanceOf(_InternalFragment);
+      expect(Crafty.craft(Crafty.craft(Crafty.TEXT, "text node 1"), Crafty.craft(Crafty.TEXT, "Text node 2"), Crafty.craft(Crafty.TEXT, "Text node 3"))).toBeInstanceOf(_InternalFragment);
+      expect(Crafty.craft(Crafty.craft(Crafty.craft('h1'), Crafty.craft('h2'), Crafty.craft(Crafty.TEXT, "Text node 3")))).toBeInstanceOf(_InternalFragment);
+      expect(Crafty.craft(Crafty.craft(Crafty.craft('xml', 'MyElement')))).toBeInstanceOf(_InternalFragment);
     });
   });
 

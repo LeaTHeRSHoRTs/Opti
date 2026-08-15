@@ -28,31 +28,7 @@ export const definitionRules = {
   'no-var': 'off',
   'no-undef': 'off',
   'camelcase': 'warn',
-  '@stylistic/semi': 'error',
-  "@stylistic/member-delimiter-style": [
-    "error", {
-      "multiline": {
-        "delimiter": "semi",
-        "requireLast": true
-      },
-      "singleline": {
-        "delimiter": "semi",
-        "requireLast": true
-      },
-      "overrides": {
-        "typeLiteral": {
-          "multiline": {
-            "delimiter": "comma",
-            "requireLast": false
-          },
-          "singleline": {
-            "delimiter": "comma",
-            "requireLast": false
-          },
-        }
-      }
-    }
-  ],
+  'semi': ["error", "always"],
   '@typescript-eslint/no-explicit-any': 'warn',
   "@typescript-eslint/no-empty-object-type": "off",
   "@typescript-eslint/no-restricted-types": [

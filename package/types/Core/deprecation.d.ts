@@ -5,7 +5,7 @@ interface ParentNode extends Node {
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Node/parentElement)
    * 
    * @deprecated
-   * @migrate {@link Node.parent}
+   * @migrate {@link Node.getParent}
    */
   readonly parentElement: HTMLElement | null;
 
@@ -14,7 +14,7 @@ interface ParentNode extends Node {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Node/parentElement)
    * @deprecated
-   * @migrate {@link Node.parent}
+   * @migrate {@link Node.getParent}
    */
   readonly parentNode: ParentNode | null;
 

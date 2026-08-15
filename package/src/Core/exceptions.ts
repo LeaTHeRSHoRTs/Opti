@@ -96,7 +96,4 @@ export class AccessException extends Exception {}
 export class AssertionException extends Exception {}
 export class FetchException extends Exception {}
 export class DebouncedException extends Exception {}
-export class AbstractMethodInvokedException extends Exception {}
-export class AbstractInitializationException extends Exception {}
-export class IncorrectDecoratorPlacementException extends Exception {}
 export class RegistryException extends Exception {}

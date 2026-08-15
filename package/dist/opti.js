@@ -12,173 +12,98 @@ return /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
 var __webpack_exports__ = {};
 
-;// ./src/classes.ts
-/** @potential */
-class Time {
-    constructor(hours, minutes, seconds, milliseconds) {
-        if (hours instanceof Date) {
-            this.hours = hours.getHours();
-            this.minutes = hours.getMinutes();
-            this.seconds = hours.getSeconds();
-            this.milliseconds = hours.getMilliseconds();
-        }
-        else {
-            const now = new Date();
-            this.hours = hours !== null && hours !== void 0 ? hours : now.getHours();
-            this.minutes = minutes !== null && minutes !== void 0 ? minutes : now.getMinutes();
-            this.seconds = seconds !== null && seconds !== void 0 ? seconds : now.getSeconds();
-            this.milliseconds = milliseconds !== null && milliseconds !== void 0 ? milliseconds : now.getMilliseconds();
-        }
-        this.validateTime();
-    }
-    // Validation for time properties
-    validateTime() {
-        if (this.hours < 0 || this.hours >= 24)
-            throw new globalThis.SyntaxException("Hours must be between 0 and 23.");
-        if (this.minutes < 0 || this.minutes >= 60)
-            throw new globalThis.SyntaxException("Minutes must be between 0 and 59.");
-        if (this.seconds < 0 || this.seconds >= 60)
-            throw new globalThis.SyntaxException("Seconds must be between 0 and 59.");
-        if (this.milliseconds < 0 || this.milliseconds >= 1000)
-            throw new globalThis.SyntaxException("Milliseconds must be between 0 and 999.");
-    }
-    static of(date) {
-        return new this(date);
-    }
-    // Getters
-    getHours() { return this.hours; }
-    getMinutes() { return this.minutes; }
-    getSeconds() { return this.seconds; }
-    getMilliseconds() { return this.milliseconds; }
-    // Setters
-    setHours(hours) {
-        this.hours = hours;
-        this.validateTime();
-    }
-    setMinutes(minutes) {
-        this.minutes = minutes;
-        this.validateTime();
-    }
-    setSeconds(seconds) {
-        this.seconds = seconds;
-        this.validateTime();
-    }
-    setMilliseconds(milliseconds) {
-        this.milliseconds = milliseconds;
-        this.validateTime();
-    }
-    // Returns the time in milliseconds since the start of the day
-    getTime() {
-        return (this.hours * 3600000 +
-            this.minutes * 60000 +
-            this.seconds * 1000 +
-            this.milliseconds);
-    }
-    // Returns the time in milliseconds since the start of the day
-    static at(hours, minutes, seconds, milliseconds) {
-        return new Time(hours, minutes, seconds, milliseconds).getTime();
-    }
-    sync() {
-        return new Time();
-    }
-    // Static: Return current time as a Time object
-    static now() {
-        return new Time().getTime();
-    }
-    toString() {
-        return `${this.hours.toString().padStart(2, '0')}:${this.minutes.toString().padStart(2, '0')}:${this.seconds.toString().padStart(2, '0')}`;
-        // removed by dead control flow
-
-    }
-    toISOString() {
-        return `T${this.toString()}.${this.milliseconds.toString().padStart(3, '0')}Z`;
-    }
-    toJSON() {
-        return this.toISOString(); // Leverage the existing toISOString() method
-    }
-    toDate(years, months, days) {
-        return new Date(years, months, days, this.hours, this.minutes, this.seconds, this.milliseconds);
-    }
-    static fromDate(date) {
-        return new Time(date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds());
-    }
-    // Arithmetic operations
-    addMilliseconds(ms) {
-        const totalMilliseconds = this.getTime() + ms;
-        return Time.fromMilliseconds(totalMilliseconds);
-    }
-    subtractMilliseconds(ms) {
-        const totalMilliseconds = this.getTime() - ms;
-        return Time.fromMilliseconds(totalMilliseconds);
-    }
-    addSeconds(seconds) {
-        return this.addMilliseconds(seconds * 1000);
-    }
-    addMinutes(minutes) {
-        return this.addMilliseconds(minutes * 60000);
-    }
-    addHours(hours) {
-        return this.addMilliseconds(hours * 3600000);
-    }
-    // Static: Create a Time object from total milliseconds
-    static fromMilliseconds(ms) {
-        const hours = Math.floor(ms / 3600000) % 24;
-        const minutes = Math.floor(ms / 60000) % 60;
-        const seconds = Math.floor(ms / 1000) % 60;
-        const milliseconds = ms % 1000;
-        return new Time(hours, minutes, seconds, milliseconds);
-    }
-    // Parsing
-    static fromString(timeString) {
-        var _a, _b;
-        const match = timeString.match(/^(\d{2}):(\d{2})(?::(\d{2}))?(?:\.(\d{3}))?$/);
-        if (match) {
-            const hours = parseInt(match[1], 10);
-            const minutes = parseInt(match[2], 10);
-            const seconds = parseInt((_a = match[3]) !== null && _a !== void 0 ? _a : "0", 10);
-            const milliseconds = parseInt((_b = match[4]) !== null && _b !== void 0 ? _b : "0", 10);
-            return new Time(hours, minutes, seconds, milliseconds);
-        }
-        throw new globalThis.SyntaxException("Invalid time string format.");
-    }
-    static fromISOString(isoString) {
-        const match = isoString.match(/T(\d{2}):(\d{2}):(\d{2})\.(\d{3})Z/);
-        if (match) {
-            const hours = parseInt(match[1], 10);
-            const minutes = parseInt(match[2], 10);
-            const seconds = parseInt(match[3], 10);
-            const milliseconds = parseInt(match[4], 10);
-            return new Time(hours, minutes, seconds, milliseconds);
-        }
-        throw new globalThis.SyntaxException("Invalid ISO string format.");
-    }
-    // Comparison
-    compare(other) {
-        const currentTime = this.getTime();
-        const otherTime = other.getTime();
-        if (currentTime < otherTime) {
-            return -1;
-        }
-        else if (currentTime > otherTime) {
-            return 1;
-        }
-        else {
-            return 0;
-        }
-    }
-    isBefore(other) {
-        return this.compare(other) === -1;
-    }
-    isAfter(other) {
-        return this.compare(other) === 1;
-    }
-    equals(other) {
-        return this.compare(other) === 0;
-    }
-    static equals(first, other) {
-        return first.compare(other) === 0;
+;// ./package/src/helpers.ts
+function arrType(array, type) {
+    return array.every(v => type === String ? typeof v === "string" :
+        type === Number ? typeof v === "number" :
+            type === Boolean ? typeof v === "boolean" :
+                type === Symbol ? typeof v === "symbol" :
+                    v instanceof type);
+}
+function isEventTarget(obj) {
+    return (obj &&
+        typeof obj.addEventListener === "function" &&
+        typeof obj.removeEventListener === "function" &&
+        typeof obj.dispatchEvent === "function");
+}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function declare(f) {
+    f.call(globalThis, globalThis);
+}
+function createModuleError(submodule) {
+    return new Error(`Opti should be imported before the import for opti/${submodule}`, {
+        cause: `Not importing opti before importing opti/${submodule}`
+    });
+}
+function setNotEnumerable(obj, prop, val) {
+    Object.defineProperty(obj, prop, {
+        value: val,
+        enumerable: false,
+        writable: true,
+        configurable: true
+    });
+}
+function setNameOfGlobalThisProp(cls) {
+    Object.defineProperty(globalThis[cls], "name", { value: cls });
+}
+function setPropName(cls, prop) {
+    Object.defineProperty(cls[prop], "name", { value: prop });
+}
+function setGetter(object, prop, getter) {
+    Object.defineProperty(object, prop, {
+        get: getter,
+        enumerable: false,
+        configurable: true
+    });
+}
+function setReadOnly(object, prop, val) {
+    Object.defineProperty(object, prop, {
+        value: val,
+        enumerable: false,
+        configurable: true
+    });
+}
+function supportsStyles(el) {
+    return el instanceof HTMLElement || el instanceof SVGElement || el instanceof MathMLElement;
+}
+function parseUnit(unit) {
+    if (/^0[^.]?/.test(unit))
+        return 0;
+    if (!isNaN(Number(unit)))
+        return Number(unit);
+    return unit;
+}
+function dashToCamel(str) {
+    return str.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+}
+function camelToDash(str) {
+    return str.replace(/[A-Z]/g, m => '-' + m.toLowerCase());
+}
+function parseTime(value) {
+    const [h, m, s] = value.split(":");
+    const [sec, ms] = (s ?? "0").split(".");
+    const date = new Date();
+    date.setHours(+(h || 0), +(m || 0), +(sec || 0), +(ms || 0));
+    return date;
+}
+function mixin(fn, location, mixinFn) {
+    switch (location) {
+        case "HEAD":
+            return (function (...args) {
+                mixinFn.call(this, ...args);
+                return fn.call(this, ...args);
+            });
+        case "TAIL":
+            return (function (...args) {
+                const result = fn.call(this, ...args);
+                const self = Object.assign({ mixin: { value: result } }, this);
+                mixinFn.call(self, ...args);
+                return result;
+            });
     }
 }
+
+;// ./package/src/Core/constructableobjects.ts
 function Tuple(...values) {
     return values;
 }
@@ -210,92 +135,37 @@ function Enum(...values) {
     });
     return obj;
 }
-class Collection {
-    constructor(items) {
-        this.items = items !== null && items !== void 0 ? items : [];
-    }
-    get length() {
-        return this.items.length;
-    }
-    static from(arrayLike) {
-        return new Collection(Array.from(arrayLike));
-    }
-    static of(...values) {
-        return new Collection(values);
-    }
-    /**
-     * @throws {CollectionOutOfBoundsException} The index does not exist
-     */
-    item(index) {
-        const item = this.items[index];
-        if (!item)
-            throw new CollectionOutOfBoundsException("index " + index + " does not exist on this collection");
-        return this.items[index];
-    }
-    each(callback, thisArg) {
-        this.items.forEach(callback, thisArg);
-    }
-    *[Symbol.iterator]() {
-        yield* this.items;
-    }
-    *entries() {
-        yield* this.items.entries();
-    }
-    *keys() {
-        yield* this.items.keys();
-    }
-    *values() {
-        yield* this.items.values();
-    }
-    toArray() {
-        return this.items;
-    }
-    toReadonlyArray() {
-        return this.items;
-    }
-}
 
-;// ./src/document.ts
+;// ./package/src/Core/document.ts
 function ready(callback) {
     document.addEventListener("DOMContentLoaded", callback);
 }
+let called = false;
 function leaving(callback) {
-    document.addEventListener("beforeunload", (e) => callback.call(document, e));
+    if (called)
+        return;
+    function handler(e) {
+        try {
+            callback.call(document, e);
+        }
+        finally {
+            called = true;
+        }
+    }
+    if ('onbeforeunload' in window)
+        window.addEventListener('beforeunload', handler, { once: true });
+    if ('onpagehide' in window)
+        window.addEventListener('pagehide', handler, { once: true });
+    document.addEventListener('visibilitychange', (e) => {
+        if (document.visibilityState === 'hidden')
+            handler(e);
+    }, { once: true });
 }
-// export function bindShortcut (
-//   shortcut: Shortcut,
-//   callback: (event: ShortcutEvent) => void
-// ): void {
-//   document.addEventListener('keydown', (event: Event) => {
-//     const keyboardEvent = event as ShortcutEvent;
-//     keyboardEvent.keys = shortcut.split("+") as [KeyboardEventKey, KeyboardEventKey, KeyboardEventKey?, KeyboardEventKey?, KeyboardEventKey?];
-//     const keys = shortcut
-//       .trim()
-//       .toLowerCase()
-//       .split("+");
-//     // Separate out the modifier keys and the actual key
-//     const modifiers = keys.slice(0, -1);
-//     const finalKey = keys[keys.length - 1];
-//     const modifierMatch = modifiers.every((key: any) => {
-//       if (key === 'ctrl' || key === 'control') return keyboardEvent.ctrlKey;
-//       if (key === 'alt') return keyboardEvent.altKey;
-//       if (key === 'shift') return keyboardEvent.shiftKey;
-//       if (key === 'meta' || key === 'windows' || key === 'command') return keyboardEvent.metaKey;
-//       return false;
-//     });
-//     // Check that the pressed key matches the final key
-//     const keyMatch = finalKey === keyboardEvent.key.toLowerCase();
-//     if (modifierMatch && keyMatch) {
-//       callback(keyboardEvent);
-//     }
-//   });
-// }
 function documentCss(element, object) {
     const selector = element.trim();
     if (!selector) {
         throw new globalThis.SyntaxException("Selector cannot be empty.");
     }
-    //@ts-ignore
     let styleTag = document.querySelector("style[js-styles]");
     if (!styleTag) {
         styleTag = document.createElement("style");
@@ -312,6 +182,8 @@ function documentCss(element, object) {
             const declarations = rule.style;
             for (let j = 0; j < declarations.length; j++) {
                 const name = declarations[j];
+                if (!name)
+                    continue;
                 existingStyles[name] = declarations.getPropertyValue(name).trim();
             }
             break;
@@ -324,11 +196,11 @@ function documentCss(element, object) {
     const newStyles = {};
     for (const [prop, val] of Object.entries(object)) {
         if (val !== null && val !== undefined) {
-            const kebab = prop.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
+            const kebab = prop.toString().replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
             newStyles[kebab] = val.toString();
         }
     }
-    const mergedStyles = Object.assign(Object.assign({}, existingStyles), newStyles);
+    const mergedStyles = { ...existingStyles, ...newStyles };
     const styleString = Object.entries(mergedStyles)
         .map(([prop, val]) => `${prop}: ${val};`)
         .join(" ");
@@ -342,69 +214,10 @@ function documentCss(element, object) {
         console.error("Failed to insert CSS rule:", err, { selector, styleString });
     }
 }
-function createElements(node) {
-    const el = document.createElement(node.tag);
-    // Add class if provided
-    if (node.class)
-        el.className = node.class;
-    // Add text content if provided
-    if (node.text)
-        el.textContent = node.text;
-    // Add inner HTML if provided
-    if (node.html)
-        el.innerHTML = node.html;
-    // Handle styles, ensure it’s an object
-    if (node.style && typeof node.style === 'object') {
-        for (const [prop, val] of Object.entries(node.style)) {
-            el.style.setProperty(prop, val.toString());
-        }
-    }
-    // Handle other attributes (excluding known keys)
-    for (const [key, val] of Object.entries(node)) {
-        if (key !== 'tag' &&
-            key !== 'class' &&
-            key !== 'text' &&
-            key !== 'html' &&
-            key !== 'style' &&
-            key !== 'children') {
-            if (typeof val === 'string') {
-                el.setAttribute(key, val);
-            }
-            else
-                throw new globalThis.TypeException("Custom parameters must be of type 'string'");
-        }
-    }
-    // Handle children (ensure it's an array or a single child)
-    if (node.children) {
-        if (Array.isArray(node.children)) {
-            node.children.forEach(child => {
-                el.appendChild(createElements(child));
-            });
-        }
-        else {
-            el.appendChild(createElements(node.children)); // Support for a single child node
-        }
-    }
-    return el;
-}
-function $(selector) {
-    return document.querySelector(selector);
-}
-;
-function $$(selector) {
-    return document.querySelectorAll(selector);
-}
-;
 
-;// ./src/elements.ts
-function hasText(text) {
-    if (typeof text === "string") {
-        return this.txt().includes(text);
-    }
-    else {
-        return text.test(this.txt());
-    }
-}
+;// ./package/src/Core/nodes.ts
+
+
 function addClass(elClass) {
     this.classList.add(elClass);
 }
@@ -417,35 +230,22 @@ function toggleClass(elClass) {
 function hasClass(elClass) {
     return this.classList.contains(elClass);
 }
-function parseUnit(unit) {
-    if (/^0[^.]?/.test(unit))
-        return 0;
-    if (!isNaN(Number(unit)))
-        return Number(unit);
-    return unit;
-}
-function dashToCamel(str) {
-    return str.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
-}
-// camelCase ("backgroundColor") → dash-case ("background-color")
-function camelToDash(str) {
-    return str.replace(/[A-Z]/g, m => '-' + m.toLowerCase());
-}
 function css(key, value) {
-    const css = this.style;
+    const icss = this.style;
+    // If request for computed styles or all styles
     if (!key || key === true) {
         // Return all styles
         const result = {};
-        for (let i = 0; i < css.length; i++) {
-            const prop = css[i];
+        for (let i = 0; i < icss.length; i++) {
+            const prop = icss[i];
             if (!prop)
                 continue;
             const camelProp = dashToCamel(prop);
-            const style = css.getPropertyValue(prop).trim();
+            const style = icss.getPropertyValue(prop).trim();
             result[camelProp] = parseUnit(style);
         }
         if (key === true) {
-            const computed = getComputedStyle(this);
+            const computed = window.getComputedStyle(this);
             const computedObj = {};
             for (let i = 0; i < computed.length; i++) {
                 const prop = computed[i];
@@ -455,26 +255,29 @@ function css(key, value) {
                 const style = computed.getPropertyValue(prop).trim();
                 computedObj[camelProp] = parseUnit(style);
             }
-            return Object.assign(Object.assign({}, result), computedObj);
+            return { ...result, ...computedObj };
         }
         return result;
     }
     if (typeof key === "string") {
         if (value === undefined) {
-            return parseUnit(css.getPropertyValue(camelToDash(key)).trim());
+            return parseUnit(icss.getPropertyValue(camelToDash(key)).trim());
+        }
+        else if (value === null) {
+            icss.removeProperty(camelToDash(key));
         }
         else {
             // Set one value
-            if (key in css) {
-                css.setProperty(camelToDash(key), value.toString());
+            if (key in icss) {
+                icss.setProperty(camelToDash(key), value.toString());
             }
         }
     }
     else {
         // Set multiple
-        for (const [prop, val] of Object.entries(key)) {
-            if (val !== null && val !== undefined) {
-                css.setProperty(camelToDash(prop), val.toString());
+        for (const [prop, ival] of Object.entries(key)) {
+            if (ival !== null && ival !== undefined) {
+                icss.setProperty(camelToDash(prop.toString()), ival.toString());
             }
         }
     }
@@ -489,7 +292,7 @@ function getAncestor(arg) {
     if (typeof arg === "number") {
         let node = this;
         for (let i = 0; i < arg; i++) {
-            if (!(node === null || node === void 0 ? void 0 : node.parentNode))
+            if (!node?.parentNode)
                 return null;
             node = node.parentNode;
         }
@@ -510,24 +313,19 @@ function html(input) {
     return input !== undefined ? (this.innerHTML = input) : this.innerHTML;
 }
 ;
-function elements_text(text, ...input) {
-    var _a, _b, _c;
+function txt(modifier, ...newText) {
     // If text is provided, update the textContent
-    if (text !== undefined) {
-        if (typeof text === "string") {
-            input.unshift(text); // Add the text parameter to the beginning of the input array
-            const joined = input.join(" "); // Join all the strings with a space
-            // Replace "textContent" if it's found in the joined string (optional logic)
-            this.textContent = joined.includes("textContent")
-                ? joined.replace("textContent", (_a = this.textContent) !== null && _a !== void 0 ? _a : "")
-                : joined;
+    if (modifier !== undefined) {
+        if (typeof modifier === "string") {
+            const inputText = [...newText];
+            inputText.unshift(modifier);
+            this.textContent = inputText.join(" ");
         }
         else {
-            this.textContent = text((_b = this.textContent) !== null && _b !== void 0 ? _b : "");
+            this.textContent = modifier(this.textContent);
         }
     }
-    // Return the current textContent if no arguments are passed
-    return (_c = this.textContent) !== null && _c !== void 0 ? _c : "";
+    return this.textContent;
 }
 ;
 function show() {
@@ -547,14 +345,14 @@ function toggle() {
     }
 }
 ;
-function elements_$(selector) {
+function $(selector) {
     if (selector.includes(","))
-        throw new MalformedQueryException("Invalid query: commas are not allowed in query selectors that can only select 1 element");
-    return this.querySelector(selector); // Returns a single Element or null
+        throw new SyntaxException("Invalid query: commas are not allowed in query selectors that can only select 1 element");
+    return this.querySelector(selector);
 }
 ;
-function elements_$$(selector) {
-    return this.querySelectorAll(selector); // Returns a single Element or null
+function $$(selector) {
+    return Array.from(this.querySelectorAll(selector));
 }
 ;
 function getChildren() {
@@ -562,6 +360,8 @@ function getChildren() {
 }
 ;
 function getSiblings(inclusive) {
+    if (!this.parentNode)
+        return [];
     const siblings = Array.from(this.parentNode.childNodes);
     if (inclusive) {
         return siblings; // Include current node as part of siblings
@@ -572,70 +372,105 @@ function getSiblings(inclusive) {
 }
 ;
 function serialize() {
-    const formData = new FormData(this); // Create a FormData object from the form
-    // Create an array to hold key-value pairs
+    const formData = new FormData(this);
     const entries = [];
-    // Use FormData's forEach method to collect form data
     formData.forEach((value, key) => {
         entries.push([key, value.toString()]);
     });
-    // Convert the entries into a query string
     return entries
         .map(([key, value]) => {
         return encodeURIComponent(key) + '=' + encodeURIComponent(value);
     })
-        .join('&'); // Join the array into a single string, separated by '&'
+        .join('&');
 }
 ;
 function cut() {
+    if (!this.parentNode)
+        throw new HierarchyException("Element cannot be cut out of the DOM because it has no parent");
+    if ("remove" in this && typeof this.remove === 'function') {
+        this.remove();
+    }
+    else {
+        this.parentNode.removeChild(this);
+    }
+}
+const defaultCopy = {
+    copyAll: false,
+    copyAttributes: true,
+    copyChildren: false,
+    copyStyles: true
+};
+function copy(childrenOrObject = true) {
+    const incomingOptions = typeof childrenOrObject === "boolean"
+        ? { copyChildren: childrenOrObject }
+        : (childrenOrObject ?? {});
+    // 2. Merge defaults cleanly. TypeScript guarantees full type safety here.
+    const options = { ...defaultCopy, ...incomingOptions };
     const clone = document.createElementNS(this.namespaceURI, this.tagName);
-    // Copy all attributes
-    for (const attr of Array.from(this.attributes)) {
-        clone.setAttribute(attr.name, attr.value);
+    if (options.copyAttributes || options.copyAll) {
+        if (this instanceof HTMLElement && clone instanceof HTMLElement) {
+            if (this.title)
+                clone.title = this.title;
+            if (this.role)
+                clone.role = this.role;
+            if (this.ariaChecked)
+                clone.ariaChecked = this.ariaChecked;
+            clone.hidden = this.hidden;
+            clone.tabIndex = this.tabIndex;
+            // Sync datasets securely
+            Object.assign(clone.dataset, this.dataset);
+        }
+        for (const attribute of Array.from(this.attributes)) {
+            // Skip styles (so that copyStyles works)
+            if (attribute.name === "style")
+                continue;
+            if (attribute.name === "id" && attribute.value !== "") {
+                if (!options.fallbackId) {
+                    console.warn("Fallback ID is not set. Skipping application of ID");
+                    clone.id = "";
+                    continue;
+                }
+                else {
+                    clone.id = options.fallbackId;
+                    continue;
+                }
+            }
+            clone.setAttribute(attribute.name, attribute.value);
+        }
     }
-    // Deep copy child nodes (preserves text, elements, etc.)
-    for (const child of Array.from(this.childNodes)) {
-        clone.appendChild(child.cloneNode(true));
+    if (options.copyChildren || options.copyAll) {
+        if (!this.children.length && this.innerHTML) {
+            clone.innerHTML = this.innerHTML;
+        }
+        else {
+            for (const child of Array.from(this.childNodes)) {
+                let childCopy;
+                if (child instanceof Element) {
+                    const optionsCopy = { ...options };
+                    delete optionsCopy.fallbackId;
+                    childCopy = child.copy(optionsCopy);
+                }
+                else {
+                    childCopy = child.cloneNode(true);
+                }
+                clone.appendChild(childCopy);
+            }
+        }
     }
-    // Optionally copy inline styles (not always needed if using setAttribute above)
-    if (this instanceof HTMLElement && clone instanceof HTMLElement) {
-        clone.style.cssText = this.style.cssText;
+    if (options.copyStyles || options.copyAll) {
+        if (this instanceof HTMLElement && clone instanceof HTMLElement) {
+            clone.style.cssText = this.style.cssText;
+        }
     }
-    this.remove(); // Remove original from DOM
     return clone;
 }
 function isVisible() {
-    return this.css("visibility") !== "hidden"
-        ? this.css("display") !== "none"
-        : Number(this.css("opacity")) > 0;
-}
-function as(type) {
-    const value = this.value.trim();
-    switch (type) {
-        case "string":
-            return value;
-        case "number":
-            const num = Number(value);
-            return !isNaN(num) && value !== "" ? num : null;
-        case "boolean":
-            if (value.toLowerCase() === "true")
-                return true;
-            if (value.toLowerCase() === "false")
-                return false;
-        case "date":
-            const date = new Date(value);
-            if (!isNaN(date.getTime()))
-                return date;
-        default:
-            return null;
-    }
-}
-function parseTime(value) {
-    const [h, m, s] = value.split(":");
-    const [sec, ms] = (s !== null && s !== void 0 ? s : "0").split(".");
-    const date = new Date();
-    date.setHours(+h, +m, +sec, +ms || 0);
-    return date;
+    if (!this.isConnected)
+        return false;
+    const elCss = window.getComputedStyle(this);
+    return (elCss.display !== "none" &&
+        elCss.visibility !== "hidden" &&
+        parseFloat(elCss.opacity) > 0);
 }
 function val() {
     const self = this;
@@ -666,143 +501,538 @@ function val() {
             return date;
         },
         asString() {
-            var _a;
-            return (_a = self.value) !== null && _a !== void 0 ? _a : "";
+            return self.value ?? "";
+        },
+        inferred() {
+            return this.asDate() || this.asBoolean() || this.asNumber() || this.asString();
+        },
+        get type() {
+            return self.type;
         }
     };
 }
 ;
+function attr(key, value) {
+    if (value)
+        this[key] = value;
+    else
+        return this[key];
+}
 
-;// ./src/exception.ts
-class exception_Exception extends Error {
+;// ./package/src/Core/exceptions.ts
+var __classPrivateFieldSet = (undefined && undefined.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
+    if (kind === "m") throw new TypeError("Private method is not writable");
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
+    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
+};
+var __classPrivateFieldGet = (undefined && undefined.__classPrivateFieldGet) || function (receiver, state, kind, f) {
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+};
+var _Exception_message, _Exception_cause, _Exception_internalStack, _RuntimeException_message, _RuntimeException_cause, _RuntimeException_stack;
+class Exception extends Error {
     constructor(message, cause) {
-        var _a;
         super();
-        this._name = "Exception";
-        this._message = message !== null && message !== void 0 ? message : "";
-        this._cause = cause !== null && cause !== void 0 ? cause : "";
-        this._internalStack = (_a = new Error().stack) !== null && _a !== void 0 ? _a : "";
+        _Exception_message.set(this, void 0);
+        _Exception_cause.set(this, void 0);
+        _Exception_internalStack.set(this, void 0);
+        this.name = this.constructor.name;
+        Object.setPrototypeOf(this, new.target.prototype);
+        __classPrivateFieldSet(this, _Exception_message, message ?? "", "f");
+        __classPrivateFieldSet(this, _Exception_cause, cause ?? "", "f");
+        __classPrivateFieldSet(this, _Exception_internalStack, super.stack ?? "", "f");
     }
-    get name() {
-        return this._name;
+    getName() {
+        return this.constructor.name;
     }
     getMessage() {
-        return this._message;
+        return __classPrivateFieldGet(this, _Exception_message, "f");
     }
     getCause() {
-        return this._cause;
+        return __classPrivateFieldGet(this, _Exception_cause, "f");
     }
     throw() {
         throw this;
     }
     getStackTrace() {
-        return this._internalStack;
+        return __classPrivateFieldGet(this, _Exception_internalStack, "f");
     }
     toString() {
-        return `${this._name}: ${this._message}\r\n${this._internalStack}`;
+        return `${this.constructor.name}: ${__classPrivateFieldGet(this, _Exception_message, "f")}\r\n${__classPrivateFieldGet(this, _Exception_internalStack, "f")}`;
+    }
+    static isException(val) {
+        return val instanceof Exception;
+    }
+    static isAnyException(val) {
+        return val instanceof Exception || val instanceof RuntimeException;
     }
 }
+_Exception_message = new WeakMap(), _Exception_cause = new WeakMap(), _Exception_internalStack = new WeakMap();
 class RuntimeException {
     constructor(message = "", cause = "") {
-        this._message = message;
-        this._cause = cause;
+        Object.defineProperty(this, "name", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: "RuntimeException"
+        });
+        _RuntimeException_message.set(this, void 0);
+        _RuntimeException_cause.set(this, void 0);
+        _RuntimeException_stack.set(this, void 0);
+        __classPrivateFieldSet(this, _RuntimeException_message, message, "f");
+        __classPrivateFieldSet(this, _RuntimeException_cause, cause, "f");
+        __classPrivateFieldSet(this, _RuntimeException_stack, new Error().stack ?? "", "f");
     }
-    get name() {
-        return "RuntimeException";
+    getName() {
+        return 'RuntimeException';
     }
     getMessage() {
-        return this._message;
+        return __classPrivateFieldGet(this, _RuntimeException_message, "f");
     }
     getCause() {
-        return this._cause;
+        return __classPrivateFieldGet(this, _RuntimeException_cause, "f");
     }
     toString() {
-        return `RuntimeException: ${this._message}`;
+        return `RuntimeException${__classPrivateFieldGet(this, _RuntimeException_message, "f") ? ": " + __classPrivateFieldGet(this, _RuntimeException_message, "f") : ""}`;
+    }
+    getStackTrace() {
+        return __classPrivateFieldGet(this, _RuntimeException_stack, "f");
+    }
+    throw() {
+        throw this;
     }
 }
-function makeException(name) {
-    return class extends exception_Exception {
-        constructor() {
-            super(...arguments);
-            this._name = name;
-        }
-    };
+_RuntimeException_message = new WeakMap(), _RuntimeException_cause = new WeakMap(), _RuntimeException_stack = new WeakMap();
+class exceptions_SyntaxException extends Exception {
 }
-const exception_SyntaxException = makeException("SyntaxException");
-const CloneException = makeException("CloneException");
-const exception_NumberTooSmallException = makeException("NumberTooSmallException");
-const exception_TypeException = makeException("TypeException");
-const NotImplementedException = makeException("NotImplementedException");
-const UnknownException = makeException("UnknownException");
-const AccessException = makeException("AccessException");
-const AssertionException = makeException("AssertionException");
-/** @future */
-const FetchException = makeException("FetchException");
-const SortException = makeException("SortException");
-const exception_DebouncedException = makeException("DebouncedException");
-const exception_AbstractMethodInvokedException = makeException("AbstractMethodInvokedException");
-const exception_AbstractInitializationException = makeException("AbstractInitializationException");
-const exception_CollectionOutOfBoundsException = makeException("CollectionOutOfBoundsException");
-const exception_MalformedQueryException = makeException("MalformedQueryException");
+class exceptions_CloneException extends Exception {
+}
+class exceptions_HierarchyException extends Exception {
+}
+class NumberException extends (/* unused pure expression or super */ null && (Exception)) {
+}
+class exceptions_NumberTooSmallException extends Exception {
+}
+class exceptions_TypeException extends Exception {
+}
+class NotImplementedException extends Exception {
+}
+class UnknownException extends Exception {
+}
+class AccessException extends Exception {
+}
+class AssertionException extends Exception {
+}
+class FetchException extends Exception {
+}
+class exceptions_DebouncedException extends Exception {
+}
+class exceptions_RegistryException extends Exception {
+}
 
-;// ./src/misc.ts
-//* Function
-function misc_args() {
-    var _a;
-    return ((_a = this.toString()
-        .replace(/\s*=\s*.*?(,|\))/g, "$1")
-        .match(/\(([^)]*)\)/)) === null || _a === void 0 ? void 0 : _a[1].split(",").map(p => p.trim()).filter(Boolean)) || [];
-}
-function throttle(func, ms) {
-    let throttled = false;
-    const cache = [];
-    return function (...args) {
-        if (!throttled) {
-            const self = this;
-            throttled = true;
-            const val = func.apply(self, args);
-            setTimeout(() => {
-                throttled = false;
-                if (cache.length > 0)
-                    func.apply(self, cache.shift());
-            }, ms);
-            return val;
+;// ./package/src/Core/globals.ts
+function typeObject(val, str) {
+    const v = val;
+    let obj = Object.create({
+        getValue() { return val; },
+        stringOf() { return str; },
+        equalTo(other) {
+            switch (typeof other) {
+                case "string":
+                    if (other.startsWith("type:")) {
+                        return other.replace("type:", "") === str;
+                    }
+                case "number":
+                case "bigint":
+                case "boolean":
+                case "symbol":
+                    return v === other;
+                case "function":
+                    const regex = /<([\w$_0-9]+)>\((\d+)\)/;
+                    const match = str.match(regex);
+                    if (match) {
+                        const [, name, argsStr] = match;
+                        const args = Number(argsStr);
+                        if (Number.isNaN(args)) {
+                            throw new TypeException(`Internal type matching error: ${argsStr} is not a number.`);
+                        }
+                        else if (!Number.isFinite(args)) {
+                            throw new TypeException(`Internal type matching error: ${argsStr} is infinite.`);
+                        }
+                        return name === (other.name || "anonymous") && args === other.length;
+                    }
+                    throw new TypeException(`Internal type matching error: Incorrect format for type string ${str}`);
+                case "undefined":
+                    return v === undefined;
+                case "object":
+                    if (other === null) {
+                        return v === null;
+                    }
+                    const ctorName = other.constructor?.name;
+                    if (ctorName && str.includes(ctorName))
+                        return true;
+                    if (typeof other.toString === "function") {
+                        return str === other.toString();
+                    }
+                    return false;
+            }
+        },
+        isInstanceOf(clazz) {
+            if (v === null || v === undefined)
+                return false;
+            return Object(v) instanceof clazz;
+        },
+        isDefined() {
+            return v !== undefined && v !== null;
+        },
+        isFalsy() {
+            return !Boolean(v);
+        },
+        isTruthy() {
+            return Boolean(v);
+        },
+        isNull() {
+            return v === null;
+        },
+        isUndefined() {
+            return v === undefined;
+        },
+        isTypeString(typestr) {
+            return typestr === str;
         }
-        cache.push(args);
+    });
+    function hasOwn(intVal, prop) {
+        if (intVal === null || intVal === undefined) {
+            return false;
+        }
+        if (typeof intVal === "string")
+            return true;
+        return Object.prototype.hasOwnProperty.call(intVal, prop);
+    }
+    if (typeof v === "string" || hasOwn(v, "size") || hasOwn(v, "length")) {
+        obj = Object.assign(obj, {
+            shorter(lengthOrObject) {
+                const len = typeof lengthOrObject === "number"
+                    ? lengthOrObject
+                    : ("size" in lengthOrObject
+                        ? lengthOrObject.size
+                        : lengthOrObject.length);
+                if (hasOwn(v, "size") && typeof v.size === "number") {
+                    return v.size < len;
+                }
+                else if (typeof v === "string" || (hasOwn(v, "length") && typeof v.length === "number")) {
+                    return v.length < len;
+                }
+                return false;
+            },
+            longer(lengthOrObject) {
+                const len = typeof lengthOrObject === "number"
+                    ? lengthOrObject
+                    : ("size" in lengthOrObject
+                        ? lengthOrObject.size
+                        : lengthOrObject.length);
+                if (hasOwn(v, "size") && typeof v.size === "number") {
+                    return v.size > len;
+                }
+                else if (hasOwn(v, "length") && typeof v.length === "number") {
+                    return v.length > len;
+                }
+                return false;
+            },
+            length(length) {
+                if (hasOwn(v, "size") && typeof v.size === "number") {
+                    return v.size === length;
+                }
+                else if (hasOwn(v, "length") && typeof v.length === "number") {
+                    return v.length === length;
+                }
+                return false;
+            }
+        });
+    }
+    if (typeof v === "function") {
+        const functionName = v.name;
+        obj = Object.assign(obj, {
+            isName(name) {
+                if (functionName === "")
+                    return name === "anonymous";
+                return functionName === name;
+            }
+        });
+    }
+    return obj;
+}
+function is(val) {
+    if (val === null)
+        return typeObject(val, "null");
+    if (val === undefined)
+        return typeObject(val, "undefined");
+    if (typeof val === "function")
+        return typeObject(val, `Function:${val.name || "<anonymous>"}(${val.length})`);
+    let typeName = Object.prototype.toString.call(val).slice(8, -1);
+    typeName = (typeName[0]?.toUpperCase() ?? "") + typeName.slice(1);
+    const ctor = val.constructor.name;
+    if (ctor && ctor === "Object") {
+        typeName = ctor;
+    }
+    switch (typeof val) {
+        case "string":
+            typeName += `(${val.length})`;
+            break;
+        case "object":
+            if (val instanceof Map || val instanceof Set) {
+                typeName += `(${val.size})`;
+            }
+            else if (val instanceof Date && !isNaN(val.getTime())) {
+                typeName += `:${val.toISOString().split("T")[0]}`;
+            }
+            else if ("length" in val && Number.isFinite(val.length)) {
+                typeName += `(${val.length})`;
+            }
+            else if (typeName === "Object") {
+                typeName += `(${Object.keys(val).length})`;
+            }
+            break;
+        case "symbol":
+            typeName += `(${val.description})`;
+    }
+    return typeObject(val, typeName);
+}
+;
+function assert(condition, reason) {
+    if (!condition) {
+        throw new globalThis.AssertionException(reason);
+    }
+}
+function sleep(ms) {
+    return new Future((res, rej) => {
+        if (ms <= 0)
+            return rej(new NumberTooSmallException("Invalid timeout value (must be greater than 0)"));
+        setTimeout(res, ms);
+    });
+}
+function isEmpty(val) {
+    // Generic type checking
+    // eslint-disable-next-line eqeqeq
+    if (val == null || val === false || val === "")
+        return true;
+    // Number checking
+    if (typeof val === "number")
+        return val === 0 || Number.isNaN(val);
+    // Array checking
+    if (Array.isArray(val) && val.length === 0)
+        return true;
+    if (val instanceof Map || val instanceof Set) {
+        return val.size === 0; // size check works for these types
+    }
+    // Object checking
+    if (typeof val === 'object') {
+        const proto = Object.getPrototypeOf(val);
+        const isPlain = proto === Object.prototype || proto === null;
+        return isPlain && Object.keys(val).length === 0;
+    }
+    return false;
+}
+
+;// ./package/src/Core/collections.ts
+function addClassList(elClass) {
+    for (const el of this) {
+        el.addClass(elClass);
+    }
+}
+;
+function removeClassList(elClass) {
+    for (const el of this) {
+        el.removeClass(elClass);
+    }
+}
+;
+function toggleClassList(elClass) {
+    for (const el of this) {
+        el.toggleClass(elClass);
+    }
+}
+;
+
+;// ./package/src/Core/arrays.ts
+
+function unique() {
+    return [...new Set(this)];
+}
+;
+function pluck(finder) {
+    const res = this.findIndex(finder);
+    if (res === -1)
         return null;
+    const [item] = this.splice(res, 1);
+    return item ?? null;
+}
+function pluckLast(finder) {
+    const index = this.map(finder).lastIndexOf(true);
+    if (index === -1)
+        return null;
+    const [item] = this.splice(index, 1);
+    return item ?? null;
+}
+function relocate(index, offset) {
+    const value = this.splice(index, 1)[0];
+    if (value !== undefined) {
+        this.splice(index + offset, 0, value);
+        return index + offset;
+    }
+    else {
+        return null;
+    }
+}
+function relocateTo(index, location) {
+    const value = this.splice(index, 1)[0];
+    if (value !== undefined) {
+        this.splice(location, 0, value);
+        return location;
+    }
+    else
+        return null;
+}
+const originalSort = Array.prototype.sort;
+function sortBy(order) {
+    if (typeof order === "function") {
+        return originalSort.call(this, order);
+    }
+    else if (order === undefined) {
+        return originalSort.call(this);
+    }
+    const copy = [...this];
+    if (arrType(this, Date)) {
+        switch (order) {
+            case "earlier": return originalSort.call(copy, (a, b) => a.getTime() - b.getTime());
+            case "later": return originalSort.call(copy, (a, b) => b.getTime() - a.getTime());
+        }
+    }
+    else if (arrType(this, String)) {
+        switch (order) {
+            case "alpha": return originalSort.call(copy);
+            case "alpha-reverse": return originalSort.call(copy).reverse();
+        }
+    }
+    else if (arrType(this, Number)) {
+        switch (order) {
+            case "increasing": return originalSort.call(copy, (a, b) => a - b);
+            case "decreasing": return originalSort.call(copy, (a, b) => b - a);
+        }
+    }
+    return copy.sort();
+}
+function replace(index, newVal) {
+    if (typeof index === "number") {
+        const oldVal = this[index];
+        this[index] = newVal;
+        return oldVal ?? null;
+    }
+    else {
+        const i = this.findIndex(index);
+        if (i === -1)
+            return null;
+        const oldVal = this[i];
+        this[i] = newVal;
+        return oldVal ?? null;
+    }
+}
+function chunk(chunkSize) {
+    if (chunkSize <= 0)
+        throw new globalThis.NumberTooSmallException("`chunkSize` cannot be a number below 1");
+    const newArr = [];
+    let tempArr = [];
+    this.forEach(val => {
+        tempArr.push(val);
+        if (tempArr.length === chunkSize) {
+            newArr.push(tempArr);
+            tempArr = []; // Reset tempArr for the next chunk
+        }
+    });
+    // Add the remaining elements in tempArr if any
+    if (tempArr.length) {
+        newArr.push(tempArr);
+    }
+    return newArr;
+}
+;
+function insert(index, ...values) {
+    this.splice(index, 0, ...values);
+}
+
+;// ./package/src/Core/misc.ts
+//* Function
+function throttle(func, ms) {
+    let timer = null;
+    let storedArgs = null;
+    let context = null;
+    return function (...rest) {
+        if (timer) {
+            storedArgs = rest;
+            context = this;
+            return null;
+        }
+        // Leading execution
+        const result = func.apply(this, rest);
+        const startTimer = () => {
+            timer = setTimeout(() => {
+                if (storedArgs) {
+                    func.apply(context, storedArgs);
+                    storedArgs = null;
+                    context = null;
+                    startTimer(); // Restart to handle the next window
+                }
+                else {
+                    timer = null;
+                }
+            }, ms);
+        };
+        startTimer();
+        return result;
     };
 }
 function debounce(func, ms) {
     let timer = null;
-    let globRej = null;
-    return function (...args) {
-        if (globRej && timer) {
-            const rej = globRej;
-            globRej = null;
-            rej(new DebouncedException());
+    let currentReject = null;
+    return function (...rest) {
+        // Immediately cancel previous pending call
+        if (currentReject) {
+            currentReject(new DebouncedException("Function was called again before this one could resolve"));
+            if (timer)
+                clearTimeout(timer);
         }
         const self = this;
-        // Clear existing timer
-        if (timer)
-            clearTimeout(timer);
-        return new Future((res, rej) => {
-            globRej = rej;
+        return new Future((resolve, reject) => {
+            currentReject = reject;
             timer = setTimeout(() => {
-                globRej = null;
-                timer = null; // clear timer reference
-                res(func.apply(self, args));
+                currentReject = null;
+                timer = null;
+                resolve(func.apply(self, rest));
             }, ms);
         });
     };
 }
-function memo(fn) {
-    const cache = new Map();
-    return function (...args) {
-        const key = JSON.stringify(args); // unique per argument set
-        if (cache.has(key))
-            return cache.get(key); // return cached result
-        const result = fn.apply(this, args); // call original function
-        cache.set(key, result); // store in cache
+const RESULT_KEY = Symbol('memo_result');
+function memo(func) {
+    // Always check the registry first for persistent state
+    let cache = InternalRegistries.MEMO.get(func);
+    if (!cache) {
+        cache = new Map();
+        InternalRegistries.MEMO.set(func, cache);
+    }
+    return function (...rest) {
+        let current = cache;
+        for (const arg of rest) {
+            if (!current.has(arg))
+                current.set(arg, new Map());
+            current = current.get(arg);
+        }
+        if (current.has(RESULT_KEY))
+            return current.get(RESULT_KEY);
+        const result = func.apply(this, rest);
+        current.set(RESULT_KEY, result);
         return result;
     };
 }
@@ -810,18 +1040,15 @@ function memo(fn) {
 function atDate(year, monthIndex, date, hours, minutes, seconds, ms) {
     return new Date(year, monthIndex, date, hours, minutes, seconds, ms).getTime();
 }
-function fromTime(time, year, monthIndex, date) {
-    return new Date(year, monthIndex, date, time.getHours(), time.getMinutes(), time.getSeconds(), time.getMilliseconds());
-}
 function clone(object, deep = true) {
     if (typeof object === "symbol") {
-        throw new globalThis.CloneException("Symbols cannot be cloned");
+        throw new CloneException("Symbols cannot be cloned");
     }
     if (!deep) {
         if (Array.isArray(object)) {
             return [...object];
         }
-        return Object.assign({}, object);
+        return { ...object };
     }
     if (object === null ||
         object === undefined ||
@@ -874,12 +1101,23 @@ function remove(finder) {
 }
 ;
 function capitalize() {
-    const i = this.search(/\S/);
-    return i === -1 ? this : this.slice(0, i) + this.charAt(i).toUpperCase() + this.slice(i + 1);
+    const m = this.match(/^(\s*)([a-z])/);
+    if (!m ||
+        m[0] === undefined ||
+        m[1] === undefined ||
+        m[2] === undefined) {
+        return this;
+    }
+    return m[1] + m[2].toUpperCase() + this.slice(m[0].length);
 }
 ;
 function matches(regexp) {
-    return this.search(regexp) !== -1;
+    if (regexp instanceof RegExp) {
+        return regexp.test(this);
+    }
+    else {
+        return this.includes(regexp);
+    }
 }
 ;
 function toCase(format) {
@@ -895,648 +1133,421 @@ function toCase(format) {
     }
 }
 //* Math
-const origionalRandom = Math.random;
-const random = (minOrMax, max) => {
+function randomRange(minOrMax, max) {
     if (typeof minOrMax !== "undefined" && typeof max !== "undefined") {
-        return origionalRandom() * (max - minOrMax) + minOrMax;
+        return Math.random() * (max - minOrMax) + minOrMax;
     }
-    else if (typeof minOrMax !== "undefined") {
-        return origionalRandom() * minOrMax;
+    return Math.random() * minOrMax;
+}
+;
+
+;// ./package/src/Core/registry.ts
+class Registry {
+    constructor(container = new Map()) {
+        // Instance-related properties and methods
+        Object.defineProperty(this, "container", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        if (container instanceof Map) {
+            this.container = container;
+        }
+        else if (Array.isArray(container)) {
+            this.container = new Map(container);
+        }
+        else {
+            this.container = new Map(Object.entries(container));
+        }
     }
-    else
-        return origionalRandom();
-};
-function mixin(fn, location, mixinFn) {
-    switch (location) {
-        case "HEAD":
-            return (function (...args) {
-                mixinFn.call(this, ...args);
-                return fn.call(this, ...args);
-            });
-        case "TAIL":
-            return (function (...args) {
-                const result = fn.call(this, ...args);
-                const self = Object.assign({ mixin: { value: result } }, this);
-                mixinFn.call(self, ...args);
-                return result;
-            });
+    get(key) {
+        return this.container.get(key);
+    }
+    set(key, value) {
+        if (this.has(key))
+            throw new RegistryException("Cannot set a value for a property that already exists");
+        this.container.set(key, value);
+    }
+    has(key) {
+        return this.container.has(key);
+    }
+    setMultiple(obj) {
+        for (const [key, value] of obj) {
+            this.set(key, value);
+        }
+        ;
     }
 }
-function getEvents(key) {
-    var _a;
-    return (_a = this._events[key]) !== null && _a !== void 0 ? _a : [];
+class Registries {
 }
-const originalAddEventListener = EventTarget.prototype.addEventListener;
-const addEventListener = mixin(originalAddEventListener, "HEAD", function (type, callback, options) {
-    var _a;
-    var _b;
-    if (!(this instanceof EventTarget))
-        return;
-    (_a = (_b = this._events)[type]) !== null && _a !== void 0 ? _a : (_b[type] = []);
-    if ("handleEvent" in callback) {
-        this._events[type].push(callback.handleEvent);
-    }
-    else {
-        this._events[type].push(callback);
-    }
+Object.defineProperty(Registries, "HTML_TAGS", {
+    enumerable: true,
+    configurable: true,
+    writable: true,
+    value: new Registry({
+        "a": HTMLAnchorElement,
+        "abbr": HTMLElement,
+        "address": HTMLElement,
+        "area": HTMLAreaElement,
+        "article": HTMLElement,
+        "aside": HTMLElement,
+        "audio": HTMLAudioElement,
+        "b": HTMLElement,
+        "base": HTMLBaseElement,
+        "bdi": HTMLElement,
+        "bdo": HTMLElement,
+        "blockquote": HTMLQuoteElement,
+        "body": HTMLBodyElement,
+        "br": HTMLBRElement,
+        "button": HTMLButtonElement,
+        "canvas": HTMLCanvasElement,
+        "caption": HTMLTableCaptionElement,
+        "cite": HTMLElement,
+        "code": HTMLElement,
+        "col": HTMLTableColElement,
+        "colgroup": HTMLTableColElement,
+        "data": HTMLDataElement,
+        "datalist": HTMLDataListElement,
+        "dd": HTMLElement,
+        "del": HTMLModElement,
+        "details": HTMLDetailsElement,
+        "dfn": HTMLElement,
+        "dialog": HTMLDialogElement,
+        "div": HTMLDivElement,
+        "dl": HTMLDListElement,
+        "dt": HTMLElement,
+        "em": HTMLElement,
+        "embed": HTMLEmbedElement,
+        "fieldset": HTMLFieldSetElement,
+        "figcaption": HTMLElement,
+        "figure": HTMLElement,
+        "footer": HTMLElement,
+        "form": HTMLFormElement,
+        "h1": HTMLHeadingElement,
+        "h2": HTMLHeadingElement,
+        "h3": HTMLHeadingElement,
+        "h4": HTMLHeadingElement,
+        "h5": HTMLHeadingElement,
+        "h6": HTMLHeadingElement,
+        "head": HTMLHeadElement,
+        "header": HTMLElement,
+        "hgroup": HTMLElement,
+        "hr": HTMLHRElement,
+        "html": HTMLHtmlElement,
+        "i": HTMLElement,
+        "iframe": HTMLIFrameElement,
+        "img": HTMLImageElement,
+        "input": HTMLInputElement,
+        "ins": HTMLModElement,
+        "kbd": HTMLElement,
+        "label": HTMLLabelElement,
+        "legend": HTMLLegendElement,
+        "li": HTMLLIElement,
+        "link": HTMLLinkElement,
+        "main": HTMLElement,
+        "map": HTMLMapElement,
+        "mark": HTMLElement,
+        "menu": HTMLMenuElement,
+        "meta": HTMLMetaElement,
+        "meter": HTMLMeterElement,
+        "nav": HTMLElement,
+        "noscript": HTMLElement,
+        "object": HTMLObjectElement,
+        "ol": HTMLOListElement,
+        "optgroup": HTMLOptGroupElement,
+        "option": HTMLOptionElement,
+        "output": HTMLOutputElement,
+        "p": HTMLParagraphElement,
+        "picture": HTMLPictureElement,
+        "pre": HTMLPreElement,
+        "progress": HTMLProgressElement,
+        "q": HTMLQuoteElement,
+        "rp": HTMLElement,
+        "rt": HTMLElement,
+        "ruby": HTMLElement,
+        "s": HTMLElement,
+        "samp": HTMLElement,
+        "script": HTMLScriptElement,
+        "search": HTMLElement,
+        "section": HTMLElement,
+        "select": HTMLSelectElement,
+        "slot": HTMLSlotElement,
+        "small": HTMLElement,
+        "source": HTMLSourceElement,
+        "span": HTMLSpanElement,
+        "strong": HTMLElement,
+        "style": HTMLStyleElement,
+        "sub": HTMLElement,
+        "summary": HTMLElement,
+        "sup": HTMLElement,
+        "table": HTMLTableElement,
+        "tbody": HTMLTableSectionElement,
+        "td": HTMLTableCellElement,
+        "template": HTMLTemplateElement,
+        "textarea": HTMLTextAreaElement,
+        "tfoot": HTMLTableSectionElement,
+        "th": HTMLTableCellElement,
+        "thead": HTMLTableSectionElement,
+        "time": HTMLTimeElement,
+        "title": HTMLTitleElement,
+        "tr": HTMLTableRowElement,
+        "track": HTMLTrackElement,
+        "u": HTMLElement,
+        "ul": HTMLUListElement,
+        "var": HTMLElement,
+        "video": HTMLVideoElement,
+        "wbr": HTMLElement,
+    })
+});
+class registry_InternalRegistries {
+}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+Object.defineProperty(registry_InternalRegistries, "MEMO", {
+    enumerable: true,
+    configurable: true,
+    writable: true,
+    value: new Map()
+});
+Object.defineProperty(registry_InternalRegistries, "THROTTLE", {
+    enumerable: true,
+    configurable: true,
+    writable: true,
+    value: new Map()
+});
+Object.defineProperty(registry_InternalRegistries, "DEBOUNCE", {
+    enumerable: true,
+    configurable: true,
+    writable: true,
+    value: new Map()
 });
 
-;// ./src/globals.ts
-
-function typeObject(val, str) {
-    let v = val;
-    let obj = Object.create({
-        get value() {
-            return v;
-        },
-        stringOf() { return str; },
-        is(other) {
-            var _a;
-            switch (typeof other) {
-                case "string":
-                    if (other.startsWith("type:")) {
-                        return other.replace("type:", "") === str;
-                    }
-                case "number":
-                case "bigint":
-                case "boolean":
-                case "symbol":
-                    return v === other;
-                case "function":
-                    const regex = /<([\w$_0-9]+)>\(([\w$_0-9,\s]*)\)/;
-                    const match = str.match(regex);
-                    if (match) {
-                        const [, name, args] = match;
-                        return name === (other.name || "anonymous") && args === misc_args.apply(other).join(",");
-                    }
-                    throw new TypeException(`Internal type matching error: Incorrect format for type string ${str}`);
-                case "undefined":
-                    return v === undefined;
-                case "object":
-                    if (other === null) {
-                        return v === null;
-                    }
-                    const ctorName = (_a = other.constructor) === null || _a === void 0 ? void 0 : _a.name;
-                    if (ctorName && str.includes(ctorName))
-                        return true;
-                    if (typeof other.toString === "function") {
-                        return str === other.toString();
-                    }
+;// ./package/src/Core/type.ts
+var type_classPrivateFieldSet = (undefined && undefined.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
+    if (kind === "m") throw new TypeError("Private method is not writable");
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
+    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
+};
+var type_classPrivateFieldGet = (undefined && undefined.__classPrivateFieldGet) || function (receiver, state, kind, f) {
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+};
+var _Type_validator;
+class Type {
+    constructor(validator) {
+        _Type_validator.set(this, void 0);
+        type_classPrivateFieldSet(this, _Type_validator, validator, "f");
+    }
+    static object(shape, fallback) {
+        // Define the target type cleanly for our type guard
+        return new Type((val) => {
+            if (typeof val !== 'object' || val === null)
+                return false;
+            // 1. Validate the blueprint shape properties
+            for (const key in shape) {
+                const rule = shape[key];
+                const actual = val[key];
+                if (rule instanceof Type) {
+                    if (!rule.is(actual))
+                        return false;
+                }
+                else if (actual !== rule) {
                     return false;
+                }
             }
-        },
-        isInstanceOf(clazz) {
-            if (v === null || v === undefined)
-                return false;
-            return Object(v) instanceof clazz;
-        },
-        isDefined() {
-            return v !== undefined && v !== null;
-        },
-        isFalsy() {
-            return !v;
-        },
-        isTruthy() {
-            return !!v;
-        },
-        isNull() {
-            return v === null;
-        },
-        isUndefined() {
-            return v === undefined;
-        },
-        alwaysDefined(orElse) {
-            v !== null && v !== void 0 ? v : (v = orElse);
-        },
-        alwaysTruthy(truthy) {
-            v = truthy;
-        },
-        isTypeString(typestr) {
-            return typestr === str;
-        },
-        isTypeOf(type) {
-            return typeof v === type;
-        }
-    });
-    function hasOwn(val, prop) {
-        if (val === null || val === undefined) {
-            return false;
-        }
-        if (typeof val === "string")
+            for (const key in val) {
+                // If the key is not inside the blueprint
+                if (!(key in shape)) {
+                    if (fallback) {
+                        const actualExtra = val[key];
+                        if (!fallback[0].is(key))
+                            return false;
+                        if (!fallback[1].is(actualExtra))
+                            return false;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+            }
             return true;
-        return Object.prototype.hasOwnProperty.call(val, prop);
-    }
-    if (typeof v === "string" || hasOwn(v, "size") || hasOwn(v, "length")) {
-        obj = Object.assign(obj, {
-            isShorter(lengthOrObject) {
-                const len = typeof lengthOrObject === "number"
-                    ? lengthOrObject
-                    : ("size" in lengthOrObject
-                        ? lengthOrObject.size
-                        : lengthOrObject.length);
-                if (hasOwn(v, "size") && typeof v.size === "number") {
-                    return v.size < len;
-                }
-                else if (typeof v === "string" || (hasOwn(v, "length") && typeof v.length === "number")) {
-                    return v.length < len;
-                }
-                return false;
-            },
-            isLonger(lengthOrObject) {
-                const len = typeof lengthOrObject === "number"
-                    ? lengthOrObject
-                    : ("size" in lengthOrObject
-                        ? lengthOrObject.size
-                        : lengthOrObject.length);
-                if (hasOwn(v, "size") && typeof v.size === "number") {
-                    return v.size > len;
-                }
-                else if (hasOwn(v, "length") && typeof v.length === "number") {
-                    return v.length > len;
-                }
-                return false;
-            },
-            isLength(length) {
-                if (hasOwn(v, "size") && typeof v.size === "number") {
-                    return v.size === length;
-                }
-                else if (hasOwn(v, "length") && typeof v.length === "number") {
-                    return v.length === length;
-                }
-                return false;
-            }
         });
     }
-    if (Array.isArray(v)) {
-        obj = Object.assign(obj, {
-            containsValues() {
-                console.log("len", v.length);
-                return v.length > 0;
-            },
-            alwaysContainsValues(values) {
-                if (v.length === 0) {
-                    v.push(...values);
-                }
-            }
+    static of(shape) {
+        return this.object(shape);
+    }
+    static literal(value) {
+        return new Type((val) => val === value);
+    }
+    static array(...types) {
+        return new Type((val) => {
+            if (!Array.isArray(val))
+                return false;
+            return val.every(item => types.some(t => t instanceof Type ? t.is(item) : item === t));
         });
     }
-    if (typeof v === "function") {
-        const functionName = v.name;
-        obj = Object.assign(obj, {
-            isName(name) {
-                if (functionName === "")
-                    return name === "anonymous";
-                return functionName === name;
-            }
+    static tuple(...types) {
+        return new Type((val) => {
+            if (!Array.isArray(val) || val.length !== types.length)
+                return false;
+            return types.every((t, i) => t instanceof Type ? t.is(val[i]) : val[i] === t);
         });
     }
-    return obj;
-}
-function typed(val) {
-    if (val === null)
-        return typeObject(val, "null");
-    if (val === undefined)
-        return typeObject(val, "undefined");
-    if (typeof val === "function") {
-        // const combos: any[][] = [];
-        // const primitives = [
-        //   undefined,
-        //   null,
-        //   true,
-        //   false,
-        //   -1,
-        //   0,
-        //   1,
-        //   Infinity,
-        //   NaN,
-        //   "",
-        //   "text",
-        //   Symbol("sym")
-        // ];
-        // const err: any[] = [];
-        // const arity = val.length;
-        // for (let i = 0; i < arity; i++) {
-        //   combos.push(primitives);
-        // }
-        // for (const combo of combos) {
-        //   try {
-        //     val(...combo);
-        //     continue;
-        //   } catch (e) {
-        //     if (e instanceof TypeError) err.push(combo);
-        //     else throw e;
-        //   }
-        // }
-        return typeObject(val, `Function:${val.name || "<anonymous>"}(${misc_args.apply(val).join(",")})`);
+    static optional(innerType) {
+        return new Type((val) => val === undefined || innerType.is(val));
     }
-    let typeName = Object.prototype.toString.call(val).slice(8, -1);
-    typeName = typeName[0].toUpperCase() + typeName.slice(1);
-    console.log("Type", typeName);
-    const ctor = val.constructor.name;
-    if (ctor && ctor === "Object") {
-        typeName = ctor;
-    }
-    console.log("Type", typeName);
-    switch (typeof val) {
-        case "string":
-            typeName += `(${val.length})`;
-            break;
-        case "object":
-            if (val instanceof Map || val instanceof Set) {
-                typeName += `(${val.size})`;
-            }
-            else if (val instanceof Date && !isNaN(val.getTime())) {
-                typeName += `:${val.toISOString().split("T")[0]}`;
-            }
-            else if ("length" in val && Number.isFinite(val.length)) {
-                typeName += `(${val.length})`;
-            }
-            else if (typeName === "Object") {
-                typeName += `(${Object.keys(val).length})`;
-            }
-            break;
-        case "symbol":
-            typeName += `(${val.description})`;
-    }
-    return typeObject(val, typeName);
-}
-;
-function info(val) {
-    return String(val);
-}
-function assert(condition, reason) {
-    if (!condition) {
-        throw new globalThis.AssertionException(reason);
+    is(val) {
+        return type_classPrivateFieldGet(this, _Type_validator, "f").call(this, val);
     }
 }
-function sleep(ms) {
-    return new Future((res, rej) => {
-        if (ms <= 0)
-            return rej(new NumberTooSmallException("Invalid timeout value (must be greater than 0)"));
-        setTimeout(res, ms);
-    });
+_Type_validator = new WeakMap();
+Object.defineProperty(Type, "STRING", {
+    enumerable: true,
+    configurable: true,
+    writable: true,
+    value: new Type((val) => typeof val === "string")
+});
+Object.defineProperty(Type, "NUMBER", {
+    enumerable: true,
+    configurable: true,
+    writable: true,
+    value: new Type((val) => typeof val === "number")
+});
+Object.defineProperty(Type, "BOOLEAN", {
+    enumerable: true,
+    configurable: true,
+    writable: true,
+    value: new Type((val) => typeof val === "boolean")
+});
+Object.defineProperty(Type, "OBJECT", {
+    enumerable: true,
+    configurable: true,
+    writable: true,
+    value: new Type((val) => typeof val === "object" && val !== null)
+});
+Object.defineProperty(Type, "UNDEFINED", {
+    enumerable: true,
+    configurable: true,
+    writable: true,
+    value: new Type((val) => typeof val === "undefined")
+});
+Object.defineProperty(Type, "SYMBOL", {
+    enumerable: true,
+    configurable: true,
+    writable: true,
+    value: new Type((val) => typeof val === "symbol")
+});
+Object.defineProperty(Type, "NULL", {
+    enumerable: true,
+    configurable: true,
+    writable: true,
+    value: new Type((val) => val === null)
+});
+
+;// ./package/src/Core/opti.ts
+
+
+
+
+
+
+
+
+
+
+
+if (typeof window === "undefined" || typeof document === "undefined") {
+    throw new Error("Opti requires a browser environment.");
 }
-function isEmpty(val) {
-    // Generic type checking
-    // eslint-disable-next-line eqeqeq
-    if (val == null || val === false || val === "")
-        return true;
-    // Number checking
-    if (typeof val === "number")
-        return val === 0 || Number.isNaN(val);
-    // Array checking
-    if (Array.isArray(val) && val.length === 0)
-        return true;
-    // Map, Set, and weak variant checks
-    if (val instanceof Map || val instanceof Set || val instanceof WeakMap || val instanceof WeakSet) {
-        return val.size === 0; // size check works for these types
-    }
-    // Object checking
-    if (typeof val === 'object') {
-        const proto = Object.getPrototypeOf(val);
-        const isPlain = proto === Object.prototype || proto === null;
-        return isPlain && Object.keys(val).length === 0;
-    }
-    return false;
-}
-function notEmpty(val) {
-    return !isEmpty(val);
-}
-// eslint-disable-next-line prefer-const
-let opti = {
+globalThis.Opti = {
     crafty: false,
     query: false,
-    evented: false,
+    unsync: false,
     requests: false,
-    templated: false,
-    flow: false,
-    help: {}
+    flow: false
 };
-
-;// ./src/lists.ts
-function addClassList(elClass) {
-    for (const el of this) {
-        el.addClass(elClass);
-    }
-}
-;
-function removeClassList(elClass) {
-    for (const el of this) {
-        el.removeClass(elClass);
-    }
-}
-;
-function toggleClassList(elClass) {
-    for (const el of this) {
-        el.toggleClass(elClass);
-    }
-}
-;
-
-;// ./src/arrays.ts
-function unique() {
-    return [...new Set(this)];
-}
-;
-function pluck(finder) {
-    const res = this.findIndex(finder);
-    if (res === -1)
-        return null;
-    const [item] = this.splice(res, 1);
-    return item;
-}
-function pluckLast(finder) {
-    // find index of last matching element
-    const index = this.map(finder).lastIndexOf(true);
-    if (index === -1)
-        return null;
-    // remove and return it
-    const [item] = this.splice(index, 1);
-    return item;
-}
-function relocate(index, offset) {
-    var _a;
-    const value = (_a = this.splice(index, 1)[0]) !== null && _a !== void 0 ? _a : null;
-    if (value) {
-        this.splice(index + offset, 0, value);
-        return index + offset;
-    }
-    else
-        return null;
-}
-function relocateTo(index, location) {
-    var _a;
-    const value = (_a = this.splice(index, 1)[0]) !== null && _a !== void 0 ? _a : null;
-    if (value) {
-        this.splice(location, 0, value);
-        return location;
-    }
-    else
-        return null;
-}
-function arrayType() {
-    return this.map(v => globalThis.typed(v).stringOf());
-}
-function arrType(array, type) {
-    return array.every(v => type === String ? typeof v === "string" :
-        type === Number ? typeof v === "number" :
-            type === Boolean ? typeof v === "boolean" :
-                type === Symbol ? typeof v === "symbol" :
-                    v instanceof type);
-}
-const origionalSort = Array.prototype.sort;
-function sortBy(order) {
-    if (typeof order === "function") {
-        return origionalSort.call(this, order);
-    }
-    else if (order === undefined) {
-        return origionalSort.call(this);
-    }
-    const copy = [...this];
-    if (arrType(this, Date)) {
-        switch (order) {
-            case "earlier": return origionalSort.call(copy, (a, b) => a.getTime() - b.getTime());
-            case "later": return origionalSort.call(copy, (a, b) => b.getTime() - a.getTime());
-        }
-    }
-    else if (arrType(this, String)) {
-        switch (order) {
-            case "alpha": return origionalSort.call(copy);
-            case "alpha-reverse": return origionalSort.call(copy).reverse();
-        }
-    }
-    else if (arrType(this, Number)) {
-        switch (order) {
-            case "increasing": return origionalSort.call(copy, (a, b) => a - b);
-            case "decreasing": return origionalSort.call(copy, (a, b) => b - a);
-        }
-    }
-    return origionalSort.call(this);
-}
-function shuffle() {
-    return this.sort(() => {
-        return Math.random() - 0.5;
-    });
-}
-function replace(index, newVal) {
-    if (typeof index === "number") {
-        const oldVal = this[index];
-        this[index] = newVal;
-        return oldVal !== null && oldVal !== void 0 ? oldVal : null;
-    }
-    else {
-        const i = this.findIndex(index);
-        if (i === -1)
-            return null;
-        const oldVal = this[i];
-        this[i] = newVal;
-        return oldVal;
-    }
-}
-function replaceLast(finder, newVal) {
-    for (let i = this.length - 1; i >= 0; i--) {
-        if (finder(this[i])) {
-            const oldVal = this[i];
-            this[i] = newVal;
-            return oldVal !== null && oldVal !== void 0 ? oldVal : null;
-        }
-    }
-    return null;
-}
-function chunk(chunkSize) {
-    if (chunkSize <= 0)
-        throw new globalThis.NumberTooSmallException("`chunkSize` cannot be a number below 1");
-    const newArr = [];
-    let tempArr = [];
-    this.forEach(val => {
-        tempArr.push(val);
-        if (tempArr.length === chunkSize) {
-            newArr.push(tempArr);
-            tempArr = []; // Reset tempArr for the next chunk
-        }
-    });
-    // Add the remaining elements in tempArr if any
-    if (tempArr.length) {
-        newArr.push(tempArr);
-    }
-    return newArr;
-}
-;
-function insert(index, ...values) {
-    this.splice(index, 0, ...values);
-}
-
-;// ./src/decorators.ts
-function isClass(x) {
-    return typeof x === "function";
-}
-function Abstract(target, propertyKey, descriptor) {
-    // --- CLASS DECORATOR ---
-    if (propertyKey === undefined) {
-        if (!isClass(target)) {
-            throw new Exception("@Abstract must be used on a class or function");
-        }
-        const Original = target;
-        const Wrapper = class extends Original {
-            constructor(...args) {
-                if (new.target === Original) {
-                    throw new AbstractInitializationException(`Abstract class ${Original.name} cannot be instantiated directly`);
-                }
-                super(...args);
-            }
-        };
-        Object.defineProperty(Wrapper, "name", { value: Original.name });
-        return Wrapper;
-    }
-    // --- METHOD DECORATOR ---
-    if (!descriptor || typeof descriptor.value !== "function") {
-        throw new Error("@Abstract can only be applied to methods");
-    }
-    const originalMethod = descriptor.value;
-    descriptor.value = function (...args) {
-        if (this.constructor === target.constructor) {
-            throw new AbstractMethodInvokedException(`Abstract method ${String(propertyKey)} must be overridden`);
-        }
-        return originalMethod.apply(this, args);
-    };
-    return descriptor;
-}
-function Final(target, propertyKey, descriptor) {
-    if (descriptor) {
-        // Decorating a method: make it non-writable
-        descriptor.writable = false;
-        return;
-    }
-    // Decorating a class: prevent subclassing
-    const original = target;
-    function FinalizedConstructor(...args) {
-        if (new.target !== original) {
-            throw new Exception(`${original.name} is a final class and cannot be extended`);
-        }
-        return Reflect.construct(original, args, new.target);
-    }
-    // Copy prototype
-    FinalizedConstructor.prototype = original.prototype;
-    return FinalizedConstructor;
-}
-
-;// ./src/opti.ts
-
-
-
-
-
-
-
-
-
-function get(object, prop, getter) {
-    Object.defineProperty(object, prop, {
-        get: getter,
-        enumerable: false,
-        configurable: true
-    });
-}
-(function () {
-    globalThis.opti = {
-        crafty: false,
-        query: false,
-        evented: false,
-        requests: false,
-        flow: false
-    };
-    //! Others may depend on these
-    globalThis.Collection = Collection;
-    globalThis.Future = Promise;
-    globalThis.Exception = exception_Exception;
-    globalThis.SyntaxException = exception_SyntaxException;
-    globalThis.TypeException = exception_TypeException;
-    globalThis.CloneException = CloneException;
-    globalThis.NumberTooSmallException = exception_NumberTooSmallException;
-    globalThis.AssertionException = AssertionException;
-    globalThis.NotImplementedException = NotImplementedException;
-    globalThis.AccessException = AccessException;
-    globalThis.UnknownException = UnknownException;
-    globalThis.DebouncedException = exception_DebouncedException;
-    globalThis.AbstractMethodInvokedException = exception_AbstractMethodInvokedException;
-    globalThis.AbstractInitializationException = exception_AbstractInitializationException;
-    globalThis.SortException = SortException;
-    globalThis.CollectionOutOfBoundsException = exception_CollectionOutOfBoundsException;
-    globalThis.MalformedQueryException = exception_MalformedQueryException;
-    globalThis.RuntimeException = RuntimeException;
-    globalThis.Abstract = Abstract;
-    globalThis.Final = Final;
-    Object.defineProperty(globalThis, "f", {
-        value: (iife) => iife(),
-        writable: false,
-        configurable: false,
-    });
-    globalThis.typed = typed;
-    globalThis.assert = assert;
-    globalThis.sleep = sleep;
-    globalThis.isEmpty = isEmpty;
-    globalThis.notEmpty = notEmpty;
-    globalThis.Enum = Enum;
-    globalThis.Tuple = Tuple;
-    Document.prototype.ready = ready;
-    Document.prototype.leaving = leaving;
-    Document.prototype.css = documentCss;
-    Document.prototype.createElements = createElements;
-    Node.prototype.$ = elements_$;
-    Node.prototype.$$ = elements_$$;
-    Node.prototype.parent = getParent;
-    Node.prototype.ancestor = getAncestor;
-    Node.prototype.getChildren = getChildren;
-    Node.prototype.siblings = getSiblings;
-    Element.prototype.hasText = hasText;
-    Element.prototype.txt = elements_text;
-    Element.prototype.html = html;
-    Element.prototype.addClass = addClass;
-    Element.prototype.removeClass = removeClass;
-    Element.prototype.toggleClass = toggleClass;
-    Element.prototype.hasClass = hasClass;
-    HTMLElement.prototype.css = css;
-    HTMLElement.prototype.show = show;
-    HTMLElement.prototype.hide = hide;
-    HTMLElement.prototype.toggle = toggle;
-    get(HTMLElement.prototype, "isVisible", isVisible);
-    get(HTMLInputElement.prototype, "val", val);
-    HTMLFormElement.prototype.serialize = serialize;
-    NodeList.prototype.addClass = addClassList;
-    NodeList.prototype.removeClass = removeClassList;
-    NodeList.prototype.toggleClass = toggleClassList;
-    HTMLCollection.prototype.addClass = addClassList;
-    HTMLCollection.prototype.removeClass = removeClassList;
-    HTMLCollection.prototype.toggleClass = toggleClassList;
-    EventTarget.prototype.addEventListener = addEventListener;
-    EventTarget.prototype._events = {};
-    EventTarget.prototype.getEvents = getEvents;
-    String.prototype.remove = remove;
-    String.prototype.matches = matches;
-    String.prototype.capitalize = capitalize;
-    String.prototype.toCase = toCase;
-    Number.prototype.repeat = repeat;
-    Function.debounce = debounce;
-    Function.throttle = throttle;
-    Function.memo = memo;
-    Function.prototype.getArgs = misc_args;
-    Array.prototype.unique = unique;
-    Array.prototype.chunk = chunk;
-    Array.prototype.pluck = pluck;
-    Array.prototype.pluckLast = pluckLast;
-    Array.prototype.relocate = relocate;
-    Array.prototype.relocateTo = relocateTo;
-    Array.prototype.replace = replace;
-    Array.prototype.replaceLast = replaceLast;
-    Array.prototype.sort = sortBy;
-    Array.prototype.insert = insert;
-    get(Array.prototype, "type", arrayType);
-    Math.random = random;
-    Object.clone = clone;
-    Object.forEach = forEach;
-    Date.at = atDate;
-    Date.fromTime = fromTime;
-})();
+//! Others may depend on these
+globalThis.RegistryException = exceptions_RegistryException;
+globalThis.Future = Promise;
+globalThis.InternalRegistries = registry_InternalRegistries;
+globalThis.Registries = Registries;
+globalThis.Type = Type;
+globalThis.Exception = Exception;
+globalThis.SyntaxException = exceptions_SyntaxException;
+globalThis.TypeException = exceptions_TypeException;
+globalThis.CloneException = exceptions_CloneException;
+globalThis.NumberTooSmallException = exceptions_NumberTooSmallException;
+globalThis.NotImplementedException = NotImplementedException;
+globalThis.AccessException = AccessException;
+globalThis.UnknownException = UnknownException;
+globalThis.DebouncedException = exceptions_DebouncedException;
+globalThis.AssertionException = AssertionException;
+globalThis.FetchException = FetchException;
+globalThis.HierarchyException = exceptions_HierarchyException;
+globalThis.RuntimeException = RuntimeException;
+setReadOnly(globalThis, "f", (iife, args, thisArg) => {
+    return iife.apply(thisArg, (args || []));
+});
+globalThis.is = is;
+globalThis.assert = assert;
+globalThis.sleep = sleep;
+globalThis.isEmpty = isEmpty;
+globalThis.Enum = Enum;
+globalThis.Tuple = Tuple;
+[HTMLDocument, Document].forEach(el => el.prototype.ready = ready);
+[HTMLDocument, Document].forEach(el => el.prototype.leaving = leaving);
+[HTMLDocument, Document].forEach(el => el.prototype.css = documentCss);
+Node.prototype.$ = $;
+Node.prototype.$$ = $$;
+Node.prototype.cut = cut;
+Node.prototype.getParent = getParent; // ChildNode
+Node.prototype.getAncestor = getAncestor; // ChildNode
+Node.prototype.getChildren = getChildren; // ParentNode
+Node.prototype.getSiblings = getSiblings; // ChildNode
+Element.prototype.copy = copy;
+Element.prototype.txt = txt;
+Element.prototype.html = html;
+Element.prototype.addClass = addClass;
+Element.prototype.removeClass = removeClass;
+Element.prototype.toggleClass = toggleClass;
+Element.prototype.hasClass = hasClass;
+Element.prototype.attr = attr;
+HTMLElement.prototype.css = css;
+HTMLElement.prototype.show = show;
+HTMLElement.prototype.hide = hide;
+HTMLElement.prototype.toggle = toggle;
+setGetter(HTMLElement.prototype, "isVisible", isVisible);
+setGetter(HTMLInputElement.prototype, "val", val);
+HTMLFormElement.prototype.serialize = serialize;
+NodeList.prototype.addClass = addClassList;
+NodeList.prototype.removeClass = removeClassList;
+NodeList.prototype.toggleClass = toggleClassList;
+HTMLCollection.prototype.addClass = addClassList;
+HTMLCollection.prototype.removeClass = removeClassList;
+HTMLCollection.prototype.toggleClass = toggleClassList;
+String.prototype.remove = remove;
+String.prototype.matches = matches;
+String.prototype.capitalize = capitalize;
+String.prototype.toCase = toCase;
+Number.prototype.repeat = repeat;
+Function.debounce = debounce;
+Function.throttle = throttle;
+Function.memo = memo;
+Array.prototype.unique = unique;
+Array.prototype.chunk = chunk;
+Array.prototype.pluck = pluck;
+Array.prototype.pluckLast = pluckLast;
+Array.prototype.relocate = relocate;
+Array.prototype.relocateTo = relocateTo;
+Array.prototype.replace = replace;
+Array.prototype.sort = sortBy;
+Array.prototype.insert = insert;
+Math.randomRange = randomRange;
+Object.clone = clone;
+Object.forEach = forEach;
+Date.at = atDate;
 
 __webpack_exports__ = __webpack_exports__["default"];
 /******/ 	return __webpack_exports__;

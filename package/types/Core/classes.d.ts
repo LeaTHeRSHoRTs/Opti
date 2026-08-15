@@ -116,20 +116,6 @@ interface RuntimeExceptionConstructor {
   new(message?: string, cause?: string): RuntimeException;
 }
 
-interface DecoratorException extends Exception {}
-interface DecoratorExceptionConstructor extends ExceptionConstructor<DecoratorException> {}
-
-  interface IncorrectDecoratorPlacementException extends DecoratorException {}
-  interface IncorrectDecoratorPlacementExceptionConstructor extends ExceptionConstructor<IncorrectDecoratorPlacementException> {}
-
-  interface AbstractException extends DecoratorException {}
-  interface AbstractExceptionConstructor extends ExceptionConstructor<AbstractException> {}
-
-    interface AbstractInitializationException extends AbstractException {}
-    interface AbstractInitializationExceptionConstructor extends ExceptionConstructor<AbstractInitializationException> {}
-    interface AbstractMethodInvokedException extends AbstractException {}
-    interface AbstractMethodInvokedExceptionConstructor extends ExceptionConstructor<AbstractMethodInvokedException> {}
-
 // ------------------------------
 // Other exceptions
 // ------------------------------

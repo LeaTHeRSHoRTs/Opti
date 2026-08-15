@@ -22,7 +22,7 @@ interface Crafty {
   ): Crafty.Element<N, T, U>;
   craft(...children: Arr.Present<Crafty.Node> ): Crafty.Fragment;
   craft(type: Crafty.TEXT, str: string): Crafty.Text;
-  craft(type: typeof Crafty.HTML, html: string): Crafty.HTML;
+  craft(type: Crafty.HTML, html: string): Crafty.HTML;
   craft(type: Crafty.COMMENT, comment: string) : Crafty.Comment;
 
   /**

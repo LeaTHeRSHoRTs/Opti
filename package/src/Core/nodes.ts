@@ -1,5 +1,5 @@
-/// <reference path="../../types/Unsync/unsync.lib.d.ts" />
-import { camelToDash, dashToCamel, isEventTarget, parseUnit, parseTime } from "../helpers";
+import "@unsync";
+import { camelToDash, dashToCamel, parseUnit, parseTime } from "../helpers";
 
 export function addClass(this: Element, elClass: string): void {
   this.classList.add(elClass);
@@ -114,14 +114,18 @@ export function html(this: Element, input?: string): string {
   return input !== undefined ? (this.innerHTML = input) : this.innerHTML;
 };
 
-export function text(this: Element, internalText?: string | ((oldText: string) => string), ...input: string[]): string {
+export function txt(modifier: (text: string) => string): void;
+export function txt(newText_0: string, ...newText: string[]): void;
+export function txt(): string;
+export function txt(this: Element, modifier?: ((text: string) => string) | string, ...newText: string[]): string {
   // If text is provided, update the textContent
-  if (internalText !== undefined) {
-    if (typeof internalText === "string") {
-      input.unshift(internalText); // Add the text parameter to the beginning of the input array
-      this.textContent = input.join(" ");
+  if (modifier !== undefined) {
+    if (typeof modifier === "string") {
+      const inputText = [...newText];
+      inputText.unshift(modifier);
+      this.textContent = inputText.join(" ");
     } else {
-      this.textContent = internalText(this.textContent);
+      this.textContent = modifier(this.textContent);
     }
   }
   return this.textContent;
@@ -185,47 +189,57 @@ export function serialize(this: HTMLFormElement): string {
 
 export function cut<T extends Node>(this: T): void {
   if (!this.parentNode) throw new HierarchyException("Element cannot be cut out of the DOM because it has no parent");
-  this.parentNode.removeChild(this);
+
+  if ("remove" in this && typeof this.remove === 'function') {
+    this.remove();
+  } else {
+    this.parentNode.removeChild(this);
+  }
 }
 
 const defaultCopy: Required<Omit<Element.CopyOptions, 'fallbackId'>> = {
   copyAll: false,
   copyAttributes: true,
   copyChildren: false,
-  copyEvents: false,
   copyStyles: true
 };
 
-type _EventsRecord<T extends EventTarget> = { [K in keyof EventMapOf<T>]?: EventListenerInfo<T, K>[] };
-
 export function copy<T extends Element>(this: T, object: Element.CopyOptions): T;
-export function copy<T extends Element>(this: T, children?: boolean, events?: boolean): T;
-export function copy<T extends Element>(this: T, childrenOrObject?: boolean | Element.CopyOptions, events?: boolean): T;
-export function copy<T extends Element>(this: T, childrenOrObject: boolean | Element.CopyOptions = true, events: boolean = false): T {
-  let options: Element.CopyOptions;
-  if (typeof childrenOrObject === "boolean") {
-    options = { 
-      ...defaultCopy, 
-      copyChildren: childrenOrObject, 
-      copyEvents: events 
-    };
-  } else {
-    options = { 
-      ...defaultCopy,
-      ...childrenOrObject
-    };
-  }
+export function copy<T extends Element>(this: T, children?: boolean): T;
+export function copy<T extends Element>(this: T, childrenOrObject?: boolean | Element.CopyOptions): T;
+export function copy<T extends Element>(this: T, childrenOrObject: boolean | Element.CopyOptions = true): T {
+  const incomingOptions: Element.CopyOptions = typeof childrenOrObject === "boolean"
+    ? { copyChildren: childrenOrObject }
+    : (childrenOrObject ?? {});
+
+  // 2. Merge defaults cleanly. TypeScript guarantees full type safety here.
+  const options = { ...defaultCopy, ...incomingOptions };
 
   const clone = document.createElementNS(this.namespaceURI, this.tagName) as T;
 
   if (options.copyAttributes || options.copyAll) {
+    if (this instanceof HTMLElement && clone instanceof HTMLElement) {
+      if (this.title) clone.title = this.title;
+      if (this.role) clone.role = this.role;
+      if (this.ariaChecked) clone.ariaChecked = this.ariaChecked;
+      clone.hidden = this.hidden;
+      clone.tabIndex = this.tabIndex;
+      
+      // Sync datasets securely
+      Object.assign(clone.dataset, this.dataset);
+    }
+
     for (const attribute of Array.from(this.attributes)) {
+      // Skip styles (so that copyStyles works)
+      if (attribute.name === "style") continue; 
       if (attribute.name === "id" && attribute.value !== "") {
         if (!options.fallbackId) {
           console.warn("Fallback ID is not set. Skipping application of ID");
+          clone.id = "";
           continue;
         } else {
-          this.id = options.fallbackId;
+          clone.id = options.fallbackId;
+          continue;
         }
       }
       
@@ -234,38 +248,27 @@ export function copy<T extends Element>(this: T, childrenOrObject: boolean | Ele
   }
 
   if (options.copyChildren || options.copyAll) {
-    for (const child of Array.from(this.childNodes)) {
-      if ('id' in child && child.id !== "") {
-        console.warn("Child node has ID. Duplicate node IDs possible, skipping copy of IDs...");
-        child.id = "";
-      }
+    if (!this.children.length && this.innerHTML) {
+      clone.innerHTML = this.innerHTML;
+    } else {
+      for (const child of Array.from(this.childNodes)) {
+        let childCopy: Node;
+        if (child instanceof Element) {
+          const optionsCopy = {...options};
+          delete optionsCopy.fallbackId;
+          childCopy = child.copy(optionsCopy);
+        } else {
+          childCopy = child.cloneNode(true);
+        }
 
-      clone.appendChild(child.cloneNode(true));
+        clone.appendChild(childCopy);
+      }
     }
   }
 
   if (options.copyStyles || options.copyAll) {
     if (this instanceof HTMLElement && clone instanceof HTMLElement) {
       clone.style.cssText = this.style.cssText;
-    }
-  }
-
-  if ((options.copyEvents || options.copyAll) && isEventTarget(this)) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    for (const [event, funcs] of Object.entries((this as any)._events) as [keyof EventMapOf<T>, _EventsRecord<T>[keyof EventMapOf<T>]][]) {
-      funcs?.forEach(prop => {
-        if (Opti.unsync /* Unsync is active */) {
-          switch (prop.listener) {
-            case "default": break;
-            case "conditional":
-              return this.addConditionalListener(event, prop.func, prop.special, prop.options);
-            case "controller":
-              return this.addEventController(event, prop.func, prop.options);
-          }
-        }
-
-        this.addEventListener(event as string, prop.func as EventListener, prop.options);
-      });
     }
   }
 

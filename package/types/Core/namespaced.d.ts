@@ -195,10 +195,6 @@ declare namespace Element {
      */
     copyAll?: boolean;
     /**
-     * Defines if the new element should have the same event listeners. Defaults to `false`.
-     */
-    copyEvents?: boolean;
-    /**
      * Defines if the new element should have the same children. Defaults to `false`.
      * 
      * If `copyAttributes` is set to true, this property is also set to true
@@ -239,4 +235,6 @@ declare namespace Element {
 type Arr<T> = [T, ...T[]] | null;
 declare namespace Arr {
   type Present<T = unknown> = [T, ...T[]];
+
+  type ReadonlyPresent<T = unknown> = readonly [T, ...T[]];
 }

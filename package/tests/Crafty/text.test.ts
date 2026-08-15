@@ -7,7 +7,7 @@ describe("Text.length", () => {
 
   beforeAll(() => {
     originText = "Text Node";
-    textNode = Crafty.craft(originText);
+    textNode = Crafty.craft(Crafty.TEXT, originText);
   });
 
   it("should return the correct length of the text inside the object", () => {
@@ -21,7 +21,7 @@ describe("Text.txt", () => {
 
   beforeAll(() => {
     originText = "Text Node";
-    textNode = Crafty.craft(originText);
+    textNode = Crafty.craft(Crafty.TEXT, originText);
   });
 
   it("should return the correct text", () => {
@@ -51,7 +51,7 @@ describe("Text.normalize", () => {
 
   beforeAll(() => {
     originText = "Text Node";
-    textNode = Crafty.craft(originText);
+    textNode = Crafty.craft(Crafty.TEXT, originText);
   });
 
   it("should be able to return a normal text node from itself", () => {
