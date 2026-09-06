@@ -1,8 +1,8 @@
 {
   "name": "opti-monorepo",
-  "type": "module",
   "author": "LeaTHeR_SHoRTs",
   "license": "CC-BY-NC-SA-4.0",
+  "version": "1.0.0",
   "private": true,
   "repository": {
     "type": "git",
@@ -39,8 +39,8 @@
     "cli:test": "",
     "cli:lint": "eslint cli --config cli/eslint.config.js --no-cache",
     "cli:build": "",
-    "push": "node ./package/scripts/push.ts",
-    "prepublishOnly": "npm run package:build && npm run package:lint"
+    "push": "node ./package/scripts/push.ts"
+
   },
   "engines": {
     "node": ">=23.0.0"

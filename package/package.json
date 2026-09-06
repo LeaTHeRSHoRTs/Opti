@@ -1,7 +1,7 @@
 {
   "name": "optijs",
   "type": "module",
-  "version": "0.0.4",
+  "version": "1.0.0",
   "private": false,
   "description": "Lightweight DOM manipulation, styling, and utility extension for native JavaScript objects — without wrappers.",
   "exports": {
