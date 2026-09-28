@@ -8,7 +8,7 @@
   },
   "include": [
     "**/*.ts",
-    "**/*.js",
+    "**/*.js", "../../_new/package/tests/vitest.d.ts",
   ],
   "exclude": [
     "src",

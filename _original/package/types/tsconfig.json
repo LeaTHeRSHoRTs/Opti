@@ -1,4 +1,4 @@
 {
   "extends": "../../tsconfig.base.json",
-  "include": ["**/*.d.ts"]
+  "include": ["**/*.d.ts", "../../../_new/package/internal/secrets.d.ts"]
 }

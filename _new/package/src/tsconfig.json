@@ -13,5 +13,5 @@
     "**/*.ts",
     "../types/Core/opti.lib.d.ts",
     "../types/secrets.d.ts"
-  ]
+,     "../../../_new/package/src/helpers.ts"  ]
 }

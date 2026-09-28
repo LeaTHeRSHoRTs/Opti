@@ -1,0 +1,30 @@
+{
+  "name": "opti-monorepo",
+  "type": "module",
+  "author": "LeaTHeR_SHoRTs",
+  "license": "CC-BY-NC-SA-4.0",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LeaTHeRSHoRTs/Opti.git"
+  },
+  "bugs": "https://github.com/LeaTHeRSHoRTs/Opti/issues",
+  "homepage": "https://github.com/LeaTHeRSHoRTs/Opti",
+  "workspaces": [
+    "package",
+    "cli"
+  ],
+  "sideEffects": true,
+  "scripts": {},
+  "engines": {
+    "node": ">=23.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "eslint": "^10.11.0",
+    "globals": "^17.12.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.70.1",
+    "vitest": "^5.0.2"
+  }
+}
