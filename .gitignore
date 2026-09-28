@@ -5,9 +5,11 @@
 # Generated
 **/dist
 **/bin
+**/coverage
 
-# Vscode
+# Vscode and Intellij
 **/.vscode
+**/.idea
 
 # Logs
 **/*.log
@@ -15,3 +17,5 @@
 # Ideas
 **/_*.*
 _*/
+!_original/
+!_new/
