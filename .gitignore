@@ -7,15 +7,14 @@
 **/bin
 **/coverage
 
-# Vscode and Intellij
-**/.vscode
-**/.idea
-
 # Logs
 **/*.log
 
-# Ideas
+# Hidden Explicitly
 **/_*.*
 _*/
-!_original/
-!_new/
+
+# For restructure
+!/_original/
+!/_new/
+!**/src/_*
