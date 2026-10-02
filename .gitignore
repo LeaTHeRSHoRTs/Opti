@@ -9,12 +9,3 @@
 
 # Logs
 **/*.log
-
-# Hidden Explicitly
-**/_*.*
-_*/
-
-# For restructure
-!/_original/
-!/_new/
-!**/src/_*

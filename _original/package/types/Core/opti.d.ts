@@ -60,6 +60,8 @@ type Widen<T> =
   T extends number ? number :
   T extends boolean ? boolean :
   T extends symbol ? symbol :
+  T extends (infer U)[] ? Widen<U>[] :
+  T extends object ? object :
   T;
 
 /** A union of the primitive js types, in string form */
@@ -96,6 +98,9 @@ type HTMLTag = keyof HTMLElementTagNameMap;
 /** Represents a HTML tag that cannot contain children in string format */
 type VoidHTMLTag = "area" | "base" | "br" | "col" | "embed" | "hr" | "img" | "input" | "link" | "meta" | "source" | "track" | "wbr";
 
+/** Represents a HTML tag that can contain children in string format */
+type ParentHTMLTag = Exclude<HTMLTag, VoidHTMLTag>
+
 /** Represents a SVG tag in string form */
 type SVGTag = keyof SVGElementTagNameMap;
 
@@ -111,7 +116,7 @@ type HTMLElementOf<T extends string> =
 type SVGElementOf<T extends keyof SVGElementTagNameMap> =
   SVGElementTagNameMap[T];
 
-  /** Gets the type of a `MathMLElement` from a string */
+/** Gets the type of a `MathMLElement` from a string */
 type MathMLElementOf<T extends keyof MathMLElementTagNameMap> =
   MathMLElementTagNameMap[T];
 
