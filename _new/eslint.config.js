@@ -1,9 +1,11 @@
 //@ts-check
 import globals from 'globals';
-import createTestResolutionPlugin from './internal/eslint-test-plugin.cjs';
+import createTestResolutionPlugin from './internal/eslint/eslint-test-plugin.cjs';
+import singleLineControlPlugin from "./internal/eslint/eslint-general.cjs";
 import { defineConfig } from 'eslint/config';
+import stylistic from "@stylistic/eslint-plugin";
 import { parser as tsParser, plugin as typescriptEslint } from 'typescript-eslint';
-import { typescriptRules, definitionRules, testRules } from "./internal/eslint";
+import { typescriptRules, definitionRules, testRules } from "./internal/eslint/eslint.js";
 
 /**
  * 
@@ -14,43 +16,46 @@ import { typescriptRules, definitionRules, testRules } from "./internal/eslint";
  * @returns {import('eslint').Linter.Config}
  */
 const eslintConfiguration = (regex, rules, node, plugins) => ({
-  files: [regex],
-  ignores: ['node_modules/', "dist/"],
-  languageOptions: {
-    sourceType: "module",
-    ecmaVersion: 2022,
-    parser: tsParser,
-    parserOptions: {
-      sourceType: "module",
-      projectService: true,
-      tsconfigRootDir: import.meta.dirname
+    files: [regex],
+    ignores: ['node_modules/', "dist/"],
+    languageOptions: {
+        sourceType: "module",
+        ecmaVersion: 2022,
+        parser: tsParser,
+        parserOptions: {
+            sourceType: "module",
+            projectService: true,
+            tsconfigRootDir: import.meta.dirname
+        },
+        globals: node ? globals.node : globals.browser,
     },
-    globals: node ? globals.node : globals.browser,
-  },
-  plugins: {
-    "@typescript-eslint": typescriptEslint,
-    ...plugins
-  },
-  rules: rules
+    plugins: {
+        "@typescript-eslint": typescriptEslint,
+        "@stylistic": stylistic,
+        "single-line": singleLineControlPlugin,
+        ...plugins
+    },
+    rules
 });
 
-
 export default defineConfig([
-  { ignores: [
-    "**/node_modules", 
-    "**/dist/", 
-    "**/build/", 
-    "**/coverage/", 
-    "**/_*.ts"
-  ] },
-  eslintConfiguration('**/*.{ts,tsx}',          typescriptRules, false),
-  eslintConfiguration('**/*.d.ts',              definitionRules, false),
-  eslintConfiguration('**/*.{test.js,test.ts}', testRules,       false, {
-    "opti":     createTestResolutionPlugin("opti", "./types/Core/opti.lib.d.ts"),
-    "crafty":   createTestResolutionPlugin("crafty", "./types/Crafty/crafty.lib.d.ts"),
-    "query":    createTestResolutionPlugin("query", "./types/Query/Query.lib.d.ts"),
-    "requests": createTestResolutionPlugin("request", "./types/Requests/requests.lib.d.ts"),
-    "unsync":   createTestResolutionPlugin("unsync", "./types/Unsync/unsync.lib.d.ts"),
-    "flow":     createTestResolutionPlugin("flow", "./types/Flow/flow.lib.d.ts"),
-  })
+    {
+        ignores: [
+            "**/node_modules",
+            "**/dist/",
+            "**/build/",
+            "**/coverage/",
+            "**/_*.ts"
+        ]
+    },
+    eslintConfiguration('**/*.{ts,tsx}', typescriptRules, false),
+    eslintConfiguration('**/*.d.ts', definitionRules, false),
+    eslintConfiguration('**/*.{test.js,test.ts}', testRules, false/*, {
+        "opti": createTestResolutionPlugin("opti", "./package/types/Core/opti.lib.d.ts"),
+        "crafty": createTestResolutionPlugin("crafty", "./package/types/Crafty/crafty.lib.d.ts"),
+        "query": createTestResolutionPlugin("query", "./package/types/Query/query.lib.d.ts"),
+        "requests": createTestResolutionPlugin("request", "./package/types/Requests/requests.lib.d.ts"),
+        "unsync": createTestResolutionPlugin("unsync", "./package/types/Unsync/unsync.lib.d.ts"),
+        "flow": createTestResolutionPlugin("flow", "./package/types/Flow/flow.lib.d.ts"),
+    } */)
 ]);

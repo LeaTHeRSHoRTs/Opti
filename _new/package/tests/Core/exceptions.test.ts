@@ -1,183 +1,127 @@
 import "opti";
 
-describe("Exception", () => {
-  it("should throw", () => {
-    expect(() => {
-      throw new Exception("ErrorException");
-    }).toThrow();
-  });
+describe("Errors", () => {
+    const Errors: { name: string, instance: DynErrorCtor }[] = [{
+        name: "CloneError",
+        instance: CloneError
+    }, {
+        name: "NumberTooSmallError",
+        instance: NumberTooSmallError
+    }, {
+        name: "AssertionError",
+        instance: AssertionError
+    }, {
+        name: "NotImplementedError",
+        instance: NotImplementedError
+    }, {
+        name: "AccessError",
+        instance: AccessError
+    }, {
+        name: "UnknownError",
+        instance: UnknownError
+    }, {
+        name: "DebouncedError",
+        instance: DebouncedError
+    }];
 
-  it("should have a static method that can check if an object is an exception", () => {
-    expect(Exception.isException(new Exception)).toBeTruthy();
-    expect(Exception.isException(new Error)).toBeFalsy();
-    expect(Exception.isException(new SyntaxException)).toBeTruthy();
-    expect(Exception.isException(new SyntaxError)).toBeFalsy();
-    expect(Exception.isException(new AssertionException)).toBeTruthy();
-    expect(Exception.isException(new TypeError)).toBeFalsy();
-    expect(Exception.isException(new class extends Exception { })).toBeTruthy();
-  });
+    describe.each(Errors)("$name", ({ name, instance }) => {
+        const normalInstance = new instance;
+        const instanceWithMessage = new instance("myMessage");
+        const instanceWithCause = new instance(undefined, "throwing");
+        const instanceWithAll = new instance("myMessage", "throwing");
 
-  it("should have a static method that can check if an object is an exception or runtime exception", () => {
-    expect(Exception.isAnyException(new Exception)).toBeTruthy();
-    expect(Exception.isAnyException(new Error)).toBeFalsy();
-    expect(Exception.isAnyException(new SyntaxException)).toBeTruthy();
-    expect(Exception.isAnyException(new SyntaxError)).toBeFalsy();
-    expect(Exception.isAnyException(new AssertionException)).toBeTruthy();
-    expect(Exception.isAnyException(new TypeError)).toBeFalsy();
-    expect(Exception.isAnyException(new RuntimeException)).toBeTruthy();
-    expect(Exception.isAnyException(new class extends RuntimeException { })).toBeTruthy();
-  });
+        it("should be a subclass of Error", () => {
+            expect(normalInstance).toBeInstanceOf(Error);
+        });
 
-  const exceptions: { name: string, instance: ExceptionConstructor }[] = [{
-    name: "Exception",
-    instance: Exception
-  }, {
-    name: "SyntaxException",
-    instance: SyntaxException
-  }, {
-    name: "TypeException",
-    instance: TypeException
-  }, {
-    name: "CloneException",
-    instance: CloneException
-  }, {
-    name: "NumberTooSmallException",
-    instance: NumberTooSmallException
-  }, {
-    name: "AssertionException",
-    instance: AssertionException
-  }, {
-    name: "NotImplementedException",
-    instance: NotImplementedException
-  }, {
-    name: "AccessException",
-    instance: AccessException
-  }, {
-    name: "UnknownException",
-    instance: UnknownException
-  }, {
-    name: "DebouncedException",
-    instance: DebouncedException
-  }, {
-    name: "AbstractMethodInvokedException",
-    instance: AbstractMethodInvokedException
-  }, {
-    name: "AbstractInitializationException",
-    instance: AbstractInitializationException
-  }];
+        it("should have the right name", () => {
+            expect(normalInstance.name).toBe(name);
+        });
 
-  describe.each(exceptions)("$name", ({ name, instance }) => {
-    const normalInstance = new instance;
-    const instanceWithMessage = new instance("myMessage");
-    const instanceWithCause = new instance(undefined, "throwing");
-    const instanceWithAll = new instance("myMessage", "throwing");
+        it("should have the right message", () => {
+            expect(normalInstance.message).toBe("");
+            expect(instanceWithMessage.message).toBe("myMessage");
+        });
 
-    it("should be a subclass of Exception", () => {
-      expect(normalInstance).toBeInstanceOf(Exception);
+        it("should be have the right cause", () => {
+            expect(instanceWithCause.cause).toBe("throwing");
+        });
+
+        it("should be have the right message and cause", () => {
+            expect(instanceWithAll.message).toBe("myMessage");
+            expect(instanceWithAll.cause).toBe("throwing");
+        });
+
+        it("should give the right stack trace", () => {
+            Error.prototype.stack = "MOCK_STACK";
+
+            try {
+                throw new instance;
+            } catch (e) {
+                if (e instanceof instance) {
+                    expect(e.stack).toBe("MOCK_STACK");
+                }
+            }
+        });
+    });
+});
+
+describe("RuntimeError", () => {
+    const normalInstance = new RuntimeError;
+    const instanceWithMessage = new RuntimeError("myMessage");
+    const instanceWithCause = new RuntimeError(undefined, "throwing");
+    const instanceWithAll = new RuntimeError("myMessage", "throwing");
+
+    it("should not be a subclass of Error", () => {
+        expect(normalInstance).not.toBeInstanceOf(Error);
     });
 
     it("should have the right name", () => {
-      expect(normalInstance.name).toBe(name);
-      expect(normalInstance.getName()).toBe(name);
+        expect(normalInstance.name).toBe("RuntimeError");
+        expect(normalInstance.toString()).toBe("RuntimeError");
     });
 
     it("should have the right message", () => {
-      expect(normalInstance.getMessage()).toBe("");
-      expect(instanceWithMessage.getMessage()).toBe("myMessage");
+        expect(normalInstance.message).toBe("");
+        expect(instanceWithMessage.message).toBe("myMessage");
+        expect(instanceWithMessage.toString()).toBe("RuntimeError: myMessage");
     });
 
     it("should be have the right cause", () => {
-      expect(instanceWithCause.getCause()).toBe("throwing");
+        expect(instanceWithCause.cause).toBe("throwing");
     });
 
     it("should be have the right message and cause", () => {
-      expect(instanceWithAll.getMessage()).toBe("myMessage");
-      expect(instanceWithAll.getCause()).toBe("throwing");
+        expect(instanceWithAll.message).toBe("myMessage");
+        expect(instanceWithAll.cause).toBe("throwing");
     });
 
-    it("should be throwable again using the throw method", () => {
-      expect(() => {
-        normalInstance.throw();
-      }).toThrow(instance);
-    });
+    it.skip("should give the right stack trace", () => {
+        Error.prototype.stack = "MOCK_STACK";
 
-    it("should give the right stack trace", () => {
-      Error.prototype.stack = "MOCK_STACK";
-
-      try {
-        throw new instance;
-      } catch (e) {
-        if (e instanceof instance) {
-          expect(e.getStackTrace()).toBe("MOCK_STACK");
+        try {
+            throw new RuntimeError;
+        } catch (e) {
+            if (e instanceof RuntimeError) {
+                e.stack = "MOCK_STACK";
+                expect(e.stack).toBe("MOCK_STACK");
+            } else {
+                expect.fail("Error was not a RuntimeError");
+            }
         }
-      }
+
+        expect.fail("RuntimeError was not caught");
     });
-  });
-});
 
-describe("RuntimeException", () => {
-  const normalInstance = new RuntimeException;
-  const instanceWithMessage = new RuntimeException("myMessage");
-  const instanceWithCause = new RuntimeException(undefined, "throwing");
-  const instanceWithAll = new RuntimeException("myMessage", "throwing");
-
-  it("should not be a subclass of Exception", () => {
-    expect(normalInstance).not.toBeInstanceOf(Exception);
-  });
-
-  it("should have the right name", () => {
-    expect(normalInstance.name).toBe("RuntimeException");
-    expect(normalInstance.getName()).toBe("RuntimeException");
-    expect(normalInstance.toString()).toBe("RuntimeException");
-  });
-
-  it("should have the right message", () => {
-    expect(normalInstance.getMessage()).toBe("");
-    expect(instanceWithMessage.getMessage()).toBe("myMessage");
-    expect(instanceWithMessage.toString()).toBe("RuntimeException: myMessage");
-  });
-
-  it("should be have the right cause", () => {
-    expect(instanceWithCause.getCause()).toBe("throwing");
-  });
-
-  it("should be have the right message and cause", () => {
-    expect(instanceWithAll.getMessage()).toBe("myMessage");
-    expect(instanceWithAll.getCause()).toBe("throwing");
-  });
-
-  it("should be throwable again using the throw method", () => {
-    expect(() => {
-      normalInstance.throw();
-    }).toThrow(RuntimeException);
-  });
-
-  it.skip("should give the right stack trace", () => {
-    Error.prototype.stack = "MOCK_STACK";
-
-    try {
-      throw new RuntimeException;
-    } catch (e) {
-      if (e instanceof RuntimeException) {
-        (e as any).stack = "MOCK_STACK";
-        expect(e.getStackTrace()).toBe("MOCK_STACK");
-      } else {
-        expect.fail("Error was not a RuntimeException");
-      }
-    }
-
-    expect.fail("RuntimeException was not caught");
-  });
-
-  it("should not be catch-able using the exception class or Error class", () => {
-    try {
-      throw new RuntimeException();
-    } catch (e) {
-      if (e instanceof Error || e instanceof Exception) {
-        expect.fail("Error was not instance of Error or Exception");
-      } else if (!(e instanceof RuntimeException)) {
-        expect.fail("Error was not a runtime exception");
-      }
-    }
-  });
+    it("should not be catch-able using the Error class or Error class", () => {
+        try {
+            throw new RuntimeError();
+        } catch (e) {
+            if (e instanceof Error || e instanceof Error) {
+                expect.fail("Error was not instance of Error or Error");
+            } else if (!(e instanceof RuntimeError)) {
+                expect.fail("Error was not a runtime Error");
+            }
+        }
+    });
 });

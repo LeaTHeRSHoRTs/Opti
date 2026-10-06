@@ -15,16 +15,23 @@
     "cli"
   ],
   "sideEffects": true,
-  "scripts": {},
+  "scripts": {
+    "build": "vite build",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run lint && npm run typecheck"
+  },
   "engines": {
     "node": ">=23.0.0"
   },
   "devDependencies": {
+    "@stylistic/eslint-plugin": "^5.10.0",
     "@types/node": "^26.6.3",
     "eslint": "^10.11.0",
     "globals": "^17.12.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.70.1",
+    "vite": "^8.3.1",
     "vitest": "^5.0.2"
   }
 }

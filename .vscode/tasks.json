@@ -1,0 +1,20 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "TypeScript: Check",
+      "type": "shell",
+      "command": "npx",
+      "args": ["tsc", "-p", "${workspaceFolder}/_new/tsconfig.json"],
+      "problemMatcher": "$tsc"
+    },
+    {
+      "label": "ESLint: Check",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "lint"],
+      "options": { "cwd": "${workspaceFolder}/_new/package" },
+      "problemMatcher": "$eslint-stylish"
+    }
+  ]
+}

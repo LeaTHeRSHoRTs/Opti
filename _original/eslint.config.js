@@ -1,5 +1,5 @@
-import packageConfig from "./package/eslint.config";
+// import packageConfig from "./package/eslint.config";
 
-export default [
-  ...packageConfig
-]
+// export default [
+//   ...packageConfig
+// ]

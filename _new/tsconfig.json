@@ -1,14 +1,8 @@
 {
-  "extends": "../tsconfig.base.json",
-  "compilerOptions": {
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
-    "lib": ["ESNext"],
-    "types": ["node"]
-  },
+  "extends": "./tsconfig.base.json",
   "include": [
     "**/*.ts",
-    "**/*.js", "../../_new/package/tests/vitest.d.ts",
+    "**/*.js"
   ],
   "exclude": [
     "src",

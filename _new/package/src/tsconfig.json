@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "paths": {
       "@crafty":  ["../types/Crafty/crafty.lib.d.ts"],
@@ -7,11 +7,12 @@
       "@request": ["../types/Requests/requests.lib.d.ts"],
       "@unsync":  ["../types/Unsync/unsync.lib.d.ts"],
       "@flow":    ["../types/Flow/flow.lib.d.ts"]
-    }
+    },
+    "typeRoots": ["node_modules", "types"]
   },
   "include": [
     "**/*.ts",
-    "../types/Core/opti.lib.d.ts",
-    "../types/secrets.d.ts"
-,     "../../../_new/package/src/helpers.ts"  ]
+    "../types/core/index.d.ts",
+    "../../internal/secrets.d.ts"
+  ]
 }
