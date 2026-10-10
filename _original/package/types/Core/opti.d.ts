@@ -21,7 +21,7 @@ type Stringed<T> = Extract<T, string>;
 /** Construct a type with a set of properties K of type T, all of which are optional */
 type PartialRecord<K extends Key, T> = Partial<Record<K, T>>;
 
-type WritableOnly<T> = Pick<T, Object.Writable<T>>;
+type WritableOnly<T> = Pick<T, Obj.Writable<T>>;
 
 /** Filters an object `U` by type `T` */
 type Only<T, U> = { [K in keyof T as T[K] extends U ? K : never]: T[K] };

@@ -38,9 +38,9 @@ describe("Text.txt", () => {
     it("should be able to set the text using a function", () => {
         const newText = "New text";
 
-        textNode.txt((original) => original + " " + newText);
+        textNode.txt((original) => original + ' ' + newText);
 
-        expect(textNode.txt()).toBe(originText + " " + newText);
+        expect(textNode.txt()).toBe(originText + ' ' + newText);
     });
 });
 

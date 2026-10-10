@@ -2,11 +2,11 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "paths": {
-      "@crafty":  ["../types/Crafty/crafty.lib.d.ts"],
-      "@query":   ["../types/Query/query.lib.d.ts"],
-      "@request": ["../types/Requests/requests.lib.d.ts"],
-      "@unsync":  ["../types/Unsync/unsync.lib.d.ts"],
-      "@flow":    ["../types/Flow/flow.lib.d.ts"]
+      "@crafty":  ["../types/crafty/index.d.ts"],
+      "@query":   ["../types/query/index.d.ts"],
+      "@request": ["../types/request/index.d.ts"],
+      "@unsync":  ["../types/unsync/index.d.ts"],
+      "@flow":    ["../types/flow/index.d.ts"]
     },
     "typeRoots": ["node_modules", "types"]
   },

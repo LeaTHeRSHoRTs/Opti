@@ -1,4 +1,4 @@
-import "opti";
+import 'opti';
 
 beforeEach(() => {
     document.body.innerHTML = "";
@@ -65,7 +65,7 @@ describe("Document.leaving", () => {
 
 describe("Document.css", () => {
     it("should set the css for an element", () => {
-        const div = document.createElement("div");
+        const div = document.createElement('div');
         div.className = "target";
         document.body.appendChild(div);
 
@@ -83,11 +83,11 @@ describe("Document.css", () => {
     });
 
     it("should be able to get the css for an element", () => {
-        const div = document.createElement("div");
+        const div = document.createElement('div');
         div.className = "target";
         document.body.appendChild(div);
 
-        const styleSheet = document.createElement("style");
+        const styleSheet = document.createElement('style');
         document.head.appendChild(styleSheet);
 
         styleSheet.sheet?.insertRule("div.target { color: red; font-size: 20px }");
@@ -99,7 +99,7 @@ describe("Document.css", () => {
     it("should throw if no selector is specified", () => {
         expect(() => {
             document.css("");
-        }).toThrowException(SyntaxException);
+        }).toThrow(SyntaxError);
     });
 });
 

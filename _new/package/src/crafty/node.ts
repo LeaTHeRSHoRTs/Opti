@@ -1,7 +1,7 @@
-import { _InternalChildrenNotAllowedException } from "./exceptions";
-import { isHTMLTag, isVoidHTMLTag } from "./helpers";
-import _InternalText from "./text";
-import { Crafty } from "@crafty";
+import { _InternalChildrenNotAllowedException } from './exceptions';
+import { isHTMLTag, isVoidHTMLTag } from './helpers';
+import _InternalText from './text';
+import '@crafty';
 
 export default abstract class _InternalNode implements Crafty.Node {
     public abstract readonly kind: Crafty.NodeKind;
@@ -17,7 +17,7 @@ export default abstract class _InternalNode implements Crafty.Node {
             if (isHTMLTag(nsOrTag)) {
                 return Crafty.craft(nsOrTag, {});
             } else {
-                return Crafty.craft(nsOrTag, tag as string, {});
+                return Crafty.craft(nsOrTag, tag, {});
             }
         } else {
             throw new Crafty.Exception("Parameter tag must not be a void HTML tag");

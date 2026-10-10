@@ -1,8 +1,8 @@
-import "opti";
+import 'opti';
 
 describe("Enum", () => {
     it("should create properties", () => {
-        const myEnum = Enum("A", "B", "C");
+        const myEnum = Enum('A', 'B', 'C');
 
         expect(typeof myEnum.A).toBe("symbol");
         expect(typeof myEnum.B).toBe("symbol");
@@ -10,7 +10,7 @@ describe("Enum", () => {
     });
 
     it("should make properties that are unique and not comparable", () => {
-        const myEnum = Enum("A", "B", "C", "D");
+        const myEnum = Enum('A', 'B', 'C', 'D');
 
         expect(myEnum.A === myEnum.B).toBeFalsy();
         expect(myEnum.C === myEnum.D).toBeFalsy();
@@ -22,8 +22,8 @@ describe("Enum", () => {
         expect(myEnum.D === myEnum.D).toBeTruthy();
     
         try {
-            Enum("A", "A", "B", "Q", "Q");
-            fail("Enum did not throw for duplicate properties");
+            Enum('A', 'A', 'B', 'Q', 'Q');
+            expect.fail("Enum did not throw for duplicate properties");
         } catch (e: any) {
             expect(e).toBeInstanceOf(SyntaxError);
             expect(e.getMessage()).toBe("Enum members may only be unique");
@@ -33,7 +33,7 @@ describe("Enum", () => {
     it("should throw when the wrong characters are added", () => {
         try {
             Enum("A_", "$B", "{}");
-            fail("Enum did not throw for invalid characters");
+            expect.fail("Enum did not throw for invalid characters");
         } catch (e: any) {
             expect(e).toBeInstanceOf(SyntaxError);
             expect(e.getMessage()).toBe("Enum values must be defined and may only be the characters A-Z, a-z, 0-9, _ and $");
@@ -41,30 +41,30 @@ describe("Enum", () => {
     });
 
     it("should be iterable", () => {
-        expect([...Enum("A", "B", "C", "D")]).toEqual(["A", "B", "C", "D"]);
+        expect([...Enum('A', 'B', 'C', 'D')]).toEqual(['A', 'B', 'C', 'D']);
 
-        const iterator = Enum("A", "B", "C", "D")[Symbol.iterator]();
-        expect(iterator.next()).toEqual({ value: "A", done: false });
-        expect(iterator.next()).toEqual({ value: "B", done: false });
-        expect(iterator.next()).toEqual({ value: "C", done: false });
-        expect(iterator.next()).toEqual({ value: "D", done: false });
+        const iterator = Enum('A', 'B', 'C', 'D')[Symbol.iterator]();
+        expect(iterator.next()).toEqual({ value: 'A', done: false });
+        expect(iterator.next()).toEqual({ value: 'B', done: false });
+        expect(iterator.next()).toEqual({ value: 'C', done: false });
+        expect(iterator.next()).toEqual({ value: 'D', done: false });
         expect(iterator.next()).toEqual({ value: undefined, done: true });
     });
 });
 
 describe("Tuple", () => {
-    const tuple = Tuple("A", "B", "C");
+    const tuple = Tuple('A', 'B', 'C');
 
     it("should create a correct tuple", () => {
         expectTypeOf<typeof tuple>().toEqualTypeOf<[string, string, string]>();
         expectTypeOf<typeof tuple>().not.toBeArray;
-        expect(tuple).toEqual(["A", "B", "C"]);
+        expect(tuple).toEqual(['A', 'B', 'C']);
     });
 
     it("should be able to access the values inside the tuple", () => {
-        expect(tuple[0]).toBe("A");
-        expect(tuple[1]).toBe("B");
-        expect(tuple[2]).toBe("C");
+        expect(tuple[0]).toBe('A');
+        expect(tuple[1]).toBe('B');
+        expect(tuple[2]).toBe('C');
     });
 });
 

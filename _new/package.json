@@ -18,7 +18,10 @@
   "scripts": {
     "build": "vite build",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "npm run typecheck:src && npm run typecheck:types && npm run typecheck:tests",
+    "typecheck:src": "tsc -p package/src",
+    "typecheck:tests": "tsc -p package/tests",
+    "typecheck:types": "tsc -p package/types",
     "check": "npm run lint && npm run typecheck"
   },
   "engines": {
@@ -28,9 +31,10 @@
     "@stylistic/eslint-plugin": "^5.10.0",
     "@types/node": "^26.6.3",
     "eslint": "^10.11.0",
+    "eslint-plugin-jsdoc": "^65.1.0",
     "globals": "^17.12.0",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.70.1",
+    "typescript-eslint": "^8.71.1",
     "vite": "^8.3.1",
     "vitest": "^5.0.2"
   }

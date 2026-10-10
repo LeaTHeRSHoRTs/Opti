@@ -1,3 +1,11 @@
+interface Opti {
+    crafty: boolean;
+    query: boolean;
+    unsync: boolean;
+    requests: boolean;
+    flow: boolean;
+}
+
 declare namespace HTMLInputElement {
     interface ValueAccessor {
         asString(): string;
@@ -9,30 +17,25 @@ declare namespace HTMLInputElement {
     }
 }
 
-interface Opti {
-    crafty: boolean;
-    query: boolean;
-    unsync: boolean;
-    requests: boolean;
-    flow: boolean;
-}
-
 interface BaseValueQueries<T> {
     getValue(): T;
 
     /**
-   * 
-   * @param other 
-   */
+     * 
+     * @opti
+     * @param other 
+     */
     equalTo(other: unknown): boolean;
     /**
-   * Checks if a value is in the format Object, Object(size), Date:time or Function:<name>(...params,)
-   * @param str The type string to check
-   */
+     * Checks if a value is in the format Object, Object(size), Date:time or Function:<name>(...params,)
+     * @opti
+     * @param str The type string to check
+     */
     isTypeString(str: string): boolean;
     /**
-   * Returns the type of the object in the format Object, Object(size), Date:time or Function:<name>(...params,)
-   */
+     * Returns the type of the object in the format Object, Object(size), Date:time or Function:<name>(...params,)
+     * @opti
+     */
     stringOf(): string;
     isInstanceOf<U extends Class>(clazz: U): this is BaseValueQueries<Class.Instance<U>>;
     isDefined(): this is BaseValueQueries<NonNullable<T>>;
@@ -43,7 +46,7 @@ interface BaseValueQueries<T> {
 }
 
 interface SizedObjectTesters<T> extends BaseValueQueries<T> {
-    length<U extends number>(length: U): this is ValueQueries<T extends unknown[] ? Tuple.Of<T[number], U> : T & { length: U }>;
+    length<U extends number>(length: U): this is ValueQueries<T extends unknown[] ? Tuple<T[number], U> : T & { length: U }>;
     longer(object: Sized): boolean;
     longer(length: number): boolean;
     shorter(length: number): boolean;
@@ -57,16 +60,16 @@ interface FuncTesters<T extends Func> extends BaseValueQueries<T> {
 type EventListenerInfo<T, K extends keyof EventMapOf<T> = keyof EventMapOf<T>> =
   | {
       type: K, 
-      func: EventTarget.Func<T, K>,
+      func: EventFunc<T, K>,
       options: AddEventListenerOptions,
-      listener: "default" | "controller",
+      listener: 'default' | 'controller',
       special?: undefined
   }
   | {
       type: K, 
-      func: EventTarget.Func<T, K>,
+      func: EventFunc<T, K>,
       options: AddEventListenerOptions,
-      listener: "conditional",
+      listener: 'conditional',
       special: ((this: T, e: EventMapOf<T>[K]) => boolean) | number
   };
 
@@ -79,34 +82,40 @@ interface RegistryOf<K, V> {
 
 declare interface ElementCopyOptions {
     /**
-   * Defines if the new element should have everything that the previous element had. Defaults to `false`.
-   */
+     * Defines if the new element should have everything that the previous element had. Defaults to `false`.
+     * @opti
+     */
     copyAll?: boolean;
     /**
-   * Defines if the new element should have the same event listeners. Defaults to `false`.
-   */
+     * Defines if the new element should have the same event listeners. Defaults to `false`.
+     * @opti
+     */
     copyEvents?: boolean;
     /**
-   * Defines if the new element should have the same children. Defaults to `false`.
-   * 
-   * If `copyAttributes` is set to true, this property is also set to true
-   */
+     * Defines if the new element should have the same children. Defaults to `false`.
+     * @opti
+     * 
+     * If `copyAttributes` is set to true, this property is also set to true
+     */
     copyChildren?: boolean;
     /**
-   * Defines if the new element should have the same attributes. Defaults to `true`.
-   */
+     * Defines if the new element should have the same attributes. Defaults to `true`.
+     * @opti
+     */
     copyAttributes?: boolean;
     /**
-   * Defines if the new element should have the same styles. Defaults to `true`.
-   * 
-   * If `copyAttributes` is set to true, this property is also set to true
-   */
+     * Defines if the new element should have the same styles. Defaults to `true`.
+     * @opti
+     * 
+     * If `copyAttributes` is set to true, this property is also set to true
+     */
     copyStyles?: boolean;
 
     /** 
-   * The fallback ID to use if the copied element has an ID
-   * 
-   * This attribute never has a default value
-   */
+     * The fallback ID to use if the copied element has an ID
+     * @opti
+     * 
+     * This attribute never has a default value
+     */
     fallbackId?: string;
 }

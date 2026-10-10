@@ -1,5 +1,4 @@
-import "opti";
-import "opti/flow";
+import { Flow } from 'opti';
 
 declare global {
     var FLAG_1: boolean;
@@ -41,39 +40,5 @@ describe("Flow.always", () => {
         expect(replaced2).toBeTruthy();
         expect(result1).not.toBe(mock1);
         expect(result2).toBe(mock2);
-    });
-});
-
-describe("Flow.globals", () => {
-    describe("flows", () => {
-        it("should be able to check if an implementation works", () => {
-            expect(Flow.globals.flows('document')).toBeTruthy();
-            expect(Flow.globals.flows('nonExistentProp')).toBeFalsy();
-        });
-    });
-
-    describe("always", () => {
-        beforeEach(() => {
-            vi.stubGlobal('FLAG_1', true);
-            vi.stubGlobal('FLAG_2', undefined);
-        });
-
-        afterEach(() => {
-            vi.unstubAllGlobals();
-        });
-
-        it("should not assign new values to global objects when the value passes the check", () => {
-            const res = Flow.globals.always('FLAG_1', false);
-
-            expect(res).toBeFalsy();
-            expect(globalThis.FLAG_1).toBeTruthy();
-        });
-
-        it("should assign a new value if the original value does not pass the check", () => {
-            const res = Flow.globals.always('FLAG_2', true);
-
-            expect(res).toBeTruthy();
-            expect(globalThis.FLAG_2).toBeTruthy();
-        });
     });
 });

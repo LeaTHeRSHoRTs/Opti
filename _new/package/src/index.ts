@@ -1,4 +1,4 @@
-import "./core/index.js";
+import './core/index.js';
 export { default as Crafty } from "./crafty/index.js";
 export { default as Flow } from "./flow/index.js";
 export { default as Query } from "./query/index.js";

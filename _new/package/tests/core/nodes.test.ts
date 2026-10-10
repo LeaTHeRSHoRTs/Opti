@@ -1,9 +1,9 @@
-import "opti";
+import 'opti';
 
 describe("Node.parent", () => {
     it("should return the direct parent element", () => {
-        const parent = document.createElement("div");
-        const child = document.createElement("span");
+        const parent = document.createElement('div');
+        const child = document.createElement('span');
         parent.appendChild(child);
         document.body.appendChild(parent);
 
@@ -13,9 +13,9 @@ describe("Node.parent", () => {
 
 describe("Node.ancestor", () => {
     it("should return the closest matching ancestor", () => {
-        const ancestor = document.createElement("section");
-        const parent = document.createElement("div");
-        const child = document.createElement("span");
+        const ancestor = document.createElement('section');
+        const parent = document.createElement('div');
+        const child = document.createElement('span');
 
         ancestor.classList.add("target");
         ancestor.appendChild(parent);
@@ -26,8 +26,8 @@ describe("Node.ancestor", () => {
     });
 
     it("should return null if no matching ancestor", () => {
-        const parent = document.createElement("div");
-        const child = document.createElement("span");
+        const parent = document.createElement('div');
+        const child = document.createElement('span');
 
         parent.appendChild(child);
         document.body.appendChild(parent);
@@ -36,9 +36,9 @@ describe("Node.ancestor", () => {
     });
 
     it("should return the direct parent when level is 1", () => {
-        const grandparent = document.createElement("div");
-        const parent = document.createElement("section");
-        const child = document.createElement("span");
+        const grandparent = document.createElement('div');
+        const parent = document.createElement('section');
+        const child = document.createElement('span');
 
         grandparent.appendChild(parent);
         parent.appendChild(child);
@@ -49,10 +49,10 @@ describe("Node.ancestor", () => {
     });
 
     it("should return the grandparent when level is 2", () => {
-        const great = document.createElement("article");
-        const grandparent = document.createElement("div");
-        const parent = document.createElement("section");
-        const child = document.createElement("span");
+        const great = document.createElement('article');
+        const grandparent = document.createElement('div');
+        const parent = document.createElement('section');
+        const child = document.createElement('span');
 
         great.appendChild(grandparent);
         grandparent.appendChild(parent);
@@ -64,8 +64,8 @@ describe("Node.ancestor", () => {
     });
 
     it("should return null if the requested level exceeds tree depth", () => {
-        const parent = document.createElement("div");
-        const child = document.createElement("span");
+        const parent = document.createElement('div');
+        const child = document.createElement('span');
 
         parent.appendChild(child);
         document.body.appendChild(parent);
@@ -75,7 +75,7 @@ describe("Node.ancestor", () => {
     });
 
     it("should return the node itself when level is 0", () => {
-        const node = document.createElement("div");
+        const node = document.createElement('div');
         document.body.appendChild(node);
 
         // level 0 → the node itself
@@ -83,8 +83,8 @@ describe("Node.ancestor", () => {
     });
 
     it("should return the closest ancestor of a text node", () => {
-        const ancestor = document.createElement("section");
-        const parent = document.createElement("div");
+        const ancestor = document.createElement('section');
+        const parent = document.createElement('div');
         const child = document.createTextNode("span");
 
         ancestor.classList.add("target");
@@ -98,9 +98,9 @@ describe("Node.ancestor", () => {
 
 describe("Node.getChildren", () => {
     it("should return all element children", () => {
-        const parent = document.createElement("div");
-        const child1 = document.createElement("p");
-        const child2 = document.createElement("span");
+        const parent = document.createElement('div');
+        const child1 = document.createElement('p');
+        const child2 = document.createElement('span');
 
         parent.appendChild(child1);
         parent.appendChild(child2);
@@ -115,9 +115,9 @@ describe("Node.getChildren", () => {
 
 describe("Node.siblings", () => {
     it("should return all siblings excluding self", () => {
-        const parent = document.createElement("div");
-        const child1 = document.createElement("span");
-        const child2 = document.createElement("a");
+        const parent = document.createElement('div');
+        const child1 = document.createElement('span');
+        const child2 = document.createElement('a');
 
         parent.appendChild(child1);
         parent.appendChild(child2);
@@ -129,9 +129,9 @@ describe("Node.siblings", () => {
     });
 
     it("should return all siblings including itself when inclusive is set to true", () => {
-        const parent = document.createElement("div");
-        const child1 = document.createElement("span");
-        const child2 = document.createElement("a");
+        const parent = document.createElement('div');
+        const child1 = document.createElement('span');
+        const child2 = document.createElement('a');
 
         parent.appendChild(child1);
         parent.appendChild(child2);
@@ -156,7 +156,7 @@ describe("Element.cut", () => {
 
     it("should throw if it tries to detach an invalid element", () => {
         const el = document.createElement('div');
-        expect(() => el.cut()).toThrowException(HierarchyException);
+        expect(() => el.cut()).toThrow(HierarchyError);
     });
 });
 
@@ -179,7 +179,7 @@ describe("Element.copy", () => {
         const copy = el.copy();
 
         expect(copy).toMatchObject<Partial<HTMLElement>>({
-            tagName: 'DIV',
+            tagName: "DIV",
             innerHTML: "<p>Text</p>",
             title: "My Title",
             role: "text",
@@ -217,9 +217,9 @@ describe("Element.copy", () => {
       <option value="a">A</option>
       <option value="b" selected>B</option>
     `;
-        select.value = "b";
+        select.value = 'b';
 
-        option.value = "c";
+        option.value = 'c';
         option.text = "Option";
         option.selected = true;
 
@@ -232,12 +232,12 @@ describe("Element.copy", () => {
         expect(link.href).toContain("https://example.org");
         expect(img.src).toContain("https://example.org/image");
         expect(select).toMatchObject<Partial<HTMLSelectElement>>({
-            value: "b",
+            value: 'b',
             selectedIndex: 1
         });
 
         expect(option).toMatchObject<Partial<HTMLOptionElement>>({
-            value: "c",
+            value: 'c',
             text: "Option",
             selected: true
         });
@@ -317,30 +317,30 @@ describe("Element.copy", () => {
 
 describe("Node.$", () => {
     it("should return the first matching descendant", () => {
-        const root = document.createElement("div");
-        const match = document.createElement("b");
+        const root = document.createElement('div');
+        const match = document.createElement('b');
 
         root.appendChild(match);
         document.body.appendChild(root);
 
-        expect(root.$("b")).toEqual(match);
+        expect(root.$('b')).toEqual(match);
     });
 
     it("should return null if no match is found", () => {
-        const root = document.createElement("div");
+        const root = document.createElement('div');
         document.body.appendChild(root);
 
-        expect(root.$("section")).toBeNull();
+        expect(root.$('section')).toBeNull();
     });
 
     it("should support complex selectors", () => {
-        const inner = document.createElement("p");
-        const outside = document.createElement("div");
+        const inner = document.createElement('p');
+        const outside = document.createElement('div');
 
         outside.appendChild(inner);
         document.body.appendChild(outside);
 
-        inner.className = "x";
+        inner.className = 'x';
         inner.id = "outsider";
         inner.setAttribute("data-test", "testing");
 
@@ -349,38 +349,39 @@ describe("Node.$", () => {
     });
 
     it("should error out and tell users that commas are not allowed", () => {
-        expect(() => document.$("div, p")).toThrowException(SyntaxException, "Invalid query: commas are not allowed in query selectors that can only select 1 element");
+        expect(() => document.$("div, p"))
+            .toThrow(new SyntaxError("Invalid query: commas are not allowed in query selectors that can only select 1 element"));
     });
 });
 
 describe("Node.$$", () => {
     it("should return all matching descendants", () => {
-        const root = document.createElement("div");
-        const em1 = document.createElement("em");
-        const em2 = document.createElement("em");
+        const root = document.createElement('div');
+        const em1 = document.createElement('em');
+        const em2 = document.createElement('em');
 
         root.appendChild(em1);
         root.appendChild(em2);
         document.body.appendChild(root);
 
-        const found = root.$$("em");
+        const found = root.$$('em');
         expect(found).toContain(em1);
         expect(found).toContain(em2);
         expect(found.length).toBe(2);
     });
 
     it("should return an empty array if no matches", () => {
-        const root = document.createElement("div");
+        const root = document.createElement('div');
         document.body.appendChild(root);
 
-        const found = root.$$("footer");
+        const found = root.$$('footer');
         expect(found).toHaveLength(0);
     });
 
     it("should support more advanced selectors", () => {
-        const root = document.createElement("div");
-        const em1 = document.createElement("em");
-        const em2 = document.createElement("em");
+        const root = document.createElement('div');
+        const em1 = document.createElement('em');
+        const em2 = document.createElement('em');
 
         em1.id = "child1";
         em1.className = "target";

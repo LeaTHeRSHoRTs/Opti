@@ -40,7 +40,7 @@ function typeObject<T>(val: T, str: string): ValueQueries<T> {
                     const ctorName = other.constructor?.name;
                     if (ctorName && str.includes(ctorName)) return true;
 
-                    if (typeof other.toString === "function") {
+                    if (typeof other.toString === 'function') {
                         return str === other.toString();
                     }
 
@@ -76,37 +76,37 @@ function typeObject<T>(val: T, str: string): ValueQueries<T> {
             return false;
         }
 
-        if (typeof intVal === "string") return true;
+        if (typeof intVal === 'string') return true;
         return Object.prototype.hasOwnProperty.call(intVal, prop);
     }
 
-    if (typeof v === "string" || hasOwn(v, "size") || hasOwn(v, "length")) {
+    if (typeof v === 'string' || hasOwn(v, "size") || hasOwn(v, "length")) {
         obj = Object.assign(obj, {
             shorter(lengthOrObject: number | Sized): boolean {
-                const len = typeof lengthOrObject === "number"
+                const len = typeof lengthOrObject === 'number'
                     ? lengthOrObject
                     : ("size" in lengthOrObject
                         ? lengthOrObject.size
                         : lengthOrObject.length);
 
-                if (hasOwn(v, "size") && typeof v.size === "number") {
+                if (hasOwn(v, "size") && typeof v.size === 'number') {
                     return v.size < len;
-                } else if (typeof v === "string" || (hasOwn(v, "length") && typeof v.length === "number")) {
+                } else if (typeof v === 'string' || (hasOwn(v, "length") && typeof v.length === 'number')) {
                     return v.length < len;
                 }
 
                 return false;
             },
             longer(lengthOrObject: number | Sized): boolean {
-                const len = typeof lengthOrObject === "number"
+                const len = typeof lengthOrObject === 'number'
                     ? lengthOrObject
                     : ("size" in lengthOrObject
                         ? lengthOrObject.size
                         : lengthOrObject.length);
 
-                if (hasOwn(v, "size") && typeof v.size === "number") {
+                if (hasOwn(v, "size") && typeof v.size === 'number') {
                     return v.size > len;
-                } else if (hasOwn(v, "length") && typeof v.length === "number") {
+                } else if (hasOwn(v, "length") && typeof v.length === 'number') {
                     return v.length > len;
                 }
 
@@ -114,9 +114,9 @@ function typeObject<T>(val: T, str: string): ValueQueries<T> {
             },
 
             length<U extends number>(length: U): this is ValueQueries<T extends unknown[] ? Tuple.Of<T[number], U> : T & { length: U }> {
-                if (hasOwn(v, "size") && typeof v.size === "number") {
+                if (hasOwn(v, "size") && typeof v.size === 'number') {
                     return v.size === length;
-                } else if (hasOwn(v, "length") && typeof v.length === "number") {
+                } else if (hasOwn(v, "length") && typeof v.length === 'number') {
                     return v.length === length;
                 }
                 return false;
@@ -124,7 +124,7 @@ function typeObject<T>(val: T, str: string): ValueQueries<T> {
         });
     }
 
-    if (typeof v === "function") {
+    if (typeof v === 'function') {
         const functionName = (v as Func).name; 
         obj = Object.assign(obj, {
             isName(name: string): boolean {
@@ -140,7 +140,7 @@ function typeObject<T>(val: T, str: string): ValueQueries<T> {
 export function is<T>(val: T): ValueQueries<T> {
     if (val === null) return typeObject<T>(val, "null");
     if (val === undefined) return typeObject<T>(val, "undefined");
-    if (typeof val === "function") return typeObject(val, `Function:${val.name || "<anonymous>"}(${val.length})`);
+    if (typeof val === 'function') return typeObject(val, `Function:${val.name || "<anonymous>"}(${val.length})`);
 
     let typeName = Object.prototype.toString.call(val).slice(8, -1);
     typeName = (typeName[0]?.toUpperCase() ?? "") + typeName.slice(1);
@@ -158,7 +158,7 @@ export function is<T>(val: T): ValueQueries<T> {
             if (val instanceof Map || val instanceof Set) {
                 typeName += `(${val.size})`;
             } else if (val instanceof Date && !isNaN(val.getTime())) {
-                typeName += `:${val.toISOString().split("T")[0]}`;
+                typeName += `:${val.toISOString().split('T')[0]}`;
             } else if ("length" in val && Number.isFinite(val.length)) {
                 typeName += `(${val.length})`;
             } else if (typeName === "Object") {
@@ -185,7 +185,7 @@ export function sleep(ms: number): Future<void, NumberTooSmallError> {
     });
 }
 
-export function isEmpty(val: string): val is "";
+export function isEmpty(val: string): val is '';
 export function isEmpty(val: number): val is typeof NaN;
 export function isEmpty(val: boolean): val is false;
 export function isEmpty(val: null | undefined): true;
@@ -202,7 +202,7 @@ export function isEmpty(val: unknown): boolean {
     if (val == null || val === false || val === "") return true;
 
     // Number checking
-    if (typeof val === "number") return val === 0 || Number.isNaN(val);
+    if (typeof val === 'number') return val === 0 || Number.isNaN(val);
 
     // Array checking
     if (Array.isArray(val) && val.length === 0) return true;

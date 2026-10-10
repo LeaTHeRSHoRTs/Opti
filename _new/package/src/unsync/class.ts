@@ -1,4 +1,4 @@
-import { InvalidRegistrationException } from "./exceptions";
+import { InvalidRegistrationException } from './exceptions';
 
 export class Unsync {
     static InvalidRegistrationException: InvalidRegistrationErrorConstructor = InvalidRegistrationException;

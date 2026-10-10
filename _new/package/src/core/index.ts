@@ -1,15 +1,15 @@
-import { setGetter, setReadOnly } from "../helpers";
-import * as Classes from "./constructableobjects";
-import * as Doc from "./document";
-import * as Elements from "./nodes";
-import * as Errors from "./errors";
-import * as Globals from "./globals";
-import * as Lists from "./collections";
-import * as Arrays from "./arrays";
-import * as Misc from "./misc";
-import * as Reg from "./registry";
+import { setGetter, setReadOnly, throwPlaceholder } from '../helpers';
+import * as Classes from './constructableobjects';
+import * as Doc from './document';
+import * as Elements from './nodes';
+import * as Errors from './errors';
+import * as Globals from './globals';
+import * as Lists from './collections';
+import * as Arrays from './arrays';
+import * as Misc from './misc';
+import * as Reg from './registry';
 
-if (typeof window === "undefined" || typeof document === "undefined") {
+if (typeof window === 'undefined' || typeof document === 'undefined') {
     throw new Error("Opti requires a browser environment.");
 }
 
@@ -40,13 +40,22 @@ globalThis.FetchError = Errors.FetchError;
 globalThis.HierarchyError = Errors.HierarchyError;
 globalThis.RuntimeError = Errors.RuntimeError;
 
-setReadOnly(globalThis, "f", <T, P extends unknown[], R>(
+// eslint-disable-next-line prefer-arrow-callback
+globalThis.placeholder = new Proxy(function () {}, {
+    get:            throwPlaceholder,
+    set:            throwPlaceholder,
+    has:            throwPlaceholder,
+    ownKeys:        throwPlaceholder,
+    getPrototypeOf: throwPlaceholder,
+    apply:          throwPlaceholder,
+    construct:      throwPlaceholder
+});
+
+setReadOnly(globalThis, 'f', <T, P extends unknown[], R>(
     iife: Func<T, P, R>,
     args?: P,
     thisArg?: T
-): R => {
-    return iife.apply(thisArg as T, (args || []) as P);
-});
+): R => iife.apply(thisArg as T, (args || []) as P));
 
 globalThis.is = Globals.is;
 globalThis.assert = Globals.assert;
@@ -63,10 +72,10 @@ globalThis.Tuple = Classes.Tuple;
 Node.prototype.$ = Elements.$;
 Node.prototype.$$ = Elements.$$;
 Node.prototype.cut = Elements.cut;
-(Node.prototype as __Unsafe<Node>).parent = Elements.getParent;        // ChildNode
-(Node.prototype as __Unsafe<Node>).ancestor = Elements.getAncestor;    // ChildNode
+Node.prototype.parent = Elements.getParent;
+Node.prototype.ancestor = Elements.getAncestor;
+Node.prototype.siblings = Elements.getSiblings;
 (Node.prototype as __Unsafe<Node>).getChildren = Elements.getChildren; // ParentNode
-(Node.prototype as __Unsafe<Node>).siblings = Elements.getSiblings;    // ChildNode
 
 Element.prototype.copy = Elements.copy;
 Element.prototype.txt = Elements.text;
@@ -84,7 +93,6 @@ HTMLElement.prototype.toggle = Elements.toggle;
 setGetter(HTMLElement.prototype, "isVisible", Elements.isVisible);
 
 setGetter(HTMLInputElement.prototype, "val", Elements.val);
-
 HTMLFormElement.prototype.serialize = Elements.serialize;
 
 NodeList.prototype.addClass = Lists.addClassList;

@@ -1,4 +1,4 @@
-import { arrType } from "../helpers";
+import { arrType } from '../helpers';
 
 export function unique<T>(this: T[]): T[] {
     // Sets are unique by default, so convert to set and then back to array
@@ -58,11 +58,8 @@ export function relocateTo<T>(this: T[], index: number, location: number): numbe
 
 const originalSort = Array.prototype.sort;
 export function sortBy<T>(this: T[], order?: SortMode<T> | ((a: T, b: T) => number)): T[] {
-    if (typeof order === "function") {
-        return originalSort.call(this, order);
-    } else if (order === undefined) {
-        return originalSort.call(this);
-    }
+    if (typeof order === 'function') return originalSort.call(this, order);
+    else if (order === undefined) return originalSort.call(this);
 
     const copy = [...this];
     if (arrType(this, Date)) {
@@ -86,7 +83,7 @@ export function sortBy<T>(this: T[], order?: SortMode<T> | ((a: T, b: T) => numb
 }
 
 export function replace<T>(this: T[], index: number | ((value: T) => boolean), newVal: T): T | null {
-    if (typeof index === "number") {
+    if (typeof index === 'number') {
         const oldVal = this[index];
         this[index] = newVal;
 

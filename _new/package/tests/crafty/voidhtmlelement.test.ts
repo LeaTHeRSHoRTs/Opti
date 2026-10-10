@@ -1,5 +1,4 @@
-import 'opti';
-import 'opti/crafty';
+import { Crafty } from 'opti';
 
 describe("VoidHTMLElement.prepend, VoidHTMLElement.append", () => {
     let el: Crafty.VoidHTMLElement;

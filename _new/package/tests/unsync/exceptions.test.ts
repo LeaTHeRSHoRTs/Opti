@@ -1,10 +1,9 @@
-import 'opti';
-import 'opti/unsync';
+import { Unsync } from 'opti';
 
 describe("Unsync.Exception", () => {
     it("should throw");
 
-    const exceptions: { name: string, instance: ExceptionConstructor }[] = [{
+    const exceptions: { name: string, instance: DynErrorCtor }[] = [{
         name: "InvalidRegistrationException",
         instance: Unsync.InvalidRegistrationException
     }];
@@ -15,8 +14,8 @@ describe("Unsync.Exception", () => {
         const instanceWithCause = new instance(undefined, "throwing");
         const instanceWithAll = new instance("myMessage", "throwing");
 
-        it("should be a subclass of Exception", () => {
-            expect(normalInstance).toBeInstanceOf(Exception);
+        it("should be a subclass of Error", () => {
+            expect(normalInstance).toBeInstanceOf(Error);
         });
 
         it("should have the right name", () => {
@@ -24,23 +23,17 @@ describe("Unsync.Exception", () => {
         });
 
         it("should have the right message", () => {
-            expect(normalInstance.getMessage()).toBe("");
-            expect(instanceWithMessage.getMessage()).toBe("myMessage");
+            expect(normalInstance.message).toBe("");
+            expect(instanceWithMessage.message).toBe("myMessage");
         });
 
         it("should be have the right cause", () => {
-            expect(instanceWithCause.getCause()).toBe("throwing");
+            expect(instanceWithCause.cause).toBe("throwing");
         });
 
         it("should be have the right message and cause", () => {
-            expect(instanceWithAll.getMessage()).toBe("myMessage");
-            expect(instanceWithAll.getCause()).toBe("throwing");
-        });
-
-        it("should be throwable again using the throw method", () => {
-            expect(() => {
-                normalInstance.throw();
-            }).toThrow(instance);
+            expect(instanceWithAll.message).toBe("myMessage");
+            expect(instanceWithAll.cause).toBe("throwing");
         });
 
         it("should give the right stack trace", () => {
@@ -48,9 +41,9 @@ describe("Unsync.Exception", () => {
 
             try {
                 throw new instance;
-            } catch(e) {
+            } catch (e) {
                 if (e instanceof instance) {
-                    expect(e.getStackTrace()).toBe("MOCK_STACK");
+                    expect(e.stack).toBe("MOCK_STACK");
                 }
             }
         });

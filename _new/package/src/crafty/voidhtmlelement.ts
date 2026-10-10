@@ -1,4 +1,4 @@
-import { _InternalChildrenNotAllowedException } from "./exceptions";
+import { _InternalChildrenNotAllowedException } from './exceptions';
 import _InternalHTMLElement from './htmlelement';
 
 export default class _InternalVoidHTMLElement<T extends VoidHTMLTag, P extends Crafty.Props<T> = Crafty.Props<T>> extends _InternalHTMLElement<T, P> implements Crafty.VoidHTMLElement<T, P> {

@@ -1,8 +1,12 @@
-declare namespace Query {
-    interface PseudoElement {
-        css(): CSS.Object;
-        css(prop: CSS.PropertyName): string | number | undefined;
+declare global {
+    namespace Query {
+        interface PseudoElement {
+            css(): CSS.Object;
+            css(prop: CSS.PropertyName): string | number | undefined;
 
-        exists(): boolean;
+            exists(): boolean;
+        }
     }
 }
+
+export { };

@@ -1,8 +1,8 @@
-import _InternalException from "./exceptions";
-import _InternalNode from "./node";
+import _InternalException from './exceptions';
+import _InternalNode from './node';
 
 export default class _InternalHTML extends _InternalNode implements Crafty.Html {
-    override kind: 'html' = 'html';
+    override kind: 'html' = "html";
     readonly _children: [] = [];
     #content: string;
 
@@ -21,7 +21,7 @@ export default class _InternalHTML extends _InternalNode implements Crafty.Html 
 
     normalize(): Dom.DocumentFragment {
         const parser = new DOMParser();
-        const doc = parser.parseFromString(this.#content, "text/html");
+        const doc = parser.parseFromString(this.#content, 'text/html');
         const frag = document.createDocumentFragment();
         Array.from(doc.body.childNodes).forEach(n => frag.appendChild(n));
         return frag;

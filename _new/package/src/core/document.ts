@@ -1,5 +1,5 @@
 export function ready(callback: (this: Document, ev: Event) => unknown): void {
-    document.addEventListener("DOMContentLoaded", callback);
+    document.addEventListener('DOMContentLoaded', callback);
 }
 
 let called = false;
@@ -11,10 +11,18 @@ export function leaving(callback: (this: Document, ev: Event) => unknown): void 
         finally { called = true; }
     }
 
-    if ('onbeforeunload' in window) window.addEventListener('beforeunload', handler, { once: true });
-    if ('onpagehide' in window) window.addEventListener('pagehide', handler, { once: true });
+    if ("onbeforeunload" in window) {
+        window.addEventListener("beforeunload", handler, { once: true });
+    }
+    
+    if ("onpagehide" in window) {
+        window.addEventListener('pagehide', handler, { once: true });
+    }
+    
     document.addEventListener('visibilitychange', (e) => {
-        if (document.visibilityState === 'hidden') handler(e);
+        if (document.visibilityState === "hidden") {
+            handler(e);
+        }
     }, { once: true });
 }
 
@@ -44,7 +52,7 @@ export function documentCss(
     let styleTag: HTMLStyleElement | null = document.querySelector<HTMLStyleElement>("style[js-styles]");
 
     if (!styleTag) {
-        styleTag = document.createElement<"style">("style");
+        styleTag = document.createElement<'style'>('style');
         styleTag.setAttribute("js-styles", "");
         document.head.appendChild(styleTag);
     }
@@ -84,7 +92,7 @@ export function documentCss(
     const mergedStyles = { ...existingStyles, ...newStyles };
     const styleString = Object.entries(mergedStyles)
         .map(([prop, val]) => `${prop}: ${val};`)
-        .join(" ");
+        .join(' ');
 
     if (ruleIndex !== -1) {
         sheet.deleteRule(ruleIndex);

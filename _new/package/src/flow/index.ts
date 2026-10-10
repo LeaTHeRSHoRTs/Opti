@@ -1,6 +1,7 @@
-import "@flow";
-import _InternalFlow from "./flowclass";
+import type { Flow } from '@flow';
+import _InternalFlow from './flowclass';
+import { initializer } from '../helpers';
 
-globalThis.Opti.flow = true;
-
-export default _InternalFlow satisfies globalThis.Flow;
+export default initializer<Flow>(_InternalFlow, () => {
+    globalThis.Opti.flow = true;
+});

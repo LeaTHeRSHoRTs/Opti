@@ -1,9 +1,8 @@
-import "opti";
-import "opti/unsync";
+import 'opti';
 
 describe("EventTarget.addConditionalListener", () => {
     it("should cancel the listener after `x` amount of times", () => {
-        const div = document.createElement("div");
+        const div = document.createElement('div');
         document.body.append(div);
 
         let count = 0;
@@ -20,7 +19,7 @@ describe("EventTarget.addConditionalListener", () => {
     });
 
     it("should cancel the listener when the condition specified returns true", () => {
-        const div = document.createElement("div");
+        const div = document.createElement('div');
         document.body.append(div);
 
         let ran = false;
@@ -36,7 +35,7 @@ describe("EventTarget.addEventListeners", () => {
         let flag1 = false;
         let flag2 = false;
 
-        const multi = document.createElement("div");
+        const multi = document.createElement('div');
         document.body.appendChild(multi);
 
         multi.addEventListeners({
@@ -52,7 +51,7 @@ describe("EventTarget.addEventListeners", () => {
     });
 
     it("should attach multiple event listeners to the object", () => {
-        const single = document.createElement("div");
+        const single = document.createElement('div');
         document.body.appendChild(single);
 
         let flag = 0;
@@ -71,7 +70,7 @@ describe("EventTarget.addEventController", () => {
     let el: HTMLButtonElement;
 
     beforeAll(() => {
-        el = document.createElement("button");
+        el = document.createElement('button');
         document.body.append(el);
     });
 
@@ -88,7 +87,7 @@ describe("EventTarget.addEventController", () => {
     it("should be abe to be turned off", () => {
         let flag = 1;
 
-        const controller = el.addEventController('click', () => flag++);
+        const controller = el.addEventController("click", () => flag++);
         el.click();
 
         expect(flag).toBe(2);
@@ -101,7 +100,7 @@ describe("EventTarget.addEventController", () => {
     it("should be able to return the status of the listener", () => {
         let flag = 1;
 
-        const controller = el.addEventController('click', () => flag++);
+        const controller = el.addEventController("click", () => flag++);
         expect(controller.applied).toBeTruthy();
         controller.off();
         expect(controller.applied).toBeFalsy();
@@ -111,7 +110,7 @@ describe("EventTarget.addEventController", () => {
 
     it("should be able to handle an already true status", () => {
         expect(() => {
-            const controller = el.addEventController('click', () => {});
+            const controller = el.addEventController("click", () => {});
             expect(controller.applied).toBeTruthy();
             controller.off();
             controller.off();
@@ -124,7 +123,7 @@ describe("EventTarget.addConditionalListener", () => {
     let el: HTMLButtonElement;
 
     beforeAll(() => {
-        el = document.createElement("button");
+        el = document.createElement('button');
         document.body.append(el);
     });
 
@@ -141,7 +140,7 @@ describe("EventTarget.addConditionalListener", () => {
     it("should be removed after a certain amount of activations", () => {
         let flag = 0;
 
-        el.addConditionalListener('click', () => flag++, 3);
+        el.addConditionalListener("click", () => flag++, 3);
 
         el.click();
         expect(flag).toBe(1);
@@ -160,7 +159,7 @@ describe("EventTarget.addConditionalListener", () => {
         let flag = false;
         let incr = 0;
 
-        el.addConditionalListener('click', () => incr++, () => flag === true);
+        el.addConditionalListener("click", () => incr++, () => flag === true);
 
         el.click();
         expect(incr).toBe(1);

@@ -42,12 +42,12 @@ describe("Number.repeat", () => {
 describe("Object.clone", () => {
     it("should make a clone of primitive objects", () => {
         expect(Object.clone(42)).toBe(42);
-        expect(Object.clone('hello')).toBe('hello');
+        expect(Object.clone("hello")).toBe("hello");
         expect(Object.clone(null)).toBe(null);
         expect(Object.clone(undefined)).toBe(undefined);
     });
 
-    it('clones plain objects deeply', () => {
+    it("clones plain objects deeply", () => {
         const original = { a: 1, b: { c: 2 } };
         const copied = Object.clone(original);
 
@@ -55,7 +55,7 @@ describe("Object.clone", () => {
         expect(copied).not.toBe(original);
     });
 
-    it('clones arrays deeply', () => {
+    it("clones arrays deeply", () => {
         const arr = [1, 2, [3, 4]];
         const copied = Object.clone(arr);
 
@@ -63,7 +63,7 @@ describe("Object.clone", () => {
         expect(copied).not.toBe(arr);
     });
 
-    it('preserves prototype chain', () => {
+    it("preserves prototype chain", () => {
         class Custom {
             x = 123;
             method() {
@@ -106,9 +106,15 @@ describe("Object.forEach", () => {
             ci = false;
 
         Object.forEach(obj, (key, value) => {
-            if (key === "a" && typeof value === "number") ai = true;
-            if (key === "b" && typeof value === "string") bi = true;
-            if (key === "c" && typeof value === "boolean") ci = true;
+            if (key === 'a' && typeof value === 'number') {
+                ai = true;
+            }
+            if (key === 'b' && typeof value === 'string') {
+                bi = true;
+            }
+            if (key === 'c' && typeof value === 'boolean') {
+                ci = true;
+            }
         });
 
         expect(ai).toBeTruthy();
@@ -146,7 +152,7 @@ describe("String.remove", () => {
     });
 
     it("should remove a substring by a string", () => {
-        expect("Hello_ World_".remove("_")).toBe("Hello World_");
+        expect("Hello_ World_".remove('_')).toBe("Hello World_");
         expect("Hello_  W World_".remove("_  W")).toBe("Hello World_");
     });
 });
@@ -155,40 +161,40 @@ describe("String.toCase", () => {
     const sample = "hello world example";
 
     it("should convert to kebab-case", () => {
-        expect(sample.toCase("kebab")).toBe("hello-world-example");
+        expect(sample.toCase('kebab')).toBe("hello-world-example");
     });
 
     it("should convert to snake_case", () => {
-        expect(sample.toCase("snake")).toBe("hello_world_example");
+        expect(sample.toCase('snake')).toBe("hello_world_example");
     });
 
     it("should convert to dot.case", () => {
-        expect(sample.toCase("dot")).toBe("hello.world.example");
+        expect(sample.toCase('dot')).toBe("hello.world.example");
     });
 
     it("should convert to camelCase", () => {
-        expect(sample.toCase("camel")).toBe("helloWorldExample");
+        expect(sample.toCase('camel')).toBe("helloWorldExample");
     });
 
     it("should convert to PascalCase", () => {
-        expect(sample.toCase("pascal")).toBe("HelloWorldExample");
+        expect(sample.toCase('pascal')).toBe("HelloWorldExample");
     });
 
     it("should convert to Train-Case", () => {
-        expect(sample.toCase("train")).toBe("HelloWorldExample");
+        expect(sample.toCase('train')).toBe("HelloWorldExample");
     });
 
     it("should handle a single word without spaces", () => {
-        expect("word".toCase("kebab")).toBe("word");
-        expect("word".toCase("camel")).toBe("word");
+        expect("word".toCase('kebab')).toBe("word");
+        expect("word".toCase('camel')).toBe("word");
     });
 
     it("should handle multiple consecutive spaces", () => {
         const spaced = "a  b   c";
-        expect(spaced.toCase("kebab")).toBe("a-b-c");
-        expect(spaced.toCase("snake")).toBe("a_b_c");
-        expect(spaced.toCase("dot")).toBe("a.b.c");
-        expect(spaced.toCase("camel")).toBe("aBC");
+        expect(spaced.toCase('kebab')).toBe("a-b-c");
+        expect(spaced.toCase('snake')).toBe("a_b_c");
+        expect(spaced.toCase('dot')).toBe("a.b.c");
+        expect(spaced.toCase('camel')).toBe("aBC");
     });
 });
 

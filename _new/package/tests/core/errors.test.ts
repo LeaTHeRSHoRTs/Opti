@@ -1,4 +1,4 @@
-import "opti";
+import 'opti';
 
 describe("Errors", () => {
     const Errors: { name: string, instance: DynErrorCtor }[] = [{

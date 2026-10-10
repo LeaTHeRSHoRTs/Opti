@@ -1,7 +1,7 @@
 export function addConditionalListener<T extends EventTarget, K extends keyof EventMapOf<T>>(
     this: T,
     type: K,
-    listener: EventTarget.Func<T, K>,
+    listener: EventFunc<T, K>,
     timesOrCondition: number | ((this: T, e: EventMapOf<T>[K]) => boolean),
     options?: boolean | AddEventListenerOptions
 ): void {
@@ -10,7 +10,7 @@ export function addConditionalListener<T extends EventTarget, K extends keyof Ev
     // eslint-disable-next-line prefer-const
     let _evFuncData = timesOrCondition;
 
-    if (typeof timesOrCondition === "number") {
+    if (typeof timesOrCondition === 'number') {
         if (timesOrCondition <= 0) return;
 
         let repeatCount = timesOrCondition;
@@ -81,7 +81,7 @@ export function delegateEventListener<
             if (!target) return;
 
             let selector: string;
-            if (typeof delegator === "string") {
+            if (typeof delegator === 'string') {
                 selector = delegator;
             } else {
                 selector = ""; // fallback

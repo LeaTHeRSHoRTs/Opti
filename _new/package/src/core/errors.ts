@@ -1,5 +1,5 @@
 export class RuntimeError {
-    name: "RuntimeError" = "RuntimeError";
+    name: 'RuntimeError' = "RuntimeError";
     message: string;
     cause: unknown;
     stack: string;

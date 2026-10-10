@@ -1,4 +1,4 @@
-import { _InternalQueryPseudoElement } from "./styleElement";
+import { _InternalQueryPseudoElement } from './styleElement';
 
 //* Refiners
 
@@ -9,20 +9,20 @@ export function hasText(el: Element | null, text: string): Element | null {
 
 export function before(el: Element | null): Query.PseudoElement | null {
     if (!el) return null;
-    return new _InternalQueryPseudoElement(el, '::before');
+    return new _InternalQueryPseudoElement(el, "::before");
 }
 
 export function after(el: Element | null): Query.PseudoElement | null {
     if (!el) return null;
-    return new _InternalQueryPseudoElement(el, '::after');
+    return new _InternalQueryPseudoElement(el, "::after");
 }
 
 //* Transformers
 export function styles(selector: string | undefined, styleList: string): string {
     const styleString = styleList
         .split(',')
-        .map(s => `[style*="${s.replace('=', ': ').trim()}"]`)
-        .join('');
+        .map(s => `[style*="${s.replace('=', ": ").trim()}"]`)
+        .join("");
     return (selector ?? "") + styleString;
 }
 

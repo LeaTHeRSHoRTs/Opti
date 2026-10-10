@@ -1,14 +1,14 @@
-import { Crafty } from "../../types/index";
-import { isHTMLTag, isVoidHTMLTag } from "./helpers";
-import _InternalException, { _InternalChildrenNotAllowedException, _InternalNormalizationError } from "./exceptions";
-import _InternalNode from "./node";
-import _InternalHtml from "./html";
-import _InternalText from "./text";
-import _InternalFragment from "./fragment";
-import _InternalComment from "./comment";
-import _InternalElement from "./element";
-import _InternalHTMLElement from "./htmlelement";
-import _InternalVoidHTMLElement from "./voidhtmlelement";
+import { Crafty } from '../../types/index';
+import { isHTMLTag, isVoidHTMLTag } from './helpers';
+import _InternalException, { _InternalChildrenNotAllowedException, _InternalNormalizationError } from './exceptions';
+import _InternalNode from './node';
+import _InternalHtml from './html';
+import _InternalText from './text';
+import _InternalFragment from './fragment';
+import _InternalComment from './comment';
+import _InternalElement from './element';
+import _InternalHTMLElement from './htmlelement';
+import _InternalVoidHTMLElement from './voidhtmlelement';
 
 export class _InternalCrafty {
     private constructor() {}
@@ -59,7 +59,7 @@ export class _InternalCrafty {
 
         const rawNodes = [first, second, third, ...fourth];
         const cleanNodes = rawNodes.filter(
-            (v): v is Crafty.Node => v !== undefined && v !== null && typeof v !== 'string' && !v.toString().includes('Object')
+            (v): v is Crafty.Node => v !== undefined && v !== null && typeof v !== 'string' && !v.toString().includes("Object")
         );
 
         return new _InternalFragment(...cleanNodes);

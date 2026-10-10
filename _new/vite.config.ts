@@ -4,7 +4,7 @@ export default defineConfig({
     build: {
         lib: {
             entry: "package/src/opti.ts",
-            formats: ['es'],
+            formats: ["es"],
             fileName: "opti.js"
         },
         outDir: "package/dist",

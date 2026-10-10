@@ -1,4 +1,4 @@
-type RequestType = "GET" | "POST";
+type RequestType = 'GET' | 'POST';
 
 
 interface RequestOptions {

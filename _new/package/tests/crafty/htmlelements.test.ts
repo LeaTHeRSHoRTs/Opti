@@ -1,5 +1,4 @@
-import 'opti';
-import 'opti/crafty';
+import { Crafty } from 'opti';
 
 describe("HTMLElement.css", () => {
     it("should be able to set the css of one property");

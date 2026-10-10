@@ -1,7 +1,7 @@
-import { initializer } from "../helpers";
-import * as Class from "./class";
-import * as Events from "./events";
-import * as Listeners from "./listeners";
+import { initializer } from '../helpers';
+import * as Class from './class';
+import * as Events from './events';
+import * as Listeners from './listeners';
 
 export default initializer<typeof globalThis.Unsync>(Class.Unsync, () => {
     globalThis.Opti.unsync = true; 

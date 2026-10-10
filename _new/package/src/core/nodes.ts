@@ -1,5 +1,4 @@
-/// <reference path="../../types/Unsync/unsync.lib.d.ts" />
-import { camelToDash, dashToCamel, isEventTarget, parseUnit, parseTime } from "../helpers";
+import { camelToDash, dashToCamel, isEventTarget, parseUnit, parseTime } from '../helpers';
 
 export function addClass(this: Element, elClass: string): void {
     this.classList.add(elClass);
@@ -62,7 +61,7 @@ export function css(
         return result;
     }
 
-    if (typeof key === "string") {
+    if (typeof key === 'string') {
         if (value === undefined) {
             return parseUnit(icss.getPropertyValue(camelToDash(key)).trim());
         } else if (value === null) {
@@ -89,7 +88,7 @@ export function getParent(this: ChildNode): ParentNode | null {
 
 export function getAncestor<T extends Element>(this: ChildNode, arg: string | number): T | Node | null {
     // Case 1: numeric level
-    if (typeof arg === "number") {
+    if (typeof arg === 'number') {
         let node: Node | null = this;
         for (let i = 0; i < arg; i++) {
             if (!node?.parentNode) return null;
@@ -117,9 +116,9 @@ export function html(this: Element, input?: string): string {
 export function text(this: Element, internalText?: string | ((oldText: string) => string), ...input: string[]): string {
     // If text is provided, update the textContent
     if (internalText !== undefined) {
-        if (typeof internalText === "string") {
+        if (typeof internalText === 'string') {
             input.unshift(internalText); // Add the text parameter to the beginning of the input array
-            this.textContent = input.join(" ");
+            this.textContent = input.join(' ');
         } else {
             this.textContent = internalText(this.textContent);
         }
@@ -128,15 +127,15 @@ export function text(this: Element, internalText?: string | ((oldText: string) =
 };
 
 export function show(this: HTMLElement): void {
-    this.css("visibility", "visible");
+    this.css('visibility', "visible");
 };
 
 export function hide(this: HTMLElement): void {
-    this.css("visibility", "hidden");
+    this.css('visibility', "hidden");
 };
 
 export function toggle(this: HTMLElement): void {
-    if (this.css("visibility") === "visible" || this.css("visibility") === "") {
+    if (this.css('visibility') === "visible" || this.css('visibility') === "") {
         this.hide();
     } else {
         this.show();
@@ -144,7 +143,7 @@ export function toggle(this: HTMLElement): void {
 };
 
 export function $(this: ParentNode, selector: string): Element | null {
-    if (selector.includes(",")) throw new SyntaxError("Invalid query: commas are not allowed in query selectors that can only select 1 element");
+    if (selector.includes(',')) throw new SyntaxError("Invalid query: commas are not allowed in query selectors that can only select 1 element");
     return this.querySelector(selector);
 };
 
@@ -203,7 +202,7 @@ export function copy<T extends Element>(this: T, children?: boolean, events?: bo
 export function copy<T extends Element>(this: T, childrenOrObject?: boolean | ElementCopyOptions, events?: boolean): T;
 export function copy<T extends Element>(this: T, childrenOrObject: boolean | ElementCopyOptions = true, events: boolean = false): T {
     let options: ElementCopyOptions;
-    if (typeof childrenOrObject === "boolean") {
+    if (typeof childrenOrObject === 'boolean') {
         options = { 
             ...defaultCopy, 
             copyChildren: childrenOrObject, 
@@ -235,7 +234,7 @@ export function copy<T extends Element>(this: T, childrenOrObject: boolean | Ele
 
     if (options.copyChildren || options.copyAll) {
         for (const child of Array.from(this.childNodes)) {
-            if ('id' in child && child.id !== "") {
+            if ("id" in child && child.id !== "") {
                 console.warn("Child node has ID. Duplicate node IDs possible, skipping copy of IDs...");
                 child.id = "";
             }
@@ -309,7 +308,9 @@ export function val(this: HTMLInputElement): HTMLInputElement.ValueAccessor {
         },
         asDate() {
             let date = self.valueAsDate;
-            if (!date && self.type === "time") date = parseTime(self.value);
+            if (!date && self.type === "time") {
+                date = parseTime(self.value);
+            }
             return date;
         },
         asString() {
@@ -325,6 +326,8 @@ export function val(this: HTMLInputElement): HTMLInputElement.ValueAccessor {
 };
 
 export function attr<T extends Element, K extends keyof T>(this: T, key: K, value?: T[K]): T[K] | void {
-    if (value)  this[key] = value;
+    if (value) {
+        this[key] = value;
+    }
     else return this[key];
 }

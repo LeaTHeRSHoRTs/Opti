@@ -1,5 +1,5 @@
-import { _InternalQueryPseudoElement } from "./styleElement";
-import { transformQuery } from "./parsers";
+import { _InternalQueryPseudoElement } from './styleElement';
+import { transformQuery } from './parsers';
 
 function _$(this: ParentNode, selector: string): HTMLElement | Query.PseudoElement | null {
     // eslint-disable-next-line prefer-const
@@ -38,6 +38,7 @@ _$.with = function(this: ParentNode, selector: string): HTMLElement | null {
     throw new NotImplementedError();
 };
 
+//@ts-expect-error
 export const $ = _$ satisfies Query.$;
 
 function _$$(this: ParentNode, selector: string): HTMLElement[] {

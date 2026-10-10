@@ -22,7 +22,8 @@ const baseRules = {
     'no-useless-constructor': 'warn',
     'no-useless-escape': 'warn',
     "@stylistic/indent": ["error", 4],
-    "single-line/single-line-control-flow": "error"
+    "custom-rules/single-line-control-flow": "error",
+    "custom-rules/conditional-single": "error"
 };
 
 /** @type {import('eslint').Linter.RulesRecord} */
@@ -64,6 +65,66 @@ export const definitionRules = {
                 "Function": "Use function literals or the catch-all literal (this: any, ...args: any[]) => any",
             },
         },
+    ],
+    "jsdoc/require-jsdoc": [
+        "error",
+        {
+            "skipInterveningOverloadedDeclarations": true,
+            "contexts": [
+                "TSDeclareFunction",
+                "TSMethodSignature",
+                "TSTypeAliasDeclaration",
+                "TSDeclareMethod",
+                "ClassDeclaration",
+                "VariableDeclaration"
+            ]
+        }
+    ],
+    "jsdoc/require-tags": ["error", { tags: ["since","opti"] }],
+    "jsdoc/require-param": [
+        "error",
+        {
+            "contexts": [
+                "ArrowFunctionExpression",
+                "FunctionDeclaration",
+                "FunctionExpression",
+                "TSDeclareFunction",
+                "TSMethodSignature",
+                "TSDeclareMethod"
+            ]
+        }
+    ],
+    "jsdoc/check-param-names": "error",
+    "jsdoc/require-description": "error",
+    "jsdoc/require-example": [
+        "error",
+        {
+            "contexts": [
+                "TSDeclareFunction",
+                "TSMethodSignature",
+                "TSDeclareMethod"
+            ]
+        }
+    ],
+    "jsdoc/sort-tags": [
+        "error",
+        {
+            "reportIntraTagGroupSpacing": false,
+            "reportTagGroupSpacing": false,
+            "tagSequence": [
+                { tags: ["opti"] },
+                { tags: ["deprecated"] },
+                { tags: ["since"] },
+                { tags: ["template"] },
+                { tags: ["extends"] },
+                { tags: ["implements"] },
+                { tags: ["param"] },
+                { tags: ["returns"] },
+                { tags: ["throws"] },
+                { tags: ["see"] },
+                { tags: ["example"] }
+            ]
+        }
     ]
 };
 

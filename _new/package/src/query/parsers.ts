@@ -1,4 +1,4 @@
-import { after, before, hasText, hidden, parent, styles, visible } from "./transformers";
+import { after, before, hasText, hidden, parent, styles, visible } from './transformers';
 
 export type Processor = (el: Element | null) => Element | Query.PseudoElement | null;
 export type RefinerFactory = (el: Element | null, ...args: string[]) => Processor;
@@ -16,7 +16,7 @@ export function transformQuery(query: string): [string, Processor[]] {
     function extract(regex: RegExp, id: string, refinerFactory: RefinerFactory): void {
         queryString = queryString.replace(regex, (_, ...args) => {
             processors.push(refinerFactory);
-            return "\x01" + id + "\x01";
+            return '\x01' + id + '\x01';
         });
     }
 
@@ -25,9 +25,13 @@ export function transformQuery(query: string): [string, Processor[]] {
     transform(/([^\s,>+~]+?)?:visible/, visible);
     transform(/([^\s,>+~]+?)?:hidden/, hidden);
 
+    //@ts-expect-error
     extract(/::before$/, "before", before);
+    //@ts-expect-error
     extract(/::after$/, "after", after);
+    //@ts-expect-error
     extract(/:has-text\((.+?)\)/, "hasText", (text) => hasText());
 
+    //@ts-expect-error
     return [queryString, processors];
 }

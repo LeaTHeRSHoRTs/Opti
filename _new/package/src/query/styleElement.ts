@@ -1,4 +1,4 @@
-import { dashToCamel, parseUnit } from "../helpers";
+import { dashToCamel, parseUnit } from '../helpers';
 
 export class _InternalQueryPseudoElement {
     #parent: Element;
@@ -25,7 +25,7 @@ export class _InternalQueryPseudoElement {
 
                 const value = styles.getPropertyValue(prop).trim();
 
-                const finalKey = prop.startsWith('--') ? prop : dashToCamel(prop);
+                const finalKey = prop.startsWith("--") ? prop : dashToCamel(prop);
                 result[finalKey as keyof CSSStyleDeclaration] = parseUnit(value);
             }
             return result;
@@ -34,7 +34,7 @@ export class _InternalQueryPseudoElement {
 
     exists(): boolean {
         const content = window.getComputedStyle(this.#parent, this.#type).content;
-        return content !== 'none' && content !== 'normal';
+        return content !== "none" && content !== "normal";
     }
 }
 

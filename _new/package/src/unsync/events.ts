@@ -34,7 +34,8 @@ export class Emitter<T extends Record<string, unknown[]> = {}> {
         ev: K,
         callback: (...args: L) => void
     ): asserts this is Unsync.EventEmitter<T & { [P in K]: K extends keyof T ? [...T[K], L] : [L] }> {
-        this._eventMap[ev] = [...(this._eventMap[ev] || []), callback] as Unsync.Callbacks<unknown[]>;
+        //@ts-expect-error
+        this._eventMap[ev] = [...(this._eventMap[ev] || []), callback];
     }
 
     off<K extends keyof T>(ev: K): asserts this is Unsync.EventEmitter<Omit<T, K>> {

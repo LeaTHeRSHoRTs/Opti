@@ -40,7 +40,9 @@ export function debounce<T, A extends unknown[], R>(func: Func<T, A, R>, ms: num
     // Immediately cancel previous pending call
         if (currentReject) {
             currentReject(new DebouncedError("Function was called again before this one could resolve"));
-            if (timer) clearTimeout(timer);
+            if (timer) {
+                clearTimeout(timer);
+            }
         }
 
         const self = this;
@@ -55,7 +57,7 @@ export function debounce<T, A extends unknown[], R>(func: Func<T, A, R>, ms: num
     };
 }
 
-const RESULT_KEY = Symbol('memo_result');
+const RESULT_KEY = Symbol("memo_result");
 export function memo<T, A extends unknown[], R>(func: Func<T, A, R>): Func<T, A, R> {
     // Always check the registry first for persistent state
     let cache = InternalRegistries.MEMO.get(func);
@@ -68,7 +70,9 @@ export function memo<T, A extends unknown[], R>(func: Func<T, A, R>): Func<T, A,
     return function (this: T, ...rest: A): R {
         let current = cache;
         for (const arg of rest) {
-            if (!current.has(arg)) current.set(arg, new Map());
+            if (!current.has(arg)) {
+                current.set(arg, new Map());
+            }
             current = current.get(arg);
         }
 
@@ -91,7 +95,7 @@ export function atDate(year: number, monthIndex: number, date?: number, hours?: 
 export function clone<T>(object: symbol, deep?: boolean): never;
 export function clone<T>(object: T, deep?: boolean): T;
 export function clone<T>(object: T, deep: boolean = true): T {
-    if (typeof object === "symbol") {
+    if (typeof object === 'symbol') {
         throw new CloneError("Symbols cannot be cloned");
     }
 
@@ -105,7 +109,7 @@ export function clone<T>(object: T, deep: boolean = true): T {
     if (
         object === null ||
     object === undefined ||
-    typeof object !== "object"
+    typeof object !== 'object'
     ) {
         return object;
     }
@@ -134,6 +138,7 @@ export function clone<T>(object: T, deep: boolean = true): T {
     const result = Object.create(proto);
 
     for (const key of Reflect.ownKeys(object)) {
+        //@ts-expect-error
         const value = object[key];
         result[key] = deep ? clone(value, true) : value;
     }
@@ -186,9 +191,9 @@ export function toCase(this: string, format: Str.Case): string {
     const charRegex = /[\s]+/g;
 
     switch (format) {
-        case "kebab": return this.replace(charRegex, "-");
-        case "snake": return this.replace(charRegex, "_");
-        case "dot": return this.replace(charRegex, ".");
+        case "kebab": return this.replace(charRegex, '-');
+        case "snake": return this.replace(charRegex, '_');
+        case "dot": return this.replace(charRegex, '.');
         case "camel": return this.replace(regex, (_, _s, next) => next.toUpperCase());
         case "pascal": return this.replace(regex, (_, _s, next) => next.toUpperCase()).replace(/^\s*(\S)/, (_, first) => first.toUpperCase());
         case "train": return this.replace(regex, (_, _s, next) => next.toUpperCase()).replace(/^\s*(\S)/, (_, first) => first.toUpperCase());
@@ -197,7 +202,7 @@ export function toCase(this: string, format: Str.Case): string {
 
 //* Math
 export function randomRange(minOrMax: number, max?: number): number {
-    if (typeof minOrMax !== "undefined" && typeof max !== "undefined") {
+    if (typeof minOrMax !== 'undefined' && typeof max !== 'undefined') {
         return Math.random() * (max - minOrMax) + minOrMax;
     }
     return Math.random() * minOrMax;

@@ -1,9 +1,9 @@
 //@ts-check
 import globals from 'globals';
-import createTestResolutionPlugin from './internal/eslint/eslint-test-plugin.cjs';
-import singleLineControlPlugin from "./internal/eslint/eslint-general.cjs";
+import plugin from "./internal/eslint/eslint-general.cjs";
 import { defineConfig } from 'eslint/config';
 import stylistic from "@stylistic/eslint-plugin";
+import jsdoc from "eslint-plugin-jsdoc";
 import { parser as tsParser, plugin as typescriptEslint } from 'typescript-eslint';
 import { typescriptRules, definitionRules, testRules } from "./internal/eslint/eslint.js";
 
@@ -18,6 +18,11 @@ import { typescriptRules, definitionRules, testRules } from "./internal/eslint/e
 const eslintConfiguration = (regex, rules, node, plugins) => ({
     files: [regex],
     ignores: ['node_modules/', "dist/"],
+    settings: {
+        jsdoc: {
+            mode: "typescript"
+        }
+    },
     languageOptions: {
         sourceType: "module",
         ecmaVersion: 2022,
@@ -32,7 +37,8 @@ const eslintConfiguration = (regex, rules, node, plugins) => ({
     plugins: {
         "@typescript-eslint": typescriptEslint,
         "@stylistic": stylistic,
-        "single-line": singleLineControlPlugin,
+        "custom-rules": plugin,
+        "jsdoc": jsdoc,
         ...plugins
     },
     rules

@@ -1,6 +1,6 @@
-import "opti";
+import 'opti';
 
-describe('is', () => {
+describe("is", () => {
     let nullVal: ValueQueries<null | true>;
     let undefinedVal: ValueQueries<undefined | true>;
     let numberVal: ValueQueries<number>;
@@ -51,14 +51,14 @@ describe('is', () => {
         symbolVal = is(Symbol("symbol"));
     });
 
-    it('should return the data type for a data type\'s input', () => {
+    it("should return the data type for a data type's input", () => {
         expect(numberVal.stringOf()).toBe("Number");
         expect(trueVal.stringOf()).toBe("Boolean");
         expect(falseVal.stringOf()).toBe("Boolean");
         expect(regexVal.stringOf()).toBe("RegExp");
     });
 
-    it('should return the data type plus the length from a data type\'s input', () => {
+    it("should return the data type plus the length from a data type's input", () => {
         expect(emptyStringVal.stringOf()).toBe("String(0)");
         expect(numberArrayVal.stringOf()).toBe("Array(3)");
         expect(objectLiteralVal.stringOf()).toBe("Object(2)");
@@ -70,7 +70,7 @@ describe('is', () => {
         expect(symbolVal.stringOf()).toBe("Symbol(symbol)");
     });
 
-    it('should return the value via the getValue() function', () => {
+    it("should return the value via the getValue() function", () => {
         expect(numberVal.getValue()).toBe(42);
         expect(trueVal.getValue()).toBe(true);
         expect(falseVal.getValue()).toBe(false);
@@ -82,25 +82,25 @@ describe('is', () => {
         expect(emptyArrayVal.getValue()).toEqual([]);
     });
 
-    it('should return "null" | "undefined" for a null | undefined input', () => {
+    it("should return 'null' | 'undefined' for a null | undefined input", () => {
         expect(nullVal.stringOf()).toBe("null");
         expect(undefinedVal.stringOf()).toBe("undefined");
     });
 
-    it('should return "Function:<anonymous>..." for an anonymous function', () => {
+    it("should return 'Function:<anonymous>...' for an anonymous function", () => {
         expect(anonymousFuncVal.stringOf()).toBe("Function:<anonymous>(0)");
     });
 
-    it('should return "Function:myFunction(a, b)" for a named function with arguments a and b', () => {
+    it("should return 'Function:myFunction(a, b)' for a named function with arguments a and b", () => {
         expect(namedFuncVal.stringOf()).toBe("Function:myFunction(2)");
     });
 
-    it('should return Map or Set and the size for a Map or Set input input', () => {
+    it("should return Map or Set and the size for a Map or Set input input", () => {
         expect(mapVal.stringOf()).toBe("Map(2)");
         expect(setVal.stringOf()).toBe("Set(3)");
     });
 
-    it('should return the right dates for date objects', () => {
+    it("should return the right dates for date objects", () => {
         expect(dateVal.stringOf()).toBe("Date:2021-09-01");
         expect(badDateVal.stringOf()).toBe("Date");
     });
@@ -244,7 +244,7 @@ describe("assert", () => {
             const myString: string = "Hello";
             const yourString: string = "Goodbye";
             assert(myString === yourString);
-        }).toThrow(AssertionException);
+        }).toThrow(AssertionError);
     });
 
     it("should not throw if the condition is true", () => {
@@ -252,11 +252,11 @@ describe("assert", () => {
             const myString: string = "Hello";
             const yourString: string = "Hello";
             assert(myString === yourString);
-        }).not.toThrow(AssertionException);
+        }).not.toThrow(AssertionError);
     });
 });
 
-describe("f", () => {
+describe('f', () => {
     it("should immediately invoke a function", () => {
         let called = false;
         f(() => { called = true; });
@@ -273,7 +273,7 @@ describe("f", () => {
 describe("sleep", () => {
     beforeAll(() => {
         vi.useFakeTimers();
-        vi.spyOn(globalThis, "setTimeout");
+        vi.spyOn(globalThis, 'setTimeout');
     });
 
     afterAll(() => {
@@ -310,13 +310,13 @@ describe("sleep", () => {
 
     it("should reject immediately if the sleep length is 0 or lower", async () => {
         await sleep(0).catch(err => {
-            expect(err).toBeInstanceOf(NumberTooSmallException);
-            expect(err.getMessage()).toBe("Invalid timeout value (must be greater than 0)");
+            expect(err).toBeInstanceOf(NumberTooSmallError);
+            expect(err.message).toBe("Invalid timeout value (must be greater than 0)");
         });
     
         await sleep(-10).catch(err => {
-            expect(err).toBeInstanceOf(NumberTooSmallException);
-            expect(err.getMessage()).toBe("Invalid timeout value (must be greater than 0)");
+            expect(err).toBeInstanceOf(NumberTooSmallError);
+            expect(err.message).toBe("Invalid timeout value (must be greater than 0)");
         });
     });
 });
@@ -350,7 +350,7 @@ describe("isEmpty", () => {
             -Infinity,
             1,
             () => { },
-            Symbol("x"),
+            Symbol('x'),
             new Date(),
             new Map([["key", "value"]]),
             new Set(["one", "two"])

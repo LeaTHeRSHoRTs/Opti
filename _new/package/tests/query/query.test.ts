@@ -1,14 +1,13 @@
-import "opti";
-import "opti/query";
+import { Query } from 'opti';
 
 beforeAll(() => {
     const elements: [HTMLDivElement, HTMLDivElement, HTMLDivElement, HTMLDivElement, HTMLHeadingElement, HTMLHeadingElement] = [
-        document.createElement("div"),
-        document.createElement("div"),
-        document.createElement("div"),
-        document.createElement("div"),
-        document.createElement("h1"),
-        document.createElement("h2")
+        document.createElement('div'),
+        document.createElement('div'),
+        document.createElement('div'),
+        document.createElement('div'),
+        document.createElement('h1'),
+        document.createElement('h2')
     ];
 
     elements[0].id = "first";
@@ -21,9 +20,9 @@ beforeAll(() => {
     document.body.append(...elements);
 });
 
-describe("$", () => {
+describe('$', () => {
     it("should select an element that exists", () => {
-        expect($("div")).toBe(document.querySelector("div"));
+        expect($('div')).toBe(document.querySelector('div'));
         expect($("#first")).toBe(document.querySelector("#first"));
         expect($("#last")).toBe(document.querySelector("#last"));
         expect($("#middle")).toBeNull();
@@ -32,7 +31,7 @@ describe("$", () => {
 
 describe("$$", () => {
     it("should select elements that exists", () => {
-        expect($$("div").length).toBe(document.querySelectorAll("div")?.length);
+        expect($$('div').length).toBe(document.querySelectorAll('div')?.length);
         expect($$("#first").length).toBe(document.querySelectorAll("#first")?.length);
         expect($$(".divs").length).toBe(document.querySelectorAll(".divs")?.length);
         expect($$("#middle").length).toBe(0);

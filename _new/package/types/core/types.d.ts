@@ -1,41 +1,82 @@
-/** Shorthand for `unknown` */
+/** 
+ * Shorthand for `unknown`
+ * @opti
+ * @since 1.0.0
+ */
 type _ = unknown;
 
-/** Used as a placeholder type */
+/** 
+ * Used as a placeholder type
+ * @opti
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type placeholder<T = _, U = _, V = _, W = _, X = _, Y = _, Z = _> = any;
 
-/** Represents a key in a key-value object */
+/** 
+ * Represents a key in a key-value object
+ * @opti
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Key = keyof any;
 
-/** Type representation of the `globalThis` variable */
+/** 
+ * Type representation of the `globalThis` variable
+ * @opti
+ */
 type GlobalThis = typeof globalThis;
 
-/** Represents any possible integer (union of bigint and number) */
+/** 
+ * Represents any possible integer (union of bigint and number)
+ * @opti
+ */
 type int = number | bigint;
 
-/** Shortcut for `Record<string, T>` */
+/** 
+ * Shortcut for `Record<string, T>`
+ * @opti
+ */
 type StringRecord<T> = Record<string, T>;
 
-/** Extract all strings from type `T` */
+/** 
+ * Extract all strings from type `T`
+ * @opti
+ */
 type Stringed<T> = Extract<T, string>;
 
-/** Construct a type with a set of properties K of type T, all of which are optional */
+/** 
+ * Construct a type with a set of properties K of type T, all of which are optional
+ * @opti
+ */
 type PartialRecord<K extends Key, T> = Partial<Record<K, T>>;
 
-type WritableOnly<T> = Pick<T, Object.Writable<T>>;
+/**
+ * Gets all the writable keys of an object
+ * @opti
+ */
+type WritableOnly<T> = Pick<T, Obj.Writable<T>>;
 
-/** Filters an object `U` by type `T` */
+/** 
+ * Filters an object `U` by type `T`
+ * @opti
+ */
 type Only<T, U> = { [K in keyof T as T[K] extends U ? K : never]: T[K] };
 
-/** Makes a raw type defined (not undefined). Does not make object values not undefined */
+/** 
+ * Makes a raw type defined (not undefined). Does not make object values not undefined
+ * @opti
+ */
 type Defined<T> = Exclude<T, undefined>;
 
-/** Objects that have a `size` or `length` property */
+/** 
+ * Objects that have a `size` or `length` property
+ * @opti
+ */
 type Sized = { size: number } | { length: number };
 
-/** Unboxes Object types to primitives */
+/** 
+ * Unboxes Object types to primitives
+ * @opti
+ */
 type Unboxed<T> =
     T extends readonly [infer First, ...infer Rest]
         ? [Unboxed<First>, ...Unboxed<Rest>]
@@ -49,6 +90,7 @@ type Unboxed<T> =
 
 /** 
  * Used for widening type literals to their respective parent types 
+ * @opti
  * @example
  * type WidenedString = Widen<'myStringLiteral'> // WidenedString is of type string, not of type 'myStringLiteral'
  */
@@ -59,61 +101,94 @@ type Widen<T> =
                 T extends symbol ? symbol :
                     T;
 
-/** A union of the primitive js types, in string form */
+/** 
+ * A union of the primitive js types, in string form
+* @opti
+*/
 type Primitive =
-  | "undefined"
-  | "object"
-  | "boolean"
-  | "number"
-  | "string"
-  | "function"
-  | "symbol"
-  | "bigint";
+  | 'undefined'
+  | 'object'
+  | 'boolean'
+  | 'number'
+  | 'string'
+  | 'function'
+  | 'symbol'
+  | 'bigint';
 
-/** Parses a string to one of the primitive js types, or never if the string does not correspond to a primitive type */
+/** 
+ * Parses a string to one of the primitive js types, or never if the string does not correspond to a primitive type
+* @opti
+*/
 type TypeOf<T extends string> =
-    T extends "string" ? string :
-        T extends "number" ? number :
-            T extends "bigint" ? bigint :
-                T extends "boolean" ? boolean :
-                    T extends "symbol" ? symbol :
-                        T extends "undefined" ? undefined :
-                            T extends "function" ? Func :
-                                T extends "object" ? object | null :
+    T extends 'string' ? string :
+        T extends 'number' ? number :
+            T extends 'bigint' ? bigint :
+                T extends 'boolean' ? boolean :
+                    T extends 'symbol' ? symbol :
+                        T extends 'undefined' ? undefined :
+                            T extends 'function' ? Func :
+                                T extends 'object' ? object | null :
                                     never;
 
-/** The value queries for the `is` function */
+/** 
+ * The value queries for the `is` function
+ * @opti
+ */
 type ValueQueries<T> = T extends Func ? FuncTesters<T>
     : T extends Sized ? SizedObjectTesters<T> 
         : BaseValueQueries<T>;
 
 // Elements
-/** Represents a HTML tag in string form */
+/** 
+ * Represents a HTML tag in string form
+ * @opti
+ */
 type HTMLTag = keyof HTMLElementTagNameMap;
 
-/** Represents a HTML tag that cannot contain children in string format */
-type VoidHTMLTag = "area" | "base" | "br" | "col" | "embed" | "hr" | "img" | "input" | "link" | "meta" | "source" | "track" | "wbr";
+/** 
+ * Represents a HTML tag that cannot contain children in string format
+ * @opti
+ */
+type VoidHTMLTag = 'area' | 'base' | 'br' | 'col' | 'embed' | 'hr' | 'img' | 'input' | 'link' | 'meta' | 'source' | 'track' | 'wbr';
 
-/** Represents a SVG tag in string form */
+/** 
+ * Represents a SVG tag in string form
+ * @opti
+ */
 type SVGTag = keyof SVGElementTagNameMap;
 
-/** Represents a MathML tag in string form */
+/** 
+ * Represents a MathML tag in string form
+ * @opti
+ */
 type MathMLTag = keyof MathMLElementTagNameMap;
 
-/** Gets the type of a `HTMLElement` from a string */
+/** 
+ * Gets the type of a `HTMLElement` from a string
+ * @opti
+ */
 type HTMLElementOf<T extends string> =
     T extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[T] :
         HTMLElement;
 
-/** Gets the type of a `SVGElement` from a string */
+/** 
+ * Gets the type of a `SVGElement` from a string
+ * @opti
+ */
 type SVGElementOf<T extends keyof SVGElementTagNameMap> =
     SVGElementTagNameMap[T];
 
-/** Gets the type of a `MathMLElement` from a string */
+/** 
+ * Gets the type of a `MathMLElement` from a string
+* @opti
+*/
 type MathMLElementOf<T extends keyof MathMLElementTagNameMap> =
     MathMLElementTagNameMap[T];
 
-/** Extract tag name from element type for HTMLElement */
+/** 
+ * Extract tag name from element type for HTMLElement
+ * @opti
+ */
 type HTMLElementTagNameOf<T extends HTMLElement> = {
     [K in keyof HTMLElementTagNameMap | keyof HTMLElementDeprecatedTagNameMap]:
     K extends keyof HTMLElementTagNameMap
@@ -123,24 +198,43 @@ type HTMLElementTagNameOf<T extends HTMLElement> = {
             : never
 }[keyof HTMLElementTagNameMap | keyof HTMLElementDeprecatedTagNameMap];
 
-/** Extract tag name from element type for SGVElement */
+/** 
+ * Extract tag name from element type for SGVElement
+ * @opti
+ */
 type SVGElementTagNameOf<T extends SVGElement> = {
     [K in keyof SVGElementTagNameMap]: SVGElementTagNameMap[K] extends T ? K : never;
 }[keyof SVGElementTagNameMap];
 
-/** Extract tag name from element type for MathMLElement */
+/** 
+ * Extract tag name from element type for MathMLElement
+ * @opti
+ */
 type MathMLElementTagNameOf<T extends MathMLElement> = {
     [K in keyof MathMLElementTagNameMap]: MathMLElementTagNameMap[K] extends T ? K : never;
 }[keyof MathMLElementTagNameMap];
 
-/** The sort mode for arrays */
+/** 
+ * The sort mode for arrays 
+ * @opti
+ */
 type SortMode<T> =
-    T extends string ? "alpha" | "alpha-reverse" :
-        T extends number ? "increasing" | "decreasing" :
-            T extends Date ? "earlier" | "later" :
+    T extends string ? 'alpha' | 'alpha-reverse' :
+        T extends number ? 'increasing' | 'decreasing' :
+            T extends Date ? 'earlier' | 'later' :
                 never;
 
-/** Gets the event map for the specified object */
+/**
+ * Represents a function for an event listener
+ * @opti
+ * @since 1.0.0
+ */
+type EventFunc<T, K extends keyof EventMapOf<T> = keyof EventMapOf<T>> = (this: T, e: EventMapOf<T>[K]) => void;
+
+/** 
+ * Gets the event map for the specified object 
+ * @opti
+ */
 type EventMapOf<T> =
     T extends HTMLVideoElement ? HTMLVideoElementEventMap :
         T extends HTMLMediaElement ? HTMLMediaElementEventMap :

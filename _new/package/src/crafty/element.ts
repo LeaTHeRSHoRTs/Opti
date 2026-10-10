@@ -1,6 +1,6 @@
-import { _InternalChildrenNotAllowedException } from "./exceptions";
-import _InternalNode from "./node";
-import _InternalText from "./text";
+import { _InternalChildrenNotAllowedException } from './exceptions';
+import _InternalNode from './node';
+import _InternalText from './text';
 
 const NamespaceMap = {
     html: null,
@@ -15,10 +15,10 @@ export default class _InternalElement<
     P extends Crafty.Props<T> = Crafty.Props<T>,
 > extends _InternalNode implements Crafty.Element<N, T, P> {
     public readonly namespaceURI: N;
-    public readonly kind: "element" | HTMLTag = "element";
+    public readonly kind: 'element' | HTMLTag = "element";
     public readonly tag: T;
-    public id: P["id"] | undefined;
-    public classList: P["classes"] | [];
+    public id: P['id'] | undefined;
+    public classList: P['classes'] | [];
 
     #props: P;
     #children: Crafty.Node[];
@@ -27,7 +27,7 @@ export default class _InternalElement<
         super();
         this.namespaceURI = namespace;
         this.tag = tag;
-        this.classList = (props.classes ?? []) as P["classes"] | [];
+        this.classList = (props.classes ?? []) as P['classes'] | [];
         this.#children = children ?? [];
         this.#props = props;
         if (!this.#props.classes) {
@@ -35,9 +35,9 @@ export default class _InternalElement<
         }
     }
 
-    attr<K extends keyof Omit<P, "css">>(prop: K): P[K];
-    attr<K extends keyof Omit<P, "css">>(prop: K, value: P[K] | null): void;
-    attr<K extends keyof Omit<P, "css">>(prop: K, value?: P[K] | null): P[K] | void {
+    attr<K extends keyof Omit<P, 'css'>>(prop: K): P[K];
+    attr<K extends keyof Omit<P, 'css'>>(prop: K, value: P[K] | null): void;
+    attr<K extends keyof Omit<P, 'css'>>(prop: K, value?: P[K] | null): P[K] | void {
         if (value) {
             this.#props[prop] = value;
             return;
@@ -54,13 +54,13 @@ export default class _InternalElement<
             return this.#children
                 .filter(n => n instanceof _InternalText)
                 .map(n => n.txt())
-                .join('');
+                .join("");
         }
 
         const current = this.#children
             .filter(n => n instanceof _InternalText)
             .map(n => n.txt())
-            .join('');
+            .join("");
 
         const next = typeof fnOrText === 'function'
             ? fnOrText(current)
@@ -75,8 +75,8 @@ export default class _InternalElement<
         const el = document.createElementNS(NamespaceMap[this.namespaceURI], this.tag);
 
         Object.entries(this.#props).forEach(([key, value]) => {
-            if (typeof key === "string") {
-                el.setAttribute(key, Array.isArray(value) ? value.join(" ") : String(value));
+            if (typeof key === 'string') {
+                el.setAttribute(key, Array.isArray(value) ? value.join(' ') : String(value));
             }
         });
 

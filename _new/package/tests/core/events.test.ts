@@ -1,19 +1,19 @@
-import "opti";
+import 'opti';
 
 describe("EventTarget.addEventListener", () => {
     it("should still normally work", () => {
-        const element = document.createElement("div");
+        const element = document.createElement('div');
         const triggers = {
             loaded: false,
             clicked: false
         };
 
-        document.addEventListener("click", e => {
+        document.addEventListener('click', e => {
             expect(e).toBeInstanceOf(MouseEvent);
             triggers.loaded = true;
         });
 
-        element.addEventListener("click", e => {
+        element.addEventListener('click', e => {
             expect(e).toBeInstanceOf(MouseEvent);
             triggers.clicked = true;
         });

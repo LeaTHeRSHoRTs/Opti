@@ -1,8 +1,8 @@
-import _InternalHTML from "./html";
-import _InternalNode from "./node";
+import _InternalHTML from './html';
+import _InternalNode from './node';
 
 export default class _InternalText extends _InternalHTML implements Crafty.Text {
-    public override readonly kind: "text" = "text";
+    public override readonly kind: 'text' = "text";
     public get length(): number {
         return this._textContent.length;
     };
@@ -17,7 +17,7 @@ export default class _InternalText extends _InternalHTML implements Crafty.Text 
     html(textOrFn?: string | ((text: string) => string)): string | void {
         if (!textOrFn) {
             return super.html();
-        } else if (typeof textOrFn === "string") {
+        } else if (typeof textOrFn === 'string') {
             this.setContent(textOrFn);
         } else {
             this.setContent(textOrFn(super.html()));

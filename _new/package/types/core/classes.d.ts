@@ -17,23 +17,23 @@ interface RegistryManifest {
 /** The types for the `Future` class */
 interface Future<T, R extends Error = Error> extends Promise<T> {
     /**
-   * Attaches callbacks for the resolution and/or rejection of the Future.
-   */
+     * Attaches callbacks for the resolution and/or rejection of the Future.
+     */
     then<TResult1 = T, TResult2 = never>(
         onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null,
         onrejected?: ((reason: R) => TResult2 | PromiseLike<TResult2>) | undefined | null
     ): Future<TResult1 | TResult2, R>;
 
     /**
-   * Attaches a callback for only the rejection of the Future.
-   */
+     * Attaches a callback for only the rejection of the Future.
+     */
     catch<TResult = never>(
         onrejected?: ((reason: R) => TResult | PromiseLike<TResult>) | undefined | null
     ): Future<T | TResult, R>;
 
     /**
-   * Attaches a callback that is invoked when the Future is settled (resolved or rejected).
-   */
+     * Attaches a callback that is invoked when the Future is settled (resolved or rejected).
+     */
     finally(onfinally?: (() => void) | undefined | null): Future<T, R>;
 }
 
@@ -52,7 +52,7 @@ interface RuntimeErrorConstructor {
 
 /** The class representing runtime errors */
 interface RuntimeError extends Object {
-    name: "RuntimeError";
+    name: 'RuntimeError';
     message: string;
     stack?: string;
     cause?: unknown;

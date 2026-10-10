@@ -1,29 +1,70 @@
+import './crafty.js';
+import './basicnodes.js';
+import './elements.js';
+import './exceptions.js';
+import './documentalias.js';
+
 declare global {
-    namespace Crafty {
-        type NodeKind = 'element' | HTMLTag | 'text' | 'fragment' | 'comment' | 'unknown';
+    interface Crafty {
+        craft<T extends VoidHTMLTag, U extends Crafty.Props<T> = {}>(
+            el: T,
+            props?: U
+        ): Crafty.VoidHTMLElement<T, U>;
+        craft<T extends Crafty.NormalHTMLTag, U extends Crafty.Props<T> = {}>(
+            el: T,
+            props?: U,
+            children?: Crafty.Node[]
+        ): Crafty.HTMLElement<T, U>;
+        craft<N extends Crafty.Namespace, T extends Crafty.TagFromNamespace<N>, U extends Crafty.Props<T> = {}>(
+            namespace: N,
+            el: T,
+            props?: U,
+            children?: Crafty.Node[]
+        ): Crafty.Element<N, T, U>;
+        craft(...children: Arr.Present<Crafty.Node>): Crafty.Fragment;
+        craft(type: Crafty.TEXT, str: string): Crafty.Text;
+        craft(type: typeof Crafty.HTML, html: string): Crafty.HTML;
+        craft(type: Crafty.COMMENT, comment: string): Crafty.Comment;
 
-        type Namespace = "html" | "svg" | "mathml" | "xml";
+        /**
+         * Crafts a Node from a HTML string
+         * @opti
+         */
+        from(html: string): Crafty.Node;
 
-        type TagFromNamespace<N extends Namespace> = N extends "html" ? HTMLTag : N extends "svg" ? SVGTag : N extends "mathml" ? MathMLTag : string;
+        /**
+         * Crafts an Element from a DOM Element
+         * @opti
+         */
+        from(el: Element): Crafty.Element;
 
-        type NamespaceURL<N extends Namespace> = N extends "html" ? null : N extends "xml" ? "http://www.w3.org/XML/1998/namespace" : N extends "svg" ? "http://www.w3.org/2000/svg" : N extends "mathml" ? "http://www.w3.org/1998/Math/MathML" : null;
+        /**
+         * Crafts a HTMLElement from a DOM HTMLElement
+         * @opti
+         */
+        from<T extends HTMLTag>(el: HTMLElementOf<T>): Crafty.HTMLElement<T>;
 
-        type NamespaceElementOf<N extends Namespace> = N extends "html" ? globalThis.HTMLElement : N extends "xml" ? globalThis.Element : N extends "svg" ? globalThis.SVGElement : N extends "mathml" ? globalThis.MathMLElement : globalThis.Element;
+        /**
+         * Crafts a Node from a DOM Node
+         * @opti
+         */
+        from<T extends Crafty.Node>(node: T): T;
 
-        type Props<T extends string> = {
-            classes?: string[],
-            text?: string,
-            id?: string,
-            name?: string,
-            css?: Partial<WritableOnly<Only<CSSStyleDeclaration, string | number>>>
-        } & Partial<Pick<HTMLElementOf<T>, Object.Properties<HTMLElementOf<T>>>>;
+        isElement(node: unknown): node is Crafty.Element;
+        isHTMLElement(node: unknown): node is Crafty.HTMLElement;
+        isVoidHTMLElement(node: unknown): node is Crafty.VoidHTMLElement;
+        isText(node: unknown): node is Crafty.Text;
+        isFragment(node: unknown): node is Crafty.Fragment;
+        isComment(node: unknown): node is Crafty.Comment;
 
-        type COMMENT = typeof import("./crafty.lib").Crafty.TEXT;
-        type TEXT = typeof import("./crafty.lib").Crafty.TEXT;
-        type HTML = typeof import("./crafty.lib").Crafty.HTML;
+        // Exceptions
+        Exception: Crafty.ErrorConstructor;
+        ChildrenNotAllowedException: Crafty.ChildrenNotAllowedErrorConstructor;
+        NormalizationException: Crafty.NormalizationErrorConstructor;
 
-        type NormalHTMLTag = Exclude<HTMLTag, VoidHTMLTag>;
+        readonly COMMENT: unique symbol;
+        readonly TEXT: unique symbol;
+        readonly HTML: unique symbol;
     }
 }
-
-export { };
+export declare const Crafty: Crafty;
