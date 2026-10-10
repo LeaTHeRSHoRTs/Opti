@@ -6,8 +6,9 @@
 type _ = unknown;
 
 /** 
- * Used as a placeholder type
+ * Used as a placeholder type (is the type `any` underneath)
  * @opti
+ * @since 1.0.0
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type placeholder<T = _, U = _, V = _, W = _, X = _, Y = _, Z = _> = any;
@@ -15,6 +16,7 @@ type placeholder<T = _, U = _, V = _, W = _, X = _, Y = _, Z = _> = any;
 /** 
  * Represents a key in a key-value object
  * @opti
+ * @since 1.0.0
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Key = keyof any;
@@ -22,60 +24,70 @@ type Key = keyof any;
 /** 
  * Type representation of the `globalThis` variable
  * @opti
+ * @since 1.0.0
  */
 type GlobalThis = typeof globalThis;
 
 /** 
  * Represents any possible integer (union of bigint and number)
  * @opti
+ * @since 1.0.0
  */
 type int = number | bigint;
 
 /** 
  * Shortcut for `Record<string, T>`
  * @opti
+ * @since 1.0.0
  */
 type StringRecord<T> = Record<string, T>;
 
 /** 
  * Extract all strings from type `T`
  * @opti
+ * @since 1.0.0
  */
 type Stringed<T> = Extract<T, string>;
 
 /** 
  * Construct a type with a set of properties K of type T, all of which are optional
  * @opti
+ * @since 1.0.0
  */
 type PartialRecord<K extends Key, T> = Partial<Record<K, T>>;
 
 /**
  * Gets all the writable keys of an object
  * @opti
+ * @since 1.0.0
  */
 type WritableOnly<T> = Pick<T, Obj.Writable<T>>;
 
 /** 
  * Filters an object `U` by type `T`
  * @opti
+ * @since 1.0.0
  */
 type Only<T, U> = { [K in keyof T as T[K] extends U ? K : never]: T[K] };
 
 /** 
  * Makes a raw type defined (not undefined). Does not make object values not undefined
  * @opti
+ * @since 1.0.0
  */
 type Defined<T> = Exclude<T, undefined>;
 
 /** 
  * Objects that have a `size` or `length` property
  * @opti
+ * @since 1.0.0
  */
 type Sized = { size: number } | { length: number };
 
 /** 
  * Unboxes Object types to primitives
  * @opti
+ * @since 1.0.0
  */
 type Unboxed<T> =
     T extends readonly [infer First, ...infer Rest]
@@ -91,6 +103,7 @@ type Unboxed<T> =
 /** 
  * Used for widening type literals to their respective parent types 
  * @opti
+ * @since 1.0.0
  * @example
  * type WidenedString = Widen<'myStringLiteral'> // WidenedString is of type string, not of type 'myStringLiteral'
  */
@@ -103,8 +116,9 @@ type Widen<T> =
 
 /** 
  * A union of the primitive js types, in string form
-* @opti
-*/
+ * @opti
+ * @since 1.0.0
+ */
 type Primitive =
   | 'undefined'
   | 'object'
@@ -117,8 +131,9 @@ type Primitive =
 
 /** 
  * Parses a string to one of the primitive js types, or never if the string does not correspond to a primitive type
-* @opti
-*/
+ * @opti
+ * @since 1.0.0
+ */
 type TypeOf<T extends string> =
     T extends 'string' ? string :
         T extends 'number' ? number :
@@ -133,6 +148,7 @@ type TypeOf<T extends string> =
 /** 
  * The value queries for the `is` function
  * @opti
+ * @since 1.0.0
  */
 type ValueQueries<T> = T extends Func ? FuncTesters<T>
     : T extends Sized ? SizedObjectTesters<T> 
@@ -142,30 +158,35 @@ type ValueQueries<T> = T extends Func ? FuncTesters<T>
 /** 
  * Represents a HTML tag in string form
  * @opti
+ * @since 1.0.0
  */
 type HTMLTag = keyof HTMLElementTagNameMap;
 
 /** 
  * Represents a HTML tag that cannot contain children in string format
  * @opti
+ * @since 1.0.0
  */
 type VoidHTMLTag = 'area' | 'base' | 'br' | 'col' | 'embed' | 'hr' | 'img' | 'input' | 'link' | 'meta' | 'source' | 'track' | 'wbr';
 
 /** 
  * Represents a SVG tag in string form
  * @opti
+ * @since 1.0.0
  */
 type SVGTag = keyof SVGElementTagNameMap;
 
 /** 
  * Represents a MathML tag in string form
  * @opti
+ * @since 1.0.0
  */
 type MathMLTag = keyof MathMLElementTagNameMap;
 
 /** 
  * Gets the type of a `HTMLElement` from a string
  * @opti
+ * @since 1.0.0
  */
 type HTMLElementOf<T extends string> =
     T extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[T] :
@@ -174,20 +195,23 @@ type HTMLElementOf<T extends string> =
 /** 
  * Gets the type of a `SVGElement` from a string
  * @opti
+ * @since 1.0.0
  */
 type SVGElementOf<T extends keyof SVGElementTagNameMap> =
     SVGElementTagNameMap[T];
 
 /** 
  * Gets the type of a `MathMLElement` from a string
-* @opti
-*/
+ * @opti
+ * @since 1.0.0
+ */
 type MathMLElementOf<T extends keyof MathMLElementTagNameMap> =
     MathMLElementTagNameMap[T];
 
 /** 
  * Extract tag name from element type for HTMLElement
  * @opti
+ * @since 1.0.0
  */
 type HTMLElementTagNameOf<T extends HTMLElement> = {
     [K in keyof HTMLElementTagNameMap | keyof HTMLElementDeprecatedTagNameMap]:
@@ -201,6 +225,7 @@ type HTMLElementTagNameOf<T extends HTMLElement> = {
 /** 
  * Extract tag name from element type for SGVElement
  * @opti
+ * @since 1.0.0
  */
 type SVGElementTagNameOf<T extends SVGElement> = {
     [K in keyof SVGElementTagNameMap]: SVGElementTagNameMap[K] extends T ? K : never;
@@ -209,6 +234,7 @@ type SVGElementTagNameOf<T extends SVGElement> = {
 /** 
  * Extract tag name from element type for MathMLElement
  * @opti
+ * @since 1.0.0
  */
 type MathMLElementTagNameOf<T extends MathMLElement> = {
     [K in keyof MathMLElementTagNameMap]: MathMLElementTagNameMap[K] extends T ? K : never;
@@ -217,6 +243,7 @@ type MathMLElementTagNameOf<T extends MathMLElement> = {
 /** 
  * The sort mode for arrays 
  * @opti
+ * @since 1.0.0
  */
 type SortMode<T> =
     T extends string ? 'alpha' | 'alpha-reverse' :

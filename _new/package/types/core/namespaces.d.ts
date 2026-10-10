@@ -403,7 +403,7 @@ declare namespace CSS {
     type PropertyName = Exclude<keyof CSSStyleDeclaration, number | symbol>;
 
     /**
-     * Represents the raw CSSStyleDeclaration type
+     * Represents the raw `CSSStyleDeclaration` type
      * @opti
      * @since 1.0.0
      */
