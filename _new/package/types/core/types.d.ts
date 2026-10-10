@@ -240,17 +240,6 @@ type MathMLElementTagNameOf<T extends MathMLElement> = {
     [K in keyof MathMLElementTagNameMap]: MathMLElementTagNameMap[K] extends T ? K : never;
 }[keyof MathMLElementTagNameMap];
 
-/** 
- * The sort mode for arrays 
- * @opti
- * @since 1.0.0
- */
-type SortMode<T> =
-    T extends string ? 'alpha' | 'alpha-reverse' :
-        T extends number ? 'increasing' | 'decreasing' :
-            T extends Date ? 'earlier' | 'later' :
-                never;
-
 /**
  * Represents a function for an event listener
  * @opti
@@ -261,6 +250,7 @@ type EventFunc<T, K extends keyof EventMapOf<T> = keyof EventMapOf<T>> = (this: 
 /** 
  * Gets the event map for the specified object 
  * @opti
+ * @since 1.0.0
  */
 type EventMapOf<T> =
     T extends HTMLVideoElement ? HTMLVideoElementEventMap :

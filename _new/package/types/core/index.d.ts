@@ -316,7 +316,7 @@ declare global {
          *   color: "grey"
          * })
          */
-        css(selector: keyof HTMLElementTagNameMap): Partial<Record<keyof CSSStyleDeclaration, string>>;
+        css(selector: keyof HTMLElementTagNameMap): CSS.Object;
 
         /** 
          * Assigns a css object to a specified css selector for all elements matching it
@@ -330,7 +330,7 @@ declare global {
          *   color: "grey"
          * })
          */
-        css(selector: keyof HTMLElementTagNameMap, styles: Partial<Record<keyof CSSStyleDeclaration, string | number>>): void;
+        css(selector: keyof HTMLElementTagNameMap, styles: CSS.Object): void;
 
         /** 
          * Assigns a css object to a specified css selector for all elements matching it
@@ -343,9 +343,7 @@ declare global {
          *   color: "grey"
          * })
          */
-        css(
-            selector: string
-        ): Partial<Record<keyof CSSStyleDeclaration, string>>;
+        css(selector: string): CSS.Object;
 
         /** 
          * Assigns a css object to a specified css selector for all elements matching it
@@ -359,10 +357,7 @@ declare global {
          *   color: "grey"
          * })
          */
-        css(
-            selector: string,
-            styles: Partial<Record<keyof CSSStyleDeclaration, string | number>>
-        ): void;
+        css(selector: string, styles: CSS.Object): void;
 
         /**
          * Calls the callback when the document is ready and all of the content is loaded
@@ -473,12 +468,13 @@ declare global {
          * el.$(".hidden").removeClass("hidden");
          */
         $<K extends keyof HTMLElementTagNameMap>(selector: K): HTMLElementTagNameMap[K] | null;
+        /* eslint-disable jsdoc/require-jsdoc, jsdoc/require-tags, jsdoc/require-param, jsdoc/require-example */
         $<K extends keyof SVGElementTagNameMap>(selector: K): SVGElementTagNameMap[K] | null;
-        $<K extends keyof MathMLElementTagNameMap>(selectors: K): MathMLElementTagNameMap[K] | null;
-        // eslint-disable-next-line jsdoc/require-tags
+        $<K extends keyof MathMLElementTagNameMap>(selector: K): MathMLElementTagNameMap[K] | null;
         /** @deprecated */
         $<K extends keyof HTMLElementDeprecatedTagNameMap>(selector: K): HTMLElementDeprecatedTagNameMap[K] | null;
         $<E extends Element = HTMLElement>(selector: string): E | null;
+        /* eslint-enable jsdoc/require-jsdoc, jsdoc/require-tags, jsdoc/require-param, jsdoc/require-example */
 
         /**
          * Finds children based on the selector specified
@@ -492,14 +488,13 @@ declare global {
          * el.$$(".hidden", true).removeClass("hidden");
          */
         $$<K extends keyof HTMLElementTagNameMap>(selector: K): HTMLElementOf<K>[];
+        /* eslint-disable jsdoc/require-jsdoc, jsdoc/require-tags, jsdoc/require-param, jsdoc/require-example */
         $$<K extends keyof SVGElementTagNameMap>(selector: K): HTMLElementOf<K>[];
         $$<K extends keyof MathMLElementTagNameMap>(selector: K): MathMLElementOf<K>[];
-        // eslint-disable-next-line jsdoc/require-tags
         /** @deprecated */
         $$<K extends keyof HTMLElementDeprecatedTagNameMap>(selector: K): HTMLElementDeprecatedTagNameMap[K][];
         $$<E extends Element = HTMLElement>(selector: string): E[];
-
-        cut<T extends Node>(this: T): void;
+        /* eslint-enable jsdoc/require-jsdoc, jsdoc/require-tags, jsdoc/require-param, jsdoc/require-example */
     }
 
     interface Element {
@@ -550,17 +545,32 @@ declare global {
         hasClass(elClass: string): boolean;
 
         /**
-         * Modifies and/or returns the text of the element
+         * Modifies the text in the element using a function that gives the original text content
+         * @opti
+         * @since 1.0.0
+         * @param modifier The function used to modify the text and return the new text
+         */
+        txt(modifier: (text: string) => string): void;
+
+        /**
+         * Modifies the text in the element
+         * @opti
+         * @since 1.0.0
+         * @param newText The text to be inserted into the element as a replacement to the old text
+         * @example
+         * const el = document.$("#target");
+         * el.txt("Yelp", "2")
+         */
+        txt(...newText: Arr.Present<string>): void;
+
+        /**
+         * Returns the text of the element
          * @opti
          * @since 1.0.0
          * @example
          * const el = document.$("#target");
-         * el.txt("textContent", "Yelp")
-         * 
-         * console.log(el.txt()); // Logs "textContent Yelp"
+         * console.log(el.txt());
          */
-        txt(modifier: (text: string) => string): void;
-        txt(newText: string, ...moreText: string[]): void;
         txt(): string;
 
         /**
@@ -1002,7 +1012,7 @@ declare global {
          * @since 1.0.0
          * @param mode The order to sort in. Options are `random`, `alpha`, `alpha-reverse`, `increasing`,`decreasing`, `earlier` and `later`
          */
-        sort(mode: SortMode<T>): T[];
+        sort(mode: Arr.SortMode<T>): T[];
         sort(compareFn?: (a: T, b: T) => number): this;
     }
 

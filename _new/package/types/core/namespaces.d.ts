@@ -325,6 +325,17 @@ declare namespace Arr {
      * @since 1.0.0
      */
     type Present<T = unknown> = [T, ...T[]];
+
+    /** 
+     * The sort mode for arrays 
+     * @opti
+     * @since 1.0.0
+     */
+    type SortMode<T> =
+        T extends string ? 'alpha' | 'alpha-reverse' :
+            T extends number ? 'increasing' | 'decreasing' :
+                T extends Date ? 'earlier' | 'later' :
+                    never;
 }
 
 /** 
