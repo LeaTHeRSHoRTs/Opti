@@ -28,6 +28,7 @@ globalThis.RegistryError = Errors.RegistryError;
 globalThis.Future = Promise;
 globalThis.InternalRegistries = Reg.InternalRegistries;
 globalThis.Registries = Reg.Registries;
+Array.prototype.asArr = Arrays.asArr;
 
 globalThis.CloneError = Errors.CloneError;
 globalThis.NumberTooSmallError = Errors.NumberTooSmallError;
