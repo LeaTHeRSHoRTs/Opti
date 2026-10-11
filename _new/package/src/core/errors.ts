@@ -22,3 +22,5 @@ export class AssertionError extends Error {}
 export class FetchError extends Error {}
 export class DebouncedError extends Error {}
 export class RegistryError extends Error {}
+export class UnnecessaryError extends Error {}
+export class InvalidSelectorError extends Error {}

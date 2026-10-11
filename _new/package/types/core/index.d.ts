@@ -52,6 +52,7 @@ declare global {
      */
     function is<T>(val: T): ValueQueries<T>;
 
+    // eslint-disable-next-line jsdoc/require-returns
     /**
      * Asserts whether `condition` is true or not and throws an {@linkcode AssertionError} if it fails
      * @opti
@@ -269,6 +270,22 @@ declare global {
      */
     var RegistryError: RegistryErrorConstructor;
 
+    /**
+     * Error for when an unnecessary operation happens
+     * @opti
+     * @since 1.0.0
+     * @extends Error
+     */
+    var UnnecessaryError: UnnecessaryErrorConstructor;
+
+    /**
+     * Error for invalid selectors
+     * @opti
+     * @since 1.0.0
+     * @extends SyntaxError
+     */
+    var InvalidSelectorError: InvalidSelectorErrorConstructor;
+
     //------------------------------ Classes, Objects, and Variables -------------------------------
 
     /**
@@ -310,6 +327,8 @@ declare global {
          * @opti
          * @since 1.0.0
          * @param selector The css selector used to fetch the styles from the stylesheet
+         * @returns A CSS object with only the properties actually defined on the element
+         * @throws {SyntaxError} When the selector has invalid syntax
          * @example
          * document.css("#target", {
          *   backgroundColor: "red",
@@ -337,6 +356,7 @@ declare global {
          * @opti
          * @since 1.0.0
          * @param selector The css selector used for the specified styles
+         * @returns A CSS object with only the properties actually defined on the element
          * @example
          * document.css("#target", {
          *   backgroundColor: "red",
@@ -427,32 +447,32 @@ declare global {
          * const el = document.$("#child");
          * const target = el.getAncestor("#parent");
          */
-        ancestor<T extends Element>(this: Element, selector: string): T | null;
+        ancestor<T extends Element>(selector: string): T | null;
 
         /**
          * Gets the siblings of the node and, if 'inclusive' is true, includes itself in the list
          * @opti
          * @since 1.0.0
-         * @param inclusive If the list should include itself
+         * @param inclusive If the returned list should include itself
+         * @returns An array of nodes containing all the siblings of the element, including itself if `inclusive` is set to true
          * @example
          * const el = document.$("#target").getSiblings(true);
          * 
          * el.forEach((sibling, i) => console.log("Sibling " + i + ": " + sibling));
          */
-        siblings(this: Node, inclusive?: boolean): Node[];
-    }
+        siblings(this: Node, inclusive?: boolean): Arr<Node>;
 
-    interface ParentNode {
         /**
          * Gets all the children of the node
          * @opti
          * @since 1.0.0
+         * @returns The children of the node
          * @example
          * const el = document.$("#target").getChildren();
          * 
          * el.forEach((child, i) => console.log("Child " + i + ": " + child));
          */
-        getChildren(this: ParentNode): NodeListOf<ChildNode>;
+        getChildren(): Arr<ChildNode>;
     }
 
     interface Node {
@@ -461,6 +481,8 @@ declare global {
          * @opti
          * @since 1.0.0
          * @param selector The css style selector used to find the descendants
+         * @returns The selected element, or null if no element matches the selector
+         * @throws {InvalidSelectorError} When the CSS selector is invalid
          * @example
          * const el = document.$("#parent");
          * el.txt("Parent");
@@ -468,33 +490,35 @@ declare global {
          * el.$(".hidden").removeClass("hidden");
          */
         $<K extends keyof HTMLElementTagNameMap>(selector: K): HTMLElementTagNameMap[K] | null;
-        /* eslint-disable jsdoc/require-jsdoc, jsdoc/require-tags, jsdoc/require-param, jsdoc/require-example */
+        /* eslint-disable jsdoc/require-jsdoc, jsdoc/require-tags, jsdoc/require-param, jsdoc/require-example,jsdoc/require-returns */
         $<K extends keyof SVGElementTagNameMap>(selector: K): SVGElementTagNameMap[K] | null;
         $<K extends keyof MathMLElementTagNameMap>(selector: K): MathMLElementTagNameMap[K] | null;
         /** @deprecated */
         $<K extends keyof HTMLElementDeprecatedTagNameMap>(selector: K): HTMLElementDeprecatedTagNameMap[K] | null;
         $<E extends Element = HTMLElement>(selector: string): E | null;
-        /* eslint-enable jsdoc/require-jsdoc, jsdoc/require-tags, jsdoc/require-param, jsdoc/require-example */
+        /* eslint-enable jsdoc/require-jsdoc, jsdoc/require-tags, jsdoc/require-param, jsdoc/require-example, jsdoc/require-returns */
 
         /**
          * Finds children based on the selector specified
          * @opti
          * @since 1.0.0
          * @param selector The css style selector used to find the descendants
+         * @returns An array of matching elements, or null if there were no matched elements
+         * @throws {InvalidSelectorError} When the CSS selector is invalid
          * @example
          * const el = document.$("#parent");
          * el.txt("Parent");
          * 
          * el.$$(".hidden", true).removeClass("hidden");
          */
-        $$<K extends keyof HTMLElementTagNameMap>(selector: K): HTMLElementOf<K>[];
-        /* eslint-disable jsdoc/require-jsdoc, jsdoc/require-tags, jsdoc/require-param, jsdoc/require-example */
-        $$<K extends keyof SVGElementTagNameMap>(selector: K): HTMLElementOf<K>[];
-        $$<K extends keyof MathMLElementTagNameMap>(selector: K): MathMLElementOf<K>[];
+        $$<K extends keyof HTMLElementTagNameMap>(selector: K): Arr<HTMLElementOf<K>>;
+        /* eslint-disable jsdoc/require-jsdoc, jsdoc/require-tags, jsdoc/require-param, jsdoc/require-example, jsdoc/require-returns */
+        $$<K extends keyof SVGElementTagNameMap>(selector: K): Arr<HTMLElementOf<K>>;
+        $$<K extends keyof MathMLElementTagNameMap>(selector: K): Arr<MathMLElementOf<K>>;
         /** @deprecated */
-        $$<K extends keyof HTMLElementDeprecatedTagNameMap>(selector: K): HTMLElementDeprecatedTagNameMap[K][];
-        $$<E extends Element = HTMLElement>(selector: string): E[];
-        /* eslint-enable jsdoc/require-jsdoc, jsdoc/require-tags, jsdoc/require-param, jsdoc/require-example */
+        $$<K extends keyof HTMLElementDeprecatedTagNameMap>(selector: K): Arr<HTMLElementDeprecatedTagNameMap[K]>;
+        $$<E extends Element = HTMLElement>(selector: string): Arr<E>;
+        /* eslint-enable jsdoc/require-jsdoc, jsdoc/require-tags, jsdoc/require-param, jsdoc/require-example, jsdoc/require-returns */
     }
 
     interface Element {
@@ -502,40 +526,42 @@ declare global {
          * Adds a class to the element
          * @opti
          * @since 1.0.0
-         * @param elClass The class to add
+         * @param classes The classes to add
          * @example
          * const el = document.$("#target");
          * el.addClass("classy")
          */
-        addClass(elClass: string): void;
+        addClass(...classes: Arr.Present<string>): void;
 
         /**
          * Removes a class from the element
          * @opti
          * @since 1.0.0
-         * @param elClass The class to remove
+         * @param classes The classes to remove
          * @example
          * const el = document.$("#target");
          * el.removeClass("classy")
          */
-        removeClass(elClass: string): void;
+        removeClass(...classes: Arr.Present<string>): void;
 
         /**
          * Toggles the class on the element
          * @opti
          * @since 1.0.0
-         * @param elClass The class to toggle
+         * @param classes The classes to toggle
+         * @returns A boolean value representing whether the class is on the element after toggling
          * @example
          * const el = document.$("#target");
          * el.toggleClass("classy")
          */
-        toggleClass(elClass: string): void;
+        toggleClass(...classes: Arr.Present<string>): boolean;
 
         /**
          * Detects whether the element has the class specified
          * @opti
          * @since 1.0.0
          * @param elClass The class to toggle
+         * @returns A boolean value representing whether the class is on the element
          * @example
          * const el = document.$("#target");
          * if (el.hasClass("classy")) {
@@ -549,6 +575,9 @@ declare global {
          * @opti
          * @since 1.0.0
          * @param modifier The function used to modify the text and return the new text
+         * @example
+         * const el = document.$("#target");
+         * el.txt(origin => origin + " Bar");
          */
         txt(modifier: (text: string) => string): void;
 
@@ -559,7 +588,7 @@ declare global {
          * @param newText The text to be inserted into the element as a replacement to the old text
          * @example
          * const el = document.$("#target");
-         * el.txt("Yelp", "2")
+         * el.txt("Foo", "Bar");
          */
         txt(...newText: Arr.Present<string>): void;
 
@@ -567,6 +596,7 @@ declare global {
          * Returns the text of the element
          * @opti
          * @since 1.0.0
+         * @returns The current text content of the element
          * @example
          * const el = document.$("#target");
          * console.log(el.txt());
@@ -574,11 +604,23 @@ declare global {
         txt(): string;
 
         /**
-         * Gets and sets the elements html
+         * Gets and sets the elements html. Use HTMLElement.{@link text} instead if you are not inserting raw html
          * @opti
          * @since 1.0.0
          * @param input The html to insert in place of the old html
-         * @throws {UnnecessaryError} When the context would be inserted exactly like text
+         * @example
+         * const el = document.$("target");
+         * const html = el.html();
+         * 
+         * el.html(html + "<a href='example.com'>Link</a>");
+         */
+        html(input: string): void;
+
+        /**
+         * Gets and sets the elements html. Use HTMLElement.{@link text} instead if you just want text content
+         * @opti
+         * @since 1.0.0
+         * @returns The raw HTML content of the element
          * @example
          * const el = document.$("target");
          * const html = el.html();
@@ -586,7 +628,6 @@ declare global {
          * el.html(html + "<a href='example.com'>Link</a>");
          * @notice use HTMLElement.{@link text} instead if you are not inserting raw html
          */
-        html(input: string): void;
         html(): string;
 
         copy<T extends Element>(this: T, children?: boolean, events?: boolean): T;
@@ -933,7 +974,7 @@ declare global {
          * const newArr = [1, 2, 3, 3, 4].unique();
          * console.log(newArr); // [1, 2, 3, 4]
          */
-        unique(this: T[]): T[];
+        unique(): T[];
         /**
          * Separates an array into an array of arrays, with each subarray of a defined size
          * @opti
@@ -943,7 +984,7 @@ declare global {
          * const newArr = [1, 2, 3, 3, 4].chunk(2);
          * console.log(newArr); // [[1, 2], [3, 3], [4]]
          */
-        chunk(this: T[], size: number): T[][];
+        chunk(size: number): T[][];
 
         /**
          * Takes a found value out of an array and returns it.
@@ -1014,6 +1055,17 @@ declare global {
          */
         sort(mode: Arr.SortMode<T>): T[];
         sort(compareFn?: (a: T, b: T) => number): this;
+
+        /**
+         * Converts an array to a type-safe {@linkcode Arr}.
+         * @opti
+         * @since 1.0.0
+         * @returns A non-empty array, or `null` if empty.
+         * @example
+         * const numberArray = [1, 2, 3];
+         * const numberArr = numberArray.asArr();
+         */
+        asArr(): Arr.Safe<this>;
     }
 
     interface String {

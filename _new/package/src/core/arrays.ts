@@ -1,5 +1,9 @@
 import { arrType } from '../helpers';
 
+export function asArr<T extends readonly _[]>(this: T): Arr.Safe<T> {
+    return (this.length >= 1 ? this : null) as Arr.Safe<T>;
+}
+
 export function unique<T>(this: T[]): T[] {
     // Sets are unique by default, so convert to set and then back to array
     return [...new Set(this)];

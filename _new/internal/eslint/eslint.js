@@ -1,3 +1,14 @@
+/** @type {string[]} */
+const jsdocPluginContexts = [
+    "TSDeclareFunction",
+    "TSMethodSignature",
+    "TSTypeAliasDeclaration",
+    "TSDeclareMethod",
+    "ClassDeclaration",
+    "VariableDeclaration"
+];
+
+//#region Rules
 /** @type {import('eslint').Linter.RulesRecord} */
 const baseRules = {
     'no-undef': 'error',
@@ -23,7 +34,8 @@ const baseRules = {
     'no-useless-escape': 'warn',
     "@stylistic/indent": ["error", 4],
     "custom-rules/single-line-control-flow": "error",
-    "custom-rules/conditional-single": "error"
+    "custom-rules/conditional-single": "error",
+    "custom-rules/validated-throws": "error"
 };
 
 /** @type {import('eslint').Linter.RulesRecord} */
@@ -56,62 +68,48 @@ export const definitionRules = {
             }
         }
     ],
-    '@typescript-eslint/no-explicit-any': 'warn',
+    "@typescript-eslint/no-explicit-any": 'warn',
     "@typescript-eslint/no-empty-object-type": "off",
     "@typescript-eslint/no-restricted-types": [
         "error",
         {
             types: {
-                "Function": "Use function literals or the catch-all literal (this: any, ...args: any[]) => any",
+                "Object": "Use `object` or an object literal",
+                "Function": "Use function literals or the catch-all literal (`(this: any, ...args: any[]) => any`). If in a safe context, use the `Func` type provided by opti"
             },
         },
     ],
     "jsdoc/require-jsdoc": [
         "error",
         {
-            "skipInterveningOverloadedDeclarations": true,
-            "contexts": [
-                "TSDeclareFunction",
-                "TSMethodSignature",
-                "TSTypeAliasDeclaration",
-                "TSDeclareMethod",
-                "ClassDeclaration",
-                "VariableDeclaration"
-            ]
+            skipInterveningOverloadedDeclarations: true,
+            contexts: jsdocPluginContexts
         }
     ],
     "jsdoc/require-tags": ["error", { tags: ["since","opti"] }],
-    "jsdoc/require-param": [
-        "error",
-        {
-            "contexts": [
-                "ArrowFunctionExpression",
-                "FunctionDeclaration",
-                "FunctionExpression",
-                "TSDeclareFunction",
-                "TSMethodSignature",
-                "TSDeclareMethod"
-            ]
-        }
-    ],
+    "jsdoc/require-param": ["error", { contexts: jsdocPluginContexts }],
     "jsdoc/check-param-names": "error",
     "jsdoc/require-description": "error",
     "jsdoc/require-example": [
         "error",
         {
-            "contexts": [
+            contexts: [
                 "TSDeclareFunction",
                 "TSMethodSignature",
                 "TSDeclareMethod"
             ]
         }
     ],
+    "jsdoc/require-returns": ["error", {
+        forceRequireReturn: false,
+        contexts: jsdocPluginContexts 
+    }],
     "jsdoc/sort-tags": [
         "error",
         {
-            "reportIntraTagGroupSpacing": false,
-            "reportTagGroupSpacing": false,
-            "tagSequence": [
+            reportIntraTagGroupSpacing: false,
+            reportTagGroupSpacing: false,
+            tagSequence: [
                 { tags: ["opti"] },
                 { tags: ["deprecated"] },
                 { tags: ["since"] },
@@ -134,33 +132,20 @@ export const typescriptRules = {
     ...definitionRules,
     'camelcase': 'off',
     'no-compare-neg-zero': 'error',
+    "jsdoc/require-jsdoc": "off",
+    "@typescript-eslint/no-explicit-any": 'error',
     '@typescript-eslint/no-shadow': 'error',
     '@typescript-eslint/no-non-null-assertion': 'warn',
     '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
     '@typescript-eslint/typedef': 'warn',
     '@typescript-eslint/array-type': ['error', { default: 'array' }],
     '@typescript-eslint/no-floating-promises': 'error',
-    '@typescript-eslint/explicit-module-boundary-types': 'error',
-    '@typescript-eslint/no-restricted-types': [
-        "error",
-        {
-            types: {
-                "Object": "Use `object` or an object literal",
-                "Function": "Use function literals or the catch-all literal `(this: any, ...args: any[]) => any`",
-            },
-        },
-    ]
+    '@typescript-eslint/explicit-module-boundary-types': 'error'
 };
 
 /** @type {import('eslint').Linter.RulesRecord} */
 export const testRules = {
     ...typescriptRules,
     '@typescript-eslint/no-explicit-any': 'off',
-    // "opti/import-restricted": "error",
-    // "crafty/import-restricted": "error",
-    // "query/import-restricted": "error",
-    // "requests/import-restricted": "error",
-    // "unsync/import-restricted": "error",
-    // "flow/import-restricted": "error",
 };
-
+//#endregion

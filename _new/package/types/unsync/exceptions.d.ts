@@ -1,2 +1,2 @@
 interface InvalidRegistrationError extends Error {}
-interface InvalidRegistrationErrorConstructor extends DynErrorCtor<InvalidRegistrationError> {}
+interface InvalidRegistrationErrorConstructor extends ErrorConstructorOf<InvalidRegistrationError> {}

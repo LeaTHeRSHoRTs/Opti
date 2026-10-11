@@ -39,6 +39,8 @@ globalThis.AssertionError = Errors.AssertionError;
 globalThis.FetchError = Errors.FetchError;
 globalThis.HierarchyError = Errors.HierarchyError;
 globalThis.RuntimeError = Errors.RuntimeError;
+globalThis.UnnecessaryError = Errors.UnnecessaryError;
+globalThis.InvalidSelectorError = Errors.InvalidSelectorError;
 
 // eslint-disable-next-line prefer-arrow-callback
 globalThis.placeholder = new Proxy(function () {}, {

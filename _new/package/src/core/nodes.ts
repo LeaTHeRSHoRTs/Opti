@@ -8,8 +8,8 @@ export function removeClass(this: Element, elClass: string): void {
     this.classList.remove(elClass);
 }
 
-export function toggleClass(this: Element, elClass: string): void {
-    this.classList.toggle(elClass);
+export function toggleClass(this: Element, elClass: string): boolean {
+    return this.classList.toggle(elClass);
 }
 
 export function hasClass(this: Element, elClass: string): boolean {
@@ -109,8 +109,13 @@ export function getAncestor<T extends Element>(this: ChildNode, arg: string | nu
     return null;
 }
 
-export function html(this: Element, input?: string): string {
-    return input !== undefined ? (this.innerHTML = input) : this.innerHTML;
+
+export function html(this: Element): string;
+export function html(this: Element, input: string): void;
+export function html(this: Element, input?: string): string | void {
+    if (input) {
+        this.innerHTML = input;
+    } else return this.innerHTML;
 };
 
 export function text(this: Element, internalText?: string | ((oldText: string) => string), ...input: string[]): string {
@@ -143,12 +148,30 @@ export function toggle(this: HTMLElement): void {
 };
 
 export function $(this: ParentNode, selector: string): Element | null {
-    if (selector.includes(',')) throw new SyntaxError("Invalid query: commas are not allowed in query selectors that can only select 1 element");
-    return this.querySelector(selector);
+    try {
+        if (selector.includes(',')) throw new InvalidSelectorError("Invalid query: commas are not allowed in query selectors that can only select 1 element");
+        return this.querySelector(selector);
+    } catch (e) {
+        throw new InvalidSelectorError(
+            e instanceof SyntaxError || (e instanceof DOMException && e.name === "SyntaxError")
+                ? `Invalid query selector: ${e.message}`
+                : "An unexpected error occurred",
+            { cause: e }
+        );
+    }
 };
 
-export function $$(this: ParentNode, selector: string): Element[] {
-    return Array.from(this.querySelectorAll(selector));
+export function $$(this: ParentNode, selector: string): Arr<Element> {
+    try {
+        return Array.from(this.querySelectorAll(selector)).asArr();
+    } catch (e) {
+        throw new InvalidSelectorError(
+            e instanceof SyntaxError || (e instanceof DOMException && e.name === "SyntaxError")
+                ? `Invalid query selector: ${e.message}`
+                : "An unexpected error occurred",
+            { cause: e }
+        );
+    }
 };
 
 export function getChildren(this: Node): NodeListOf<ChildNode> {

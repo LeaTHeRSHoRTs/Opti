@@ -39,9 +39,9 @@ interface Future<T, R extends Error = Error> extends Promise<T> {
 
 //* Errors
 
-interface DynErrorCtor<Inst extends Error = Error> {
-    new(message?: string, cause?: string): Inst;
-    prototype: Inst;
+interface ErrorConstructorOf<Inst extends Error = Error> {
+    new (message?: string, options?: ErrorOptions): Inst;
+    readonly prototype: Inst;
 }
 
 /** The constructor for runtime errors */
@@ -50,8 +50,12 @@ interface RuntimeErrorConstructor {
     readonly prototype: RuntimeError;
 }
 
-/** The class representing runtime errors */
-interface RuntimeError extends Object {
+/**
+ * The class representing runtime errors
+ * @opti
+ * @since 1.0.0
+ */
+interface RuntimeError {
     name: 'RuntimeError';
     message: string;
     stack?: string;
@@ -59,34 +63,40 @@ interface RuntimeError extends Object {
 }
 
 interface UnknownError extends Error {}
-interface UnknownErrorConstructor extends DynErrorCtor<UnknownError> {}
+interface UnknownErrorConstructor extends ErrorConstructorOf<UnknownError> {}
 
 interface DebouncedError extends Error {}
-interface DebouncedErrorConstructor extends DynErrorCtor<DebouncedError> {}
+interface DebouncedErrorConstructor extends ErrorConstructorOf<DebouncedError> {}
 
 interface NotImplementedError extends Error {}
-interface NotImplementedErrorConstructor extends DynErrorCtor<NotImplementedError> {}
+interface NotImplementedErrorConstructor extends ErrorConstructorOf<NotImplementedError> {}
 
 interface AccessError extends Error {}
-interface AccessErrorConstructor extends DynErrorCtor<AccessError> {}
+interface AccessErrorConstructor extends ErrorConstructorOf<AccessError> {}
 
 interface AssertionError extends Error {}
-interface AssertionErrorConstructor extends DynErrorCtor<AssertionError> {}
+interface AssertionErrorConstructor extends ErrorConstructorOf<AssertionError> {}
 
 interface FetchError extends Error {}
-interface FetchErrorConstructor extends DynErrorCtor<FetchError> {}
+interface FetchErrorConstructor extends ErrorConstructorOf<FetchError> {}
 
 interface CloneError extends Error {}
-interface CloneErrorConstructor extends DynErrorCtor<CloneError> {}
+interface CloneErrorConstructor extends ErrorConstructorOf<CloneError> {}
 
 interface HierarchyError extends Error {}
-interface HierarchyErrorConstructor extends DynErrorCtor<HierarchyError> {}
+interface HierarchyErrorConstructor extends ErrorConstructorOf<HierarchyError> {}
 
 interface NumberError extends Error {}
-interface NumberErrorConstructor extends DynErrorCtor<NumberError> {}
+interface NumberErrorConstructor extends ErrorConstructorOf<NumberError> {}
 
 interface NumberTooSmallError extends Error {}
-interface NumberTooSmallErrorConstructor extends DynErrorCtor<NumberTooSmallError> {}
+interface NumberTooSmallErrorConstructor extends ErrorConstructorOf<NumberTooSmallError> {}
 
 interface RegistryError extends Error {}
-interface RegistryErrorConstructor extends DynErrorCtor<RegistryError> {}
+interface RegistryErrorConstructor extends ErrorConstructorOf<RegistryError> {}
+
+interface UnnecessaryError extends Error {}
+interface UnnecessaryErrorConstructor extends ErrorConstructorOf<UnnecessaryError> {}
+
+interface InvalidSelectorError extends SyntaxError {}
+interface InvalidSelectorErrorConstructor extends ErrorConstructorOf<InvalidSelectorError> {}

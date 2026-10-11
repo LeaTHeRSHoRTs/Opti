@@ -113,7 +113,7 @@ function typeObject<T>(val: T, str: string): ValueQueries<T> {
                 return false;
             },
 
-            length<U extends number>(length: U): this is ValueQueries<T extends unknown[] ? Tuple.Of<T[number], U> : T & { length: U }> {
+            length<U extends number>(length: U): this is ValueQueries<T extends unknown[] ? Tuple<T[number], U> : T & { length: U }> {
                 if (hasOwn(v, "size") && typeof v.size === 'number') {
                     return v.size === length;
                 } else if (hasOwn(v, "length") && typeof v.length === 'number') {
@@ -179,8 +179,8 @@ export function assert(condition: boolean, reason?: string): asserts condition {
 }
 
 export function sleep(ms: number): Future<void, NumberTooSmallError> {
-    return new Future((res, rej) => {
-        if (ms <= 0) return rej(new NumberTooSmallError("Invalid timeout value (must be greater than 0)"));
+    if (ms <= 0) throw new NumberTooSmallError("Invalid timeout value (must be greater than 0)");
+    return new Future((res, _) => {
         setTimeout(res, ms);
     });
 }

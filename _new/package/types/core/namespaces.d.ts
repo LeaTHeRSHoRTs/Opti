@@ -336,6 +336,16 @@ declare namespace Arr {
             T extends number ? 'increasing' | 'decreasing' :
                 T extends Date ? 'earlier' | 'later' :
                     never;
+    
+    /**
+     * Converts an array to null or a non-empty array at type level
+     * @opti
+     * @since 1.0.0
+     */
+    type Safe<T extends readonly unknown[]> =
+        T extends readonly [] ? null :
+            T extends readonly [unknown, ...unknown[]] ? Arr.Present<T[number]> :
+                Arr<T[number]>;
 }
 
 /** 
