@@ -38,6 +38,13 @@ export function setReadOnly<T, K extends keyof T>(object: T, prop: K, val: T[K])
     });
 }
 
+export function registerErrors<T extends Record<string, ErrorConstructor>>(
+    errors: T,
+): T {
+    Object.assign(globalThis, errors);
+    return errors;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function placeholderFunc(): any {
     throw new Error("Not implemented");
@@ -74,7 +81,8 @@ export function initializer<T extends object>(object: T, init: () => void): T {
     return object;
 }
 
-/** @future */
+
+// Future
 export function mixin<T extends Func>(
     fn: T,
     location: 'HEAD',

@@ -178,8 +178,8 @@ export function assert(condition: boolean, reason?: string): asserts condition {
     }
 }
 
-export function sleep(ms: number): Future<void, NumberTooSmallError> {
-    if (ms <= 0) throw new NumberTooSmallError("Invalid timeout value (must be greater than 0)");
+export function sleep(ms: number): Future<void> {
+    if (ms <= 0) throw new RangeError("Invalid timeout value (must be greater than 0)");
     return new Future((res, _) => {
         setTimeout(res, ms);
     });

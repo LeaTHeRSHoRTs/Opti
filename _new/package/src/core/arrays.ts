@@ -12,7 +12,8 @@ export function unique<T>(this: T[]): T[] {
 export function pluck<T>(this: T[], finder: ((v: T) => boolean) | number): T | null {
     if (typeof finder === 'number') {
         // Don't allow negative indices
-        if (finder < 0) throw new NumberTooSmallError("the parameter for pluck cannot be negative");
+        if (finder < 0) throw new RangeError("The parameter for pluck cannot be negative");
+        if (finder > this.length) throw new RangeError("The parameter for pluck cannot exceed the array's length");
         return this[finder] ?? null;
     } else {
         // Find the index of the item
@@ -61,7 +62,7 @@ export function relocateTo<T>(this: T[], index: number, location: number): numbe
 }
 
 const originalSort = Array.prototype.sort;
-export function sortBy<T>(this: T[], order?: SortMode<T> | ((a: T, b: T) => number)): T[] {
+export function sortBy<T>(this: T[], order?: Arr.SortMode<T> | ((a: T, b: T) => number)): T[] {
     if (typeof order === 'function') return originalSort.call(this, order);
     else if (order === undefined) return originalSort.call(this);
 
@@ -104,7 +105,8 @@ export function replace<T>(this: T[], index: number | ((value: T) => boolean), n
 }
 
 export function chunk<T>(this: T[], chunkSize: number): T[][] {
-    if (chunkSize <= 0) throw new NumberTooSmallError("`chunkSize` cannot be a number below 1");
+    if (chunkSize <= 0) throw new RangeError("`chunkSize` cannot be a number below 1");
+    if (chunkSize > this.length) throw new RangeError("`chunkSize` cannot be greater than the length of the array");
 
     const newArr: T[][] = [];
     let tempArr: T[] = [];

@@ -91,7 +91,6 @@ export function atDate(year: number, monthIndex: number, date?: number, hours?: 
 }
 
 //* Object
-
 export function clone<T>(object: symbol, deep?: boolean): never;
 export function clone<T>(object: T, deep?: boolean): T;
 export function clone<T>(object: T, deep: boolean = true): T {
@@ -155,7 +154,6 @@ export function forEach<T>(object: T, iterator: (key: keyof T, value: T[keyof T]
 };
 
 //* Number
-
 export function repeat(this: number, iterator: (i: number) => void): void {
     for (let i = 0; i < this; i++) {
         iterator(i);
@@ -201,9 +199,21 @@ export function toCase(this: string, format: Str.Case): string {
 }
 
 //* Math
+
 export function randomRange(minOrMax: number, max?: number): number {
-    if (typeof minOrMax !== 'undefined' && typeof max !== 'undefined') {
-        return Math.random() * (max - minOrMax) + minOrMax;
+    const min = max === undefined ? Math.min(0, minOrMax) : Math.min(minOrMax, max);
+    const upper = max === undefined ? Math.max(0, minOrMax) : Math.max(minOrMax, max);
+
+    return Math.random() * (upper - min) + min;
+};
+
+export function randomIntRange(minOrMax: number, max?: number): number {
+    if (!Number.isInteger(minOrMax) || (max !== undefined && !Number.isInteger(max))) {
+        throw new FloatingNumberError("Cannot set the limit to a floating point number. Limits must be whole numbers (integers) on the function randomIntRange");
     }
-    return Math.random() * minOrMax;
+
+    const min = max === undefined ? Math.min(0, minOrMax) : Math.min(minOrMax, max);
+    const upper = max === undefined ? Math.max(0, minOrMax) : Math.max(minOrMax, max);
+
+    return Math.floor(Math.random() * (upper - min + 1)) + min;
 };

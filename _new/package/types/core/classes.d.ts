@@ -92,6 +92,9 @@ interface NumberErrorConstructor extends ErrorConstructorOf<NumberError> {}
 interface NumberTooSmallError extends Error {}
 interface NumberTooSmallErrorConstructor extends ErrorConstructorOf<NumberTooSmallError> {}
 
+interface NumberTooLargeError extends Error {}
+interface NumberTooLargeErrorConstructor extends ErrorConstructorOf<NumberTooLargeError> {}
+
 interface RegistryError extends Error {}
 interface RegistryErrorConstructor extends ErrorConstructorOf<RegistryError> {}
 
@@ -100,3 +103,9 @@ interface UnnecessaryErrorConstructor extends ErrorConstructorOf<UnnecessaryErro
 
 interface InvalidSelectorError extends SyntaxError {}
 interface InvalidSelectorErrorConstructor extends ErrorConstructorOf<InvalidSelectorError> {}
+
+interface FloatingNumberError extends NumberError {}
+interface FloatingNumberErrorConstructor extends ErrorConstructorOf<FloatingNumberError> {}
+
+interface DuplicateIDError extends Error {}
+interface DuplicateIDErrorConstructor extends ErrorConstructorOf<DuplicateIDError> {}

@@ -441,8 +441,8 @@ const validatedThrows = makePlugin('problem', false, {
 
             if (!declarations.length || !implementations.length) return;
 
-            const expected = declarations.flatMap(getThrowsTypes).sort();
-            const actual = implementations.flatMap(getActualThrowsTypes).sort();
+            const expected =  [...new Set(declarations.flatMap(getThrowsTypes).sort())];
+            const actual = [...new Set(implementations.flatMap(getActualThrowsTypes).sort())];
 
             if (JSON.stringify(expected) === JSON.stringify(actual)) return;
 

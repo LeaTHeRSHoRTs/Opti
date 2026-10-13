@@ -84,38 +84,44 @@ declare interface ElementCopyOptions {
     /**
      * Defines if the new element should have everything that the previous element had. Defaults to `false`.
      * @opti
+     * @since 1.0.0
      */
     copyAll?: boolean;
     /**
      * Defines if the new element should have the same event listeners. Defaults to `false`.
      * @opti
+     * @since 1.0.0
      */
     copyEvents?: boolean;
     /**
      * Defines if the new element should have the same children. Defaults to `false`.
-     * @opti
      * 
-     * If `copyAttributes` is set to true, this property is also set to true
+     * If `copyAttributes` is set to `true`, this property is also set to `true`, 
+     * regardless of whether this property is set to `false` or not
+     * @opti
+     * @since 1.0.0
      */
     copyChildren?: boolean;
     /**
      * Defines if the new element should have the same attributes. Defaults to `true`.
      * @opti
+     * @since 1.0.0
      */
     copyAttributes?: boolean;
     /**
      * Defines if the new element should have the same styles. Defaults to `true`.
-     * @opti
      * 
-     * If `copyAttributes` is set to true, this property is also set to true
+     * If `copyAttributes` is set to `true`, this property is also set to `true`, 
+     * regardless of whether this property is set to `false` or not
+     * @opti
+     * @since 1.0.0
      */
     copyStyles?: boolean;
 
     /** 
      * The fallback ID to use if the copied element has an ID
      * @opti
-     * 
-     * This attribute never has a default value
+     * @since 1.0.0
      */
     fallbackId?: string;
 }

@@ -14,7 +14,6 @@ import './interfaces.js';
 
 declare global {
     //------------------------------------- Global Functions  -------------------------------------
-
     /** 
      * Creates an iife (Immediately invoked function expression) that triggers on run 
      * @opti
@@ -106,8 +105,8 @@ declare global {
      * @opti
      * @since 1.0.0
      * @param ms The amount of milliseconds to wait
-     * @returns A {@linkcode Future} resolving to `void`, or rejecting with {@linkcode NumberTooSmallError} if the number is less than 1.
-     * @throws {NumberTooSmallError} When the returned {@linkcode Future} object fails because `ms` is less than 1
+     * @returns A {@linkcode Future} that resolves to `void` after the timeout specified by `ms`
+     * @throws {RangeError} When the `ms` parameter is 0 or less
      * @example
      * ```ts
      * console.log("I log when the program runs!");
@@ -117,7 +116,7 @@ declare global {
      * console.log("I wait 5 seconds before executing!");
      * ```
      */
-    function sleep(ms: number): Future<void, NumberTooSmallError>;
+    function sleep(ms: number): Future<void>;
 
     /**
      * Creates a new type-safe enum full of `string: symbol` pairs. Values in an Enum must follow the variable naming rules of JavaScript, matching `/^[A-Za-z_$][A-Za-z0-9_$]*$/`
@@ -247,14 +246,6 @@ declare global {
     var NumberError: NumberErrorConstructor;
 
     /**
-     * Error for when a number is too small
-     * @opti
-     * @since 1.0.0
-     * @extends NumberError
-     */
-    var NumberTooSmallError: NumberTooSmallErrorConstructor;
-
-    /**
      * Error for when a fetch request fails unexpectedly (not handled in the .catch block of the returned promise)
      * @opti
      * @since 1.0.0
@@ -285,6 +276,22 @@ declare global {
      * @extends SyntaxError
      */
     var InvalidSelectorError: InvalidSelectorErrorConstructor;
+
+    /**
+     * Error for use of floating point numbers
+     * @opti
+     * @since 1.0.0
+     * @extends SyntaxError
+     */
+    var FloatingNumberError: FloatingNumberErrorConstructor;
+
+    /**
+     * Error for when a duplicate ID would be present
+     * @opti
+     * @since 1.0.0
+     * @extends Error
+     */
+    var DuplicateIDError: DuplicateIDErrorConstructor;
 
     //------------------------------ Classes, Objects, and Variables -------------------------------
 
@@ -630,7 +637,36 @@ declare global {
          */
         html(): string;
 
+        /**
+         * Copies an element, with optional children and event copying
+         * @opti
+         * @since 1.0.0
+         * @param children Whether the children should be copied
+         * @param events Whether the events should be copied
+         * @returns A copy of the element
+         * @throws {DuplicateIDError} When the original element has an ID that will be copied over to the new element
+         * @example
+         * const element = document.$("#target");
+         * const copy = target.copy(true, false);
+         * document.body.append(copy);
+         */
         copy<T extends Element>(this: T, children?: boolean, events?: boolean): T;
+
+        /**
+         * Copies an element, with optional children and event copying
+         * @opti
+         * @since 1.0.0
+         * @param options An object representing the things to copy off of the element
+         * @returns A copy of the element
+         * @throws {DuplicateIDError} When the original element has an ID that will be 
+         * copied over to the new element, and a `fallbackID` is not set
+         * @example
+         * const element = document.$("#target");
+         * const copy = target.copy({
+         *   copyAttributes: true
+         * });
+         * document.body.append(copy);
+         */
         copy<T extends Element>(this: T, options: ElementCopyOptions): T;
 
         /**
@@ -638,10 +674,11 @@ declare global {
          * @opti
          * @since 1.0.0
          * @param key The attribute to get or set
+         * @returns The attribute specified by `key`
          * @example
          * const element = document.$("#target");
          * const id = element.attr('id');
-         * element.attr('href', "https://example.org");
+         * console.log(id);
          */
         attr<K extends keyof this>(key: K): this[K];
 
@@ -653,7 +690,6 @@ declare global {
          * @param value The value to set the attribute to. Use null to clear the attribute
          * @example
          * const element = document.$("#target");
-         * const id = element.attr('id');
          * element.attr('href', "https://example.org");
          */
         attr<K extends keyof this>(key: K, value: this[K] | null): void;
@@ -680,86 +716,67 @@ declare global {
         css(key: CSS.PropertyName, value: string | number | null): void;
 
         /** 
-         * Adds inline css to the element.
+         * Returns a CSS property from the element as specified by `key`
          * @opti
          * @since 1.0.0
+         * @param key The CSS key to use to fetch the property, in camelCase
+         * @returns The value of the CSS property specified by `key`
          * @example
          * const el = document.$("#target");
-         * 
-         * el.css("background-color", "red");
-         * el.css({
-         *   visibility: "visible",
-         *   backgroundColor: "blue"
-         * })
-         * 
-         * console.log(el.css());
+         * console.log(el.css('backgroundColor'));
          */
         css(key: CSS.PropertyName): string | number | null;
 
         /** 
-         * Adds inline css to the element.
+         * Returns a CSS property from the element as specified by `key`
          * @opti
          * @since 1.0.0
+         * @param key The CSS key to use to fetch the property, in camelCase
+         * @returns The value of the CSS property specified by `key`
          * @example
          * const el = document.$("#target");
-         * 
-         * el.css("background-color", "red");
-         * el.css({
-         *   visibility: "visible",
-         *   backgroundColor: "blue"
-         * })
-         * 
-         * console.log(el.css());
+         * console.log(el.css('backgroundColor'));
          */
         css(key: string): string | number | null;
 
         /** 
-         * Adds inline css to the element.
+         * Sets the CSS of the element using an object
          * @opti
          * @since 1.0.0
+         * @param object The object to use to set the properties, with the keys in camelCase
          * @example
          * const el = document.$("#target");
-         * 
-         * el.css("background-color", "red");
          * el.css({
-         *   visibility: "visible",
-         *   backgroundColor: "blue"
-         * })
-         * 
-         * console.log(el.css());
+         *   backgroundColor: 'cyan',
+         *   borderRadius: '10px'
+         * });
          */
-        css(key: CSS.Object): void;
+        css(object: CSS.Object): void;
 
         /** 
-         * Adds inline css to the element.
+         * Returns all the CSS on the element in a `CSS.Object`
          * @opti
          * @since 1.0.0
+         * @returns A CSS object with all of the styles that have been modified inline
          * @example
          * const el = document.$("#target");
-         * 
-         * el.css("background-color", "red");
-         * el.css({
-         *   visibility: "visible",
-         *   backgroundColor: "blue"
-         * })
-         * 
          * console.log(el.css());
          */
         css(): CSS.Object;
 
         /**
-         * Gets the elements tag name
+         * Gets the element's tag name
          * @opti
          * @since 1.0.0
          * @example
          * const el = document.$("#target");
          * 
-         * console.log(el.tag()); // Logs tag name
+         * console.log(el.tag); // Logs tag name
          */
         readonly tag: HTMLTag;
 
         /**
-         * Shows an element
+         * Shows an element on the page, using CSS styles
          * @opti
          * @since 1.0.0
          * @example
@@ -769,7 +786,7 @@ declare global {
         show(): void;
 
         /**
-         * Hides an element
+         * Hides an element on the page, using CSS styles
          * @opti
          * @since 1.0.0
          * @example
@@ -779,18 +796,17 @@ declare global {
         hide(): void;
 
         /**
-         * Toggles the visibility of a element
+         * Toggles the visibility of a element on the page, using CSS styles
          * @opti
          * @since 1.0.0
          * @example
          * const el = document.$("#target");
-         * el.toggle(true);
+         * el.toggle();
          */
         toggle(): void;
-        toggle(state: boolean): void;
 
         /**
-         * Returns a boolean that is true if the element is visible to the user
+         * Returns a boolean that is true if the element is visible on the page
          * @opti
          * @since 1.0.0
          */
@@ -802,6 +818,11 @@ declare global {
          * Serializes a form and its elements into a string
          * @opti
          * @since 1.0.0
+         * @returns A serialized string of all of the form data
+         * @example
+         * const form = document.$("#target");
+         * const serialized = form.serialize();
+         * console.log(serialized);
          */
         serialize(): string;
     }
@@ -817,7 +838,7 @@ declare global {
 
     interface NodeList {
         /**
-         * Adds a class to the elements
+         * Adds a class to all the elements in the list
          * @opti
          * @since 1.0.0
          * @param elClass The class to add
@@ -828,7 +849,7 @@ declare global {
         addClass(elClass: string): void;
 
         /**
-         * Removes a class from the elements
+         * Removes a class from all the elements in the list
          * @opti
          * @since 1.0.0
          * @param elClass The class to remove
@@ -839,7 +860,7 @@ declare global {
         removeClass(elClass: string): void;
 
         /**
-         * Toggles the class on the elements
+         * Toggles the specified class on all the elements in the list
          * @opti
          * @since 1.0.0
          * @param elClass The class to toggle
@@ -852,7 +873,7 @@ declare global {
 
     interface HTMLCollection {
         /**
-         * Adds a class to the elements
+         * Adds a class to all the elements in the list
          * @opti
          * @since 1.0.0
          * @param elClass The class to add
@@ -863,7 +884,7 @@ declare global {
         addClass(elClass: string): void;
 
         /**
-         * Removes a class from the elements
+         * Removes a class from all the elements in the list
          * @opti
          * @since 1.0.0
          * @param elClass The class to remove
@@ -874,7 +895,7 @@ declare global {
         removeClass(elClass: string): void;
 
         /**
-         * Toggles the class on the elements
+         * Toggles the specified class on all the elements in the list
          * @opti
          * @since 1.0.0
          * @param elClass The class to toggle
@@ -897,19 +918,71 @@ declare global {
          * @param minutes The minute to use
          * @param seconds The second to use
          * @param ms The millisecond to use
+         * @returns A number representing the amount of milliseconds between the specified date and January 1, 1970
+         * @example
+         * const dayInMs = Date.now()
+         * const dateInFuture = Date.at(2035, 6, 4);
+         * console.log(
+         *   dayInMs + " compared to " + dateInFuture + '.', 
+         *   "Gap between the two: " + (dateInFuture - dayInMs)
+         * );
          */
         at(year: number, monthIndex: number, date?: number, hours?: number, minutes?: number, seconds?: number, ms?: number): number;
     }
 
     interface Math {
         /** 
-         * Returns a pseudorandom number between 0 and max.
+         * Returns a pseudorandom number between 0 and `max`, inclusively.
          * @opti
          * @since 1.0.0
-         * @param max the maximum random number
+         * @param max the maximum for the random number
+         * @returns A random number between 0 and `max`
+         * @example
+         * const rand = Math.randomRange(3);
+         * console.log(rand);
          */
         randomRange(max: number): number;
+
+        /** 
+         * Returns a pseudorandom number between `min` and `max`, inclusively.
+         * @opti
+         * @since 1.0.0
+         * @param min The minimum for the random number
+         * @param max the maximum for the random number
+         * @returns A random number between 0 and `max`, including the two boundaries
+         * @example
+         * const rand = Math.randomRange(3);
+         * console.log(rand);
+         */
         randomRange(min: number, max: number): number;
+
+
+        /**
+         * Returns a pseudorandom whole number between 0 and `max`, inclusively.
+         * @opti
+         * @since 1.0.0
+         * @param max The maximum integer for the random number
+         * @returns A random whole number between 0 and `max`, including the two boundaries
+         * @throws {FloatingNumberError} When `max` is not a whole number
+         * @example
+         * const rand = Math.randomIntRange(5);
+         * console.log(rand);
+         */
+        randomIntRange(max: number): number;
+
+        /**
+         * Returns a pseudorandom whole number between 0 and `max`, inclusively.
+         * @opti
+         * @since 1.0.0
+         * @param min The minimum integer for the random number
+         * @param max The maximum integer for the random number
+         * @returns A random whole number between 0 and `max`, including the two boundaries
+         * @throws {FloatingNumberError} When `min` or `max` is not a whole number
+         * @example
+         * const rand = Math.randomIntRange(5);
+         * console.log(rand);
+         */
+        randomIntRange(min: number, max: number): number;
     }
 
     interface ObjectConstructor {
@@ -919,6 +992,7 @@ declare global {
          * @since 1.0.0
          * @param object The object to clone
          * @param deep Whether the clone should be deep or not
+         * @returns A duplication of the object
          * @example
          * class Example {
          *   exampleVal = 2;
@@ -933,8 +1007,20 @@ declare global {
          * newObj.run(); // Running...
          * console.log(oldObj.exampleVal); // 2
          */
-        clone<T>(object: symbol, deep?: boolean): never;
         clone<T>(object: T, deep?: boolean): T;
+
+        /**
+         * Clones an object
+         * @opti
+         * @since 1.0.0
+         * @param object The object to clone
+         * @param deep Whether the clone should be deep or not
+         * @throws {CloneError} When the object specified is a symbol
+         * @example
+         * const symbol = Symbol("Example");
+         * const newSymbol = Object.clone(symbol); // Throws a CloneError
+         */
+        clone(object: symbol, deep?: boolean): never;
 
         /**
          * Performs the specified action for each element in an array.
@@ -970,8 +1056,9 @@ declare global {
          * Makes all values in an array unique
          * @opti
          * @since 1.0.0
+         * @returns An array with perfectly unique values that do not repeat
          * @example
-         * const newArr = [1, 2, 3, 3, 4].unique();
+         * const newArr = [1, 2, 2, 2, 2, 3, 3, 3, 4, 4,].unique();
          * console.log(newArr); // [1, 2, 3, 4]
          */
         unique(): T[];
@@ -980,6 +1067,9 @@ declare global {
          * @opti
          * @since 1.0.0
          * @param size The size of the sub-arrays
+         * @returns A chunked array
+         * @throws {RangeError} When the number specified is 0 or less
+         * @throws {RangeError} When the number specified exceed's the array's length
          * @example
          * const newArr = [1, 2, 3, 3, 4].chunk(2);
          * console.log(newArr); // [[1, 2], [3, 3], [4]]
@@ -987,34 +1077,78 @@ declare global {
         chunk(size: number): T[][];
 
         /**
-         * Takes a found value out of an array and returns it.
+         * Finds an item in an array and takes it out of the array by index
+         * @opti
+         * @since 1.0.0
+         * @param index The index used to find the element
+         * @returns The element if it is found, or null
+         * @throws {RangeError} When the number specified is 0 or less
+         * @throws {RangeError} When the number specified exceed's the array's length
+         * @example
+         * const arr = [1, 2, 3, 4, 5, 6, 7, 8];
+         * const plucked = arr.pluck(3);
+         * console.log(plucked); // 4
+         * console.log(arr); // [1, 2, 3, 5, 6, 7, 8]
+         */
+        pluck(index: number): T | null;
+
+        /**
+         * Finds an item in an array and takes it out of the array using a finder function
          * @opti
          * @since 1.0.0
          * @param finder The finder function to find the value to remove
-         * @param index The index used to find and 
+         * @returns The element if it is found, or null
+         * @example
+         * const arr = ["one", "two", "three", "four", "five"];
+         * const plucked = arr.pluck(val => val.includes('r'));
+         * console.log(plucked); // three
+         * console.log(arr); // ["one", "two", "four", "five"]
          */
-        pluck(index: number): T | null;
         pluck(finder: (v: T) => boolean): T | null;
 
         /**
-         * 
+         * Finds the last item in an array that matches the finder function and takes it out and returns it
          * @opti
          * @since 1.0.0
          * @param finder The finder function used to find and pluck the value from the array
+         * @returns The last item in the array that matches the finder function
+         * @example
+         * const arr = ["one", "two", "three", "four", "five"];
+         * const plucked = arr.pluckLast(val => val.includes('r'));
+         * console.log(plucked); // four
+         * console.log(arr); // ["one", "two", "three", "five"]
          */
         pluckLast(finder: (v: T) => boolean): T | null;
 
         /**
-         * Relocates an item in an array by a set amount
+         * Relocates an item in an array to an offset position as specified by `offset`
          * @opti
          * @since 1.0.0
-         * @param index The item to move
+         * @param from The item to move
          * @param offset The offset to move it by
          * @returns The new location of the item
+         * @example
+         * const arr =  ["one", "two", "five", "four", "three"];
+         * const itemIndex = arr.relocate(4, -2);
+         * console.log(itemIndex); // 
+         * console.log(arr); ["one", "two", "three", "four", "five"]
          */
-        relocate(index: number, offset: number): number | null;
+        relocate(from: number, offset: number): number | null;
 
-        relocateTo(index: number, location: number): number | null;
+        /**
+         * Relocates an item in an array to a new position in the array
+         * @opti
+         * @since 1.0.0
+         * @param from The item to move
+         * @param to The new location to put the item
+         * @returns The new location of the item
+         * @example
+         * const arr =  ["one", "two", "five", "four", "three"];
+         * const itemIndex = arr.relocateTo(4, 2);
+         * console.log(itemIndex); // 
+         * console.log(arr); ["one", "two", "three", "four", "five"]
+         */
+        relocateTo(from: number, to: number): number | null;
 
         /**
          * An array-altering method that inserts item(s) as the specified index
@@ -1024,8 +1158,8 @@ declare global {
          * @param values The values to insert
          * @example
          * const arr = [1, 2, 3, 5];
-         * 
-         * arr.insert(2, 4); // arr is now [1, 2, 3, 4, 5]
+         * arr.insert(2, 4);
+         * console.log(arr); // [1, 2, 3, 4, 5]
          */
         insert(this: T[], index: number, ...values: T[]): void;
 
@@ -1035,6 +1169,12 @@ declare global {
          * @since 1.0.0
          * @param replaceIndex The index to replace
          * @param newVal The new value to put in place of the old removed value
+         * @returns The value that was replaced, or null if no value was replaced
+         * @example
+         * const arr =  ["one", "two", "three", "four", "three"];
+         * const itemIndex = arr.replace(4, "five");
+         * console.log(itemIndex); // 
+         * console.log(arr); ["one", "two", "three", "four", "five"]
          */
         replace(this: T[], replaceIndex: number, newVal: T): T | null;
 
@@ -1044,6 +1184,9 @@ declare global {
          * @since 1.0.0
          * @param finder The function that searches for the right value to replace
          * @param newVal The new value to put in place of the old removed value
+         * @returns The value that was replaced, or null if no value was replaced
+         * @example
+         * 
          */
         replace(this: T[], finder: (val: T) => boolean, newVal: T): T | null;
 
@@ -1052,9 +1195,11 @@ declare global {
          * @opti
          * @since 1.0.0
          * @param mode The order to sort in. Options are `random`, `alpha`, `alpha-reverse`, `increasing`,`decreasing`, `earlier` and `later`
+         * @returns A sorted array based on the parameter `mode`
+         * @example
+         * 
          */
-        sort(mode: Arr.SortMode<T>): T[];
-        sort(compareFn?: (a: T, b: T) => number): this;
+        sortBy(mode: Arr.SortMode<T>): T[];
 
         /**
          * Converts an array to a type-safe {@linkcode Arr}.
@@ -1074,6 +1219,7 @@ declare global {
          * @opti
          * @since 1.0.0
          * @param finder The searching string or regular expression
+         * @returns A new string without the removed substring
          * @example 
          * const oldString = "Hello! World!";
          * const newString = oldString.remove("!") // Hello World!
@@ -1085,23 +1231,29 @@ declare global {
          * Removes the captured text in a string, using a regular expression or search string.
          * @opti
          * @since 1.0.0
-         * @param finder The searching string or regular expression
+         * @param regex The searching string or regular expression
+         * @returns A new string without the removed substring that was captured using the regex
          * @example 
          * const oldString = "Hello! World!";
          * const newString = oldString.remove(/(!)/) // Hello World
          * const evenNewerString = newString.remove(/(\s)\w+/) // HelloWorld
          */
-        removeCaptured(finder: RegExp): string;
+        removeCaptured(regex: RegExp): string;
 
         /**
          * Capitalizes the first character in a string
          * @opti
          * @since 1.0.0
+         * @param allCapitalized Whether all of the words should be capitalized, or just the first. 
+         * Defaults to `false`
+         * @returns A string with the letters capitalized
          * @example
          * const myString = "hello world";
          * console.log(myString.capitalize()); // "Hello world"
+         * const mySecondString = "goodbye world";
+         * console.log(mySecondString.capitalize(true)); // Goodbye World
          */
-        capitalize(): string;
+        capitalize(allCapitalized?: boolean): string;
 
         /**
          * Finds the first substring match in a regular expression search.
@@ -1109,6 +1261,8 @@ declare global {
          * @since 1.0.0
          * @param regexp A string or regular expression used to search through the string
          * @returns A boolean value representing whether the string matches the value specified in `regexp`
+         * @example
+         * 
          */
         matches(regexp: string | RegExp): boolean;
 
@@ -1117,26 +1271,34 @@ declare global {
          * @opti
          * @since 1.0.0
          * @param format The string format to use, selected from the `Str.Case` type
+         * @returns A string that has been transformed to the casing specified by `format`
+         * @example
+         * 
          */
         toCase(format: Str.Case): string;
     }
 
     interface FunctionConstructor {
         /**
-         * Returns a function with a memorized return value. The memorized return value is based on the inputs given in `args`
+         * Returns a function that caches the result of `func` for the specified arguments.
          * @opti
          * @since 1.0.0
-         * @param func The function to use to create the new function
-         * //param args The arguments to use to calculate and memorize the output
+         * @param func The function whose result is to be cached
+         * @param args The arguments to pass to `func` when computing the cached result
+         * @returns A function that returns the cached result when called with the specified arguments
+         * @example
+         * 
          */
-        memo<T, A extends unknown[], R>(func: Func<T, A, R>): Func<T, A, R>;
+        memo<T, A extends unknown[], R>(func: Func<T, A, R>, ...args: A): Func<T, A, R>;
 
         /**
          * Returns a debounced version of the provided function
          * @opti
          * @since 1.0.0
-         * @param func The function to use to create the debounced function
-         * @param ms The debounce time, in milliseconds
+         * @param func The function to debounce
+         * @param ms The debounce delay, in milliseconds
+         * @returns A function that returns a {@linkcode Future} resolving to the result of `func`, or rejecting with a {@linkcode DebouncedError} if the call is superseded by another call before the delay expires
+         * @example
          */
         debounce<T, A extends unknown[], R>(func: Func<T, A, R>, ms: number): Func<T, A, Future<R, DebouncedError>>;
 
@@ -1145,7 +1307,10 @@ declare global {
          * @opti
          * @since 1.0.0
          * @param func The function to use to create the throttled function
-         * @param ms The throttle time, in milliseconds
+         * @param ms The minimum interval between calls, in milliseconds
+         * @returns A function that returns the result of `func` when a call is executed, or `null` when the call is suppressed by the throttle interval
+         * @example
+         * 
          */
         throttle<T, A extends unknown[], R>(func: Func<T, A, R>, ms: number): Func<T, A, R | null>;
     }

@@ -174,18 +174,18 @@ export function $$(this: ParentNode, selector: string): Arr<Element> {
     }
 };
 
-export function getChildren(this: Node): NodeListOf<ChildNode> {
-    return this.childNodes;
+export function getChildren(this: Node): Arr<ChildNode> {
+    return Array.from(this.childNodes).asArr();
 };
 
-export function getSiblings(this: ChildNode, inclusive?: boolean): ChildNode[] {
-    if (!this.parentNode) return[];
+export function getSiblings(this: ChildNode, inclusive?: boolean): Arr<ChildNode> {
+    if (!this.parentNode) return null;
 
     const siblings = Array.from(this.parentNode.childNodes);
     if (inclusive) {
-        return siblings; // Include current node as part of siblings
+        return siblings.asArr(); // Include current node as part of siblings
     } else {
-        return siblings.filter(node => !node.isSameNode(this));
+        return siblings.filter(node => !node.isSameNode(this)).asArr();
     }
 };
 
@@ -204,11 +204,6 @@ export function serialize(this: HTMLFormElement): string {
         })
         .join('&');
 };
-
-export function cut<T extends Node>(this: T): void {
-    if (!this.parentNode) throw new HierarchyError("Element cannot be cut out of the DOM because it has no parent");
-    this.parentNode.removeChild(this);
-}
 
 const defaultCopy: Required<Omit<ElementCopyOptions, 'fallbackId'>> = {
     copyAll: false,
@@ -236,6 +231,10 @@ export function copy<T extends Element>(this: T, childrenOrObject: boolean | Ele
             ...defaultCopy,
             ...childrenOrObject
         };
+    }
+
+    if (this.id !== "" && !options.fallbackId) {
+        throw new DuplicateIDError("The duplicate element would have the same ID as the source element. Set a fallbackId to prevent ID duplication");
     }
 
     const clone = document.createElementNS(this.namespaceURI, this.tagName) as T;

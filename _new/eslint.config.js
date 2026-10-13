@@ -1,6 +1,6 @@
 //@ts-check
 import globals from 'globals';
-import plugin from "./internal/eslint/eslint-general.cjs";
+import plugin from "./internal/eslint/eslint-plugins.cjs";
 import { defineConfig } from 'eslint/config';
 import stylistic from "@stylistic/eslint-plugin";
 import jsdoc from "eslint-plugin-jsdoc";

@@ -1,4 +1,4 @@
-import { setGetter, setReadOnly, throwPlaceholder } from '../helpers';
+import { setGetter, setReadOnly, throwPlaceholder, registerErrors } from '../helpers';
 import * as Classes from './constructableobjects';
 import * as Doc from './document';
 import * as Elements from './nodes';
@@ -12,8 +12,6 @@ import * as Reg from './registry';
 if (typeof window === 'undefined' || typeof document === 'undefined') {
     throw new Error("Opti requires a browser environment.");
 }
-
-type __Unsafe<T> = T & Record<string, unknown>;
 
 globalThis.Opti = {
     crafty: false,
@@ -29,19 +27,7 @@ globalThis.Future = Promise;
 globalThis.InternalRegistries = Reg.InternalRegistries;
 globalThis.Registries = Reg.Registries;
 Array.prototype.asArr = Arrays.asArr;
-
-globalThis.CloneError = Errors.CloneError;
-globalThis.NumberTooSmallError = Errors.NumberTooSmallError;
-globalThis.NotImplementedError = Errors.NotImplementedError;
-globalThis.AccessError = Errors.AccessError;
-globalThis.UnknownError = Errors.UnknownError;
-globalThis.DebouncedError = Errors.DebouncedError;
-globalThis.AssertionError = Errors.AssertionError;
-globalThis.FetchError = Errors.FetchError;
-globalThis.HierarchyError = Errors.HierarchyError;
-globalThis.RuntimeError = Errors.RuntimeError;
-globalThis.UnnecessaryError = Errors.UnnecessaryError;
-globalThis.InvalidSelectorError = Errors.InvalidSelectorError;
+Object.assign(globalThis, Errors);
 
 // eslint-disable-next-line prefer-arrow-callback
 globalThis.placeholder = new Proxy(function () {}, {
@@ -54,6 +40,7 @@ globalThis.placeholder = new Proxy(function () {}, {
     construct:      throwPlaceholder
 });
 
+// f(...)
 setReadOnly(globalThis, 'f', <T, P extends unknown[], R>(
     iife: Func<T, P, R>,
     args?: P,
@@ -74,11 +61,10 @@ globalThis.Tuple = Classes.Tuple;
 
 Node.prototype.$ = Elements.$;
 Node.prototype.$$ = Elements.$$;
-Node.prototype.cut = Elements.cut;
 Node.prototype.parent = Elements.getParent;
 Node.prototype.ancestor = Elements.getAncestor;
 Node.prototype.siblings = Elements.getSiblings;
-(Node.prototype as __Unsafe<Node>).getChildren = Elements.getChildren; // ParentNode
+Node.prototype.getChildren = Elements.getChildren; // ParentNode
 
 Element.prototype.copy = Elements.copy;
 Element.prototype.txt = Elements.text;
@@ -128,6 +114,7 @@ Array.prototype.sort = Arrays.sortBy;
 Array.prototype.insert = Arrays.insert;
 
 Math.randomRange = Misc.randomRange;
+Math.randomIntRange = Misc.randomIntRange;
 
 Object.clone = Misc.clone;
 Object.forEach = Misc.forEach;
