@@ -1,31 +1,134 @@
 interface Opti {
+    /**
+     * Is true when Crafty is enabled via import
+     * @opti
+     * @since 1.0.0
+     */
     crafty: boolean;
+
+    /**
+     * Is true when Query is enabled via import
+     * @opti
+     * @since 1.0.0
+     */
     query: boolean;
+
+    /**
+     * Is true when Unsync is enabled via import
+     * @opti
+     * @since 1.0.0
+     */
     unsync: boolean;
-    requests: boolean;
+
+    /**
+     * Is true when Request is enabled via import
+     * @opti
+     * @since 1.0.0
+     */
+    request: boolean;
+
+    /**
+     * Is true when Flow is enabled via import
+     * @opti
+     * @since 1.0.0
+     */
     flow: boolean;
 }
 
 declare namespace HTMLInputElement {
     interface ValueAccessor {
+        /**
+         * Returns the input's value as a string.
+         * @opti
+         * @since 1.0.0
+         * @returns The input's value as a string
+         * @example
+         * const input = document.$("form > input#target");
+         * console.log(input.val.asString());
+         */
         asString(): string;
+
+        /**
+         * Returns the input's value as a number, or `null` if it cannot be parsed as a valid number.
+         * @opti
+         * @since 1.0.0
+         * @returns The parsed number, or `null` if the value is invalid.
+         * @example
+         * const input = document.$("form > input#target");
+         * console.log(input.val.asString());
+         */
         asNumber(): number | null;
-        asBoolean(): boolean | null;
+
+        /**
+         * Returns the input's value as a boolean using JavaScript truthiness.
+         * Every value is converted to either `true` or `false`; no value is considered invalid.
+         * @opti
+         * @since 1.0.0
+         * @returns The input's value converted to a boolean.
+         * @example
+         * const input = document.$("form > input#target");
+         * console.log(input.val.asString());
+         */
+        asBoolean(): boolean;
+
+        /**
+         * Returns the input's value as a `Date`, or `null` if  it cannot  be parsed as a valid date
+         * does not conform to a valid date string
+         * @opti
+         * @since 1.0.0
+         * @returns The parsed date, or `null` if the value is invalid.
+         * @example
+         * const input = document.$("form > input#target");
+         * console.log(input.val.asDate());
+         */
         asDate(): Date | null;
+
+        /**
+         * Returns the input's value converted to the type inferred from its format.
+         * Falls back to a string if no other supported type can be inferred.
+         * @opti
+         * @since 1.0.0
+         * @returns The value converted to an inferred type.
+         * @example
+         * const input = document.$("form > input#target");
+         * console.log(input.val.inferred()); // If input.value is "3", returns the number 3
+         */
         inferred(): string | number | boolean | Date;
-        get type(): string;
+
+        /**
+         * Returns the inferred type of the input's value, using type names that differ from those returned by `typeof`.
+         * @opti
+         * @since 1.0.0
+         * @returns The input element's type.
+         * @example
+         * const input = document.$("form > input#target");
+         * console.log(input.val.type); // "text", "number", "date", etc.
+         */
+        get type(): 'string' | 'number' | 'date' | 'boolean';
     }
 }
 
 interface BaseValueQueries<T> {
+    /**
+     * Gets the value that is used in the verification
+     * @opti
+     * @since 1.0.0
+     * @returns The value that was used in the construction of this object (the value used in the is(...) call)
+     * @example
+     * const isQuery = is("twelve");
+     * console.log(isQuery.getValue()); // "twelve"
+     */
     getValue(): T;
 
     /**
-     * 
+     * Returns a boolean indicating whether the value  is equal to `other`
      * @opti
-     * @param other 
+     * @since 1.0.0
+     * @param other The value to compare with the internal value
+     * @returns A boolean representing whether the two values match
+     *
      */
-    equalTo(other: unknown): boolean;
+    equal(other: unknown): boolean;
     /**
      * Checks if a value is in the format Object, Object(size), Date:time or Function:<name>(...params,)
      * @opti

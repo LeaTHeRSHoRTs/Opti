@@ -1,110 +1,55 @@
+/* eslint-disable jsdoc/require-tags, jsdoc/require-param, jsdoc/require-example */
+
 declare interface ParentNode extends Node {
-    /**
-     * Returns the parent element.
-     *
-     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Node/parentElement)
-     * 
-     * @deprecated
-     * @migrate {@link Node.parent}
-     */
+    /** @deprecated Use {@link Node.parent} instead. */
     readonly parentElement: HTMLElement | null;
 
-    /**
-     * Returns the parent element.
-     *
-     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Node/parentElement)
-     * @deprecated
-     * @migrate {@link Node.parent}
-     */
+    /** @deprecated Use {@link Node.parent} instead. */
     readonly parentNode: ParentNode | null;
 
-    /**
-     * Returns the first element that is a descendant of node that matches selectors.
-     *
-     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Document/querySelector)
-     * @deprecated
-     * @migrate {@link Node.$}
-     */
+    /** @deprecated Use {@link Node.$} instead. */
+    //@ts-expect-error
     querySelector: ParentNode['querySelector'];
 
-    /**
-     * Returns all element descendants of node that match selectors.
-     *
-     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Document/querySelectorAll)
-     * @deprecated
-     * @migrate {@link Node.$$}
-     */
+    /** @deprecated Use {@link Node.$$} instead. */
+    //@ts-expect-error
     querySelectorAll: ParentNode['querySelectorAll'];
 
-    /** 
-     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Node/textContent) 
-     * @deprecated
-     * @migrate {@link Element.txt}
-     */
+    /** @deprecated Use {@link Element.txt} instead. */
     textContent: string | null;
 }
 
 interface Document {
-    /**
-     * @deprecated
-     * @migrate {@link document.ready}
-     */
+    /** @deprecated Use {@link document.ready} instead. */
     addEventListener(type: 'DOMContentLoaded', listener: (this: Document, ev: Event) => unknown, options?: boolean | AddEventListenerOptions): void;
 
-    /**
-     * @deprecated
-     * @migrate {@link document.ready}
-     */
+    /** @deprecated Use {@link document.ready} instead. */
     addEventListener(type: 'load', listener: (this: Document, ev: Event) => unknown, options?: boolean | AddEventListenerOptions): void;
 
-    /**
-     * @deprecated
-     * @migrate {@link document.leaving}
-     */
+    /** @deprecated Use {@link document.leaving} instead. */
     addEventListener(type: 'unload', listener: (this: Window, ev: Event) => unknown, options?: boolean | AddEventListenerOptions): void;
 }
 
 interface Window {
-    /** 
-     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/innerWidth) 
-     * @deprecated
-     * @migrate {@link window.width}
-     */
+    /** @deprecated Use {@link window.width} instead. See https://developer.mozilla.org/docs/Web/API/Window/innerWidth */
     readonly innerWidth: number;
 
-    /**
-     * @deprecated
-     * @migrate {@link document.ready}
-     */
+    /** @deprecated Use {@link document.ready} instead. */
     addEventListener(type: 'DOMContentLoaded', listener: (this: Document, ev: Event) => unknown, options?: boolean | AddEventListenerOptions): void;
 
-    /**
-     * @deprecated
-     * @migrate {@link document.leaving}
-     */
+    /** @deprecated Use {@link document.leaving} instead. */
     addEventListener(type: 'beforeunload', listener: (this: Window, ev: BeforeUnloadEvent) => unknown, options?: boolean | AddEventListenerOptions): void;
 
-    /**
-     * @deprecated
-     * @migrate {@link document.leaving}
-     */
+    /** @deprecated Use {@link document.leaving} instead. */
     addEventListener(type: 'unload', listener: (this: Window, ev: Event) => unknown, options?: boolean | AddEventListenerOptions): void;
 }
 
 interface Element {
-    /** 
-     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/innerHTML) 
-     * @deprecated
-     * @migrate {@link HTMLElement.html}
-     */
+    /** @deprecated Use {@link HTMLElement.html} instead. See https://developer.mozilla.org/docs/Web/API/Element/innerHTML */
     innerHTML: string;
 }
 
 interface HTMLElement {
-    /** 
-     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLElement/innerText) 
-     * @deprecated
-     * @migrate {@link Element.txt}
-     */
+    /** @deprecated Use {@link Element.txt} instead. See https://developer.mozilla.org/docs/Web/API/HTMLElement/innerText */
     innerText: string;
 }
