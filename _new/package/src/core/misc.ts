@@ -57,35 +57,30 @@ export function debounce<T, A extends unknown[], R>(func: Func<T, A, R>, ms: num
     };
 }
 
-const RESULT_KEY = Symbol("memo_result");
-export function memo<T, A extends unknown[], R>(func: Func<T, A, R>): Func<T, A, R> {
+export function memo<T extends Func>(func: T): T {
     // Always check the registry first for persistent state
-    let cache = InternalRegistries.MEMO.get(func);
+    let cache = InternalRegistries.MEMO.get(func) as Map<string, Func.Return<T>>;
 
     if (!cache) {
-        cache = new Map();
+        cache = new Map<string, Func.Return<T>>();
         InternalRegistries.MEMO.set(func, cache);
     }
 
-    return function (this: T, ...rest: A): R {
-        let current = cache;
-        for (const arg of rest) {
-            if (!current.has(arg)) {
-                current.set(arg, new Map());
-            }
-            current = current.get(arg);
+    return function (this: Func.This<T>, ...rest: Func.Arguments<T>): Func.Return<T> {
+        const cacheKey = JSON.stringify(rest);
+        const cachedResult = cache.get(cacheKey);
+        if (cachedResult !== undefined) {
+            return cachedResult;
         }
 
-        if (current.has(RESULT_KEY)) return current.get(RESULT_KEY);
-    
+        // 2. Compute and store directly under the string key
         const result = func.apply(this, rest);
-        current.set(RESULT_KEY, result);
+        cache.set(cacheKey, result);
         return result;
-    };
+    } as T;
 }
 
 //* Date
-
 export function atDate(year: number, monthIndex: number, date?: number, hours?: number, minutes?: number, seconds?: number, ms?: number): number {
     return new Date(year, monthIndex, date, hours, minutes, seconds, ms).getTime();
 }
@@ -161,7 +156,6 @@ export function repeat(this: number, iterator: (i: number) => void): void {
 };
 
 //* Strings
-
 export function remove(this: string, finder: string | RegExp): string {
     return this.replace(finder, "");
 };
@@ -199,7 +193,6 @@ export function toCase(this: string, format: Str.Case): string {
 }
 
 //* Math
-
 export function randomRange(minOrMax: number, max?: number): number {
     const min = max === undefined ? Math.min(0, minOrMax) : Math.min(minOrMax, max);
     const upper = max === undefined ? Math.max(0, minOrMax) : Math.max(minOrMax, max);

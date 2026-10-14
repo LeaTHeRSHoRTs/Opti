@@ -23,19 +23,10 @@ declare global {
      * @param thisArg The value used for the `this` context of the function
      * @returns The value returned from the `iife` function
      * @example
-     * ```ts
-     * f(() => {
-     *   console.log("I run when the file loads!");
-     * });
+     * f(() => console.log("I run when the file loads!"));
      * 
-     * const res = f(() => {
-     *   return "I go into the res variable!";
-     * });
-     * 
-     * const otherRes = f(r => {
-     *   return r.insert(1, " don't");
-     * }, res);
-     * ```
+     * const res = f(() => "I go into the res variable!");
+     * const otherRes = f(r => r.insert(1, " don't"), res); // I don't go into the res variable!
      */
     function f<T, R, P extends unknown[]>(iife: Func<T, P, R>, args?: P, thisArg?: T): R;
 
@@ -1186,9 +1177,12 @@ declare global {
          * @param newVal The new value to put in place of the old removed value
          * @returns The value that was replaced, or null if no value was replaced
          * @example
-         * 
+         * const arr = [1, 2, 3, 4, 100, 6, 7];
+         * const replaced = arr.replace(v => v === 100, 5);
+         * console.log(replaced); // 100
+         * console.log(arr); [1, 2, 3, 4, 5, 6, 7]
          */
-        replace(this: T[], finder: (val: T) => boolean, newVal: T): T | null;
+        replace(finder: (val: T) => boolean, newVal: T): T | null;
 
         /**
          * Sorts an array by a specific type of sorting
@@ -1197,7 +1191,9 @@ declare global {
          * @param mode The order to sort in. Options are `random`, `alpha`, `alpha-reverse`, `increasing`,`decreasing`, `earlier` and `later`
          * @returns A sorted array based on the parameter `mode`
          * @example
-         * 
+         * const arr = ["x", "y", "ab", "af", "ac", "z"];
+         * const sortedArr = arr.sortBy('alphanumeric')
+         * console.log(sortedArr); // ["ab", "ac", "af", "x", "y", "z"]
          */
         sortBy(mode: Arr.SortMode<T>): T[];
 
@@ -1259,12 +1255,17 @@ declare global {
          * Finds the first substring match in a regular expression search.
          * @opti
          * @since 1.0.0
-         * @param regexp A string or regular expression used to search through the string
+         * @param regexpOrString A string or regular expression used to search through the string
          * @returns A boolean value representing whether the string matches the value specified in `regexp`
          * @example
-         * 
+         * const str = "My String";
+         * if (str.contains("My")) {
+         *   console.log("This string contains the substring 'My;")
+         * } else if (str.contains(/\w$/)) {
+         *   console.log("This string matches the regex '\\w$'")
+         * }
          */
-        matches(regexp: string | RegExp): boolean;
+        contains(regexpOrString: string | RegExp): boolean;
 
         /**
          * Converts a string to a certain casing. The supported casings are specified in the `Str.Case` type
@@ -1273,23 +1274,41 @@ declare global {
          * @param format The string format to use, selected from the `Str.Case` type
          * @returns A string that has been transformed to the casing specified by `format`
          * @example
+         * const str = "my string";
+         * const camelString = str.toCase('camel');
+         * const kebabString = str.toCase('kebab');
+         * const pascalString = str.toCase('pascal');
+         * const dotString = str.toCase('dot');
          * 
+         * console.log(camelString);  // myString
+         * console.log(kebabString);  // my-string
+         * console.log(pascalString); // MyString
+         * console.log(dotString);    // my.string
          */
         toCase(format: Str.Case): string;
     }
 
     interface FunctionConstructor {
         /**
-         * Returns a function that caches the result of `func` for the specified arguments.
+         * Returns a function that caches the result of `func` every time it is called
+         * with arguments that have not been cached before
          * @opti
          * @since 1.0.0
          * @param func The function whose result is to be cached
-         * @param args The arguments to pass to `func` when computing the cached result
-         * @returns A function that returns the cached result when called with the specified arguments
+         * @returns A function that caches all the results of every call it makes
          * @example
+         * function formula(multiplier) {
+         *   return (multiplier * (multiplier + 1)) / 2;
+         * }
          * 
+         * const formulaMemo = Function.memo(formula);
+         * console.log(formulaMemo(2));  // Output: 3
+         * console.log(formulaMemo(6));  // Output: 21
+         * console.log(formulaMemo(2));  // Output: 3  (Faster because it was memorized before)
+         * console.log(formulaMemo(6));  // Output: 21 (Faster because it was memorized before)
+         * console.log(formulaMemo(14)); // Output: 105
          */
-        memo<T, A extends unknown[], R>(func: Func<T, A, R>, ...args: A): Func<T, A, R>;
+        memo<T extends Func>(func: T): T;
 
         /**
          * Returns a debounced version of the provided function
@@ -1299,6 +1318,17 @@ declare global {
          * @param ms The debounce delay, in milliseconds
          * @returns A function that returns a {@linkcode Future} resolving to the result of `func`, or rejecting with a {@linkcode DebouncedError} if the call is superseded by another call before the delay expires
          * @example
+         * const saveInput = (text: string) => `Saved: ${text}`;
+         * const debouncedSave = debounce(saveInput, 300);
+         * const call1 = debouncedSave("apple"); 
+         * 
+         * await sleep(200);
+         * 
+         * // Because it happened 200ms after the first call, first function is suspended
+         * const call2 = debouncedSave("banana");
+         * 
+         * call1.catch(err => console.log(err.message)); // Output: "DebouncedError: Superseded"
+         * call2.then(res => console.log(res));          // Output: "Saved: banana" (after 300ms)
          */
         debounce<T, A extends unknown[], R>(func: Func<T, A, R>, ms: number): Func<T, A, Future<R, DebouncedError>>;
 
@@ -1310,7 +1340,14 @@ declare global {
          * @param ms The minimum interval between calls, in milliseconds
          * @returns A function that returns the result of `func` when a call is executed, or `null` when the call is suppressed by the throttle interval
          * @example
+         * const logClick = (id: number) => `Clicked ${id}`;
+         * const throttledClick = throttle(logClick, 1000);
          * 
+         * console.log(throttledClick(1)); // "Clicked 1" (Executed immediately)
+         * console.log(throttledClick(1)); // null        (Suppressed, 1000ms hasn't passed)
+         * 
+         * await sleep(1050);
+         * console.log(throttledClick(1)); // "Clicked 1" (Executed after 1000ms delay)
          */
         throttle<T, A extends unknown[], R>(func: Func<T, A, R>, ms: number): Func<T, A, R | null>;
     }

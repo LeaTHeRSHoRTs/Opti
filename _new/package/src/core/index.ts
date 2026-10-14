@@ -93,7 +93,7 @@ HTMLCollection.prototype.removeClass = Lists.removeClassList;
 HTMLCollection.prototype.toggleClass = Lists.toggleClassList;
 
 String.prototype.remove = Misc.remove;
-String.prototype.matches = Misc.matches;
+String.prototype.contains = Misc.matches;
 String.prototype.capitalize = Misc.capitalize;
 String.prototype.toCase = Misc.toCase;
 
@@ -110,7 +110,7 @@ Array.prototype.pluckLast = Arrays.pluckLast;
 Array.prototype.relocate = Arrays.relocate;
 Array.prototype.relocateTo = Arrays.relocateTo;
 Array.prototype.replace = Arrays.replace;
-Array.prototype.sort = Arrays.sortBy;
+Array.prototype.sortBy = Arrays.sortBy;
 Array.prototype.insert = Arrays.insert;
 
 Math.randomRange = Misc.randomRange;
