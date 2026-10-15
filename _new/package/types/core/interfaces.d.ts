@@ -108,6 +108,11 @@ declare namespace HTMLInputElement {
     }
 }
 
+/**
+ * Common value queries for all values that have been used in a {@linkcode is} call
+ * @opti
+ * @since 1.0.0
+ */
 interface BaseValueQueries<T> {
     /**
      * Gets the value that is used in the verification
@@ -126,55 +131,51 @@ interface BaseValueQueries<T> {
      * @since 1.0.0
      * @param other The value to compare with the internal value
      * @returns A boolean representing whether the two values match
+     * @example
      *
      */
     equal(other: unknown): boolean;
+
     /**
-     * Checks if a value is in the format Object, Object(size), Date:time or Function:<name>(...params,)
+     * Checks whether the type T is empty (Emptiness is based off of the {@linkcode isEmpty} function)
      * @opti
-     * @param str The type string to check
+     * @since 1.0.0
+     * @returns A boolean representing whether the value is empty or not
      */
-    isTypeString(str: string): boolean;
+    empty(): boolean;
+
     /**
-     * Returns the type of the object in the format Object, Object(size), Date:time or Function:<name>(...params,)
+     * 
      * @opti
+     * @since 1.0.0
+     * @param type 
      */
-    stringOf(): string;
-    isInstanceOf<U extends Class>(clazz: U): this is BaseValueQueries<Class.Instance<U>>;
-    isDefined(): this is BaseValueQueries<NonNullable<T>>;
-    isFalsy(): this is BaseValueQueries<Boolean.Falsy<T>>;
-    isTruthy(): this is BaseValueQueries<Boolean.Truthy<T>>;
-    isNull(): this is BaseValueQueries<null>;
-    isUndefined(): this is BaseValueQueries<undefined>;
+    type<U extends Primitive>(type: U): this is ValueQueries<T & TypeOf<U>>;
 }
 
 interface SizedObjectTesters<T> extends BaseValueQueries<T> {
     length<U extends number>(length: U): this is ValueQueries<T extends unknown[] ? Tuple<T[number], U> : T & { length: U }>;
+
+    /**
+     * Checks if the value is longer than the object provided
+     * @opti
+     * @since 1.0.0
+     * @param object The object to test. Must have a `size` or `length` property
+     * @returns A boolean value that represents whether the object is shorter than the value
+     */
     longer(object: Sized): boolean;
+
+    /**
+     * Checks if the value is longer than `length`
+     * @opti
+     * @since 1.0.0
+     * @param length A number used to check the length
+     * @returns A boolean value that represents whether the object is longer than `length`
+     */
     longer(length: number): boolean;
     shorter(length: number): boolean;
     shorter(object: Sized): boolean;
 }
-
-interface FuncTesters<T extends Func> extends BaseValueQueries<T> {
-    isName(name: string): boolean;
-}
-
-type EventListenerInfo<T, K extends keyof EventMapOf<T> = keyof EventMapOf<T>> =
-  | {
-      type: K, 
-      func: EventFunc<T, K>,
-      options: AddEventListenerOptions,
-      listener: 'default' | 'controller',
-      special?: undefined
-  }
-  | {
-      type: K, 
-      func: EventFunc<T, K>,
-      options: AddEventListenerOptions,
-      listener: 'conditional',
-      special: ((this: T, e: EventMapOf<T>[K]) => boolean) | number
-  };
 
 interface RegistryOf<K, V> { 
     get(key: K): V | undefined;
