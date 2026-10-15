@@ -1,9 +1,8 @@
-function typeObject<T>(val: T, str: string): ValueQueries<T> {
+function typeObject<T>(val: T, str: string): Is<T> {
     const v: T = val;
-    let obj: ValueQueries<T> = Object.create({
-        getValue() { return val; },
-        stringOf() { return str; },
-        equalTo(other: unknown): boolean {
+    let obj: Is<T> = Object.create({
+        get() { return val; },
+        equal(other: unknown): boolean {
             switch (typeof other) {
                 case "string":
                     if (other.startsWith("type:")) {
@@ -47,29 +46,13 @@ function typeObject<T>(val: T, str: string): ValueQueries<T> {
                     return false;
             }
         },
-        isInstanceOf<U extends Class>(clazz: U): this is BaseValueQueries<Class.Instance<U>> {
-            if (v === null || v === undefined) return false;
-            return Object(v) instanceof clazz;
-        },
-        isDefined(): this is BaseValueQueries<NonNullable<T>> {
-            return v !== undefined && v !== null;
-        },
-        isFalsy(): this is BaseValueQueries<Boolean.Falsy<T>> {
-            return !Boolean(v);
-        },
-        isTruthy(): this is BaseValueQueries<Boolean.Truthy<T>> {
-            return Boolean(v);
-        },
-        isNull(): this is BaseValueQueries<null> {
-            return v === null;
-        },
-        isUndefined(): this is BaseValueQueries<undefined> {
-            return v === undefined;
-        },
-        isTypeString(typestr: string) {
-            return typestr === str;
+
+        same<U>(value: U): boolean {
         }
-    } satisfies BaseValueQueries<T>);
+        type(type: Primitive): boolean {
+            return typeof val === type;
+        }
+    } satisfies Is<T>);
 
     function hasOwn<U extends string>(intVal: T, prop: U): intVal is typeof intVal & { [K in U]: number } {
         if (intVal === null || intVal === undefined) {
@@ -82,7 +65,7 @@ function typeObject<T>(val: T, str: string): ValueQueries<T> {
 
     if (typeof v === 'string' || hasOwn(v, "size") || hasOwn(v, "length")) {
         obj = Object.assign(obj, {
-            shorter(lengthOrObject: number | Sized): boolean {
+            smaller(lengthOrObject: number | Sized): boolean {
                 const len = typeof lengthOrObject === 'number'
                     ? lengthOrObject
                     : ("size" in lengthOrObject
@@ -97,7 +80,7 @@ function typeObject<T>(val: T, str: string): ValueQueries<T> {
 
                 return false;
             },
-            longer(lengthOrObject: number | Sized): boolean {
+            larger(lengthOrObject: number | Sized): boolean {
                 const len = typeof lengthOrObject === 'number'
                     ? lengthOrObject
                     : ("size" in lengthOrObject
@@ -113,7 +96,7 @@ function typeObject<T>(val: T, str: string): ValueQueries<T> {
                 return false;
             },
 
-            length<U extends number>(length: U): this is ValueQueries<T extends unknown[] ? Tuple<T[number], U> : T & { length: U }> {
+            length<U extends number>(length: U): this is Is<T extends unknown[] ? Tuple<T[number], U> : T & { length: U }> {
                 if (hasOwn(v, "size") && typeof v.size === 'number') {
                     return v.size === length;
                 } else if (hasOwn(v, "length") && typeof v.length === 'number') {
@@ -137,7 +120,7 @@ function typeObject<T>(val: T, str: string): ValueQueries<T> {
     return obj;
 }
 
-export function is<T>(val: T): ValueQueries<T> {
+export function is<T>(val: T): Is<T> {
     if (val === null) return typeObject<T>(val, "null");
     if (val === undefined) return typeObject<T>(val, "undefined");
     if (typeof val === 'function') return typeObject(val, `Function:${val.name || "<anonymous>"}(${val.length})`);

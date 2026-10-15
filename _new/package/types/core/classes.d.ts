@@ -13,7 +13,7 @@ type EnumInstance<T extends readonly string[]> = {
      * @opti
      * @since 1.0.0
      */
-    [Symbol.iterator](): IterableIterator<T[number]>
+    [Symbol.iterator](): IterableIterator<T[number]>;
 };
 
 /** 

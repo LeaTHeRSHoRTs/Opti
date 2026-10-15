@@ -47,21 +47,36 @@ type Is<T> = {
      * @since 1.0.0
      * @returns The value that was used in the construction of this object (the value used in the is(...) call)
      * @example
-     * const isQuery = is("twelve");
-     * console.log(isQuery.getValue()); // "twelve"
+     * const isQuery = is("string");
+     * console.log(isQuery.getValue()); // "string"
      */
-    getValue(): T;
+    get(): T;
 
     /**
-     * Returns a boolean indicating whether the value  is equal to `other`
+     * Checks whether the value is equal to `other`. For deep equality use {@linkcode Is.same}
      * @opti
      * @since 1.0.0
-     * @param other The value to compare with the internal value
-     * @returns A boolean representing whether the two values match
+     * @param other The value to compare against
+     * @returns Whether the value are equal
      * @example
-     *
+     * if (is("string").equal("string")) {
+     *   console.log("The strings are equal"); // Gets to this branch
+     * } else {
+     *   console.log("The strings are not equal");
+     * }
      */
     equal(other: unknown): boolean;
+
+    /**
+     * Checks whether the value is equal to `other` using deep equality
+     * @opti
+     * @since 1.0.0
+     * @param other The value to compare against
+     * @returns Whether the values are deeply equal
+     * @example
+     * 
+     */
+    same<U>(other: U): this is Is<U>;
 
     /**
      * Checks whether the type T is empty (Emptiness is based off of the {@linkcode isEmpty} function)
@@ -69,6 +84,11 @@ type Is<T> = {
      * @since 1.0.0
      * @returns A boolean representing whether the value is empty or not
      * @example
+     * if (is("").empty()) {
+     *   console.log("The string is empty"); // Gets to this branch
+     * } else {
+     *   console.log("The string is not empty");
+     * }
      */
     empty(): boolean;
 
@@ -81,33 +101,94 @@ type Is<T> = {
      * @example
      */
     type<U extends Primitive>(type: U): this is Is<T & TypeOf<U>>;
-} & IsForSized<T>;
+} & IsForSized<T> & IsForNumber<T>;
 
+
+/**
+ * {@linkcode Is} checks for sized objects (objects with a `length` or `size` property)
+ * @opti
+ * @since 1.0.0
+ */
 type IsForSized<T> = T extends Sized ? {
-    length<U extends number>(length: U): this is ValueQueries<T extends unknown[] ? Tuple<T[number], U> : T & { length: U }>;
+    /**
+     * Checks whether the value is the same length or size as `length`
+     * @opti
+     * @since 1.0.0
+     * @param size The size to check
+     * @returns Whether the objects are the same size or not
+     * @example
+     */
+    length<U extends number>(size: U): this is Is<T extends unknown[] ? Tuple<T[number], U> : T>;
 
     /**
      * Checks if the value is longer than the object provided
      * @opti
      * @since 1.0.0
      * @param object The object to test. Must have a `size` or `length` property
-     * @returns A boolean value that represents whether the object is shorter than the value
+     * @returns Whether the value is shorter than `object`
+     * @example
      */
-    longer(object: Sized): boolean;
+    bigger(object: Sized): boolean;
 
     /**
-     * Checks if the value is longer than `length`
+     * Checks if the value is longer than `size`
      * @opti
      * @since 1.0.0
-     * @param length A number used to check the length
-     * @returns A boolean value that represents whether the object is longer than `length`
+     * @param size A number used to check the size
+     * @returns Whether the value is longer than `size`
+     * @example
      */
-    longer(length: number): boolean;
-    shorter(length: number): boolean;
-    shorter(object: Sized): boolean;
+    bigger(size: number): boolean;
+
+    /**
+     * Checks if the value is shorter than the object provided
+     * @opti
+     * @since 1.0.0
+     * @param object The object to test. Must have a `size` or `length` property
+     * @returns Whether the value is shorter than `object`
+     * @example
+     */
+    smaller(object: Sized): boolean;
+
+    /**
+     * Checks if the value is shorter than `size`
+     * @opti
+     * @since 1.0.0
+     * @param size A number used to check the size
+     * @returns Whether the value is shorter than `size`
+     * @example
+     */
+    smaller(size: number): boolean;
 } : never;
 
-interface RegistryOf<K, V> { 
+/**
+ * {@linkcode Is} checks for numbers
+ * @opti
+ * @since 1.0.0
+ */
+type IsForNumber<T> = T extends number ? {
+    /**
+     * Checks if the value is longer than `value`
+     * @opti
+     * @since 1.0.0
+     * @param num The number to check against the value
+     * @returns Whether the value is bigger than the specified number
+     * @example
+     */
+    bigger<U extends number>(num: U): boolean;
+
+    /**
+     * Checks if the value is shorter than `value`
+     * @opti
+     * @since 1.0.0
+     * @param num The number to check against the value
+     * @returns Whether the value is smaller than the specified number
+     * @example
+     */
+    smaller(num: number): boolean;
+} : never;
+
+interface RegistryOf<K, V> {
     get(key: K): V | undefined;
     set(key: K, value: V): void;
     has(key: K): boolean;
