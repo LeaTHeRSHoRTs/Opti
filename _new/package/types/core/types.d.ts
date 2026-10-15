@@ -145,15 +145,6 @@ type TypeOf<T extends string> =
                                 T extends 'object' ? object | null :
                                     never;
 
-/** 
- * The value queries for the `is` function
- * @opti
- * @since 1.0.0
- */
-type ValueQueries<T> = T extends Func ? FuncTesters<T>
-    : T extends Sized ? SizedObjectTesters<T> 
-        : BaseValueQueries<T>;
-
 // Elements
 /** 
  * Represents a HTML tag in string form

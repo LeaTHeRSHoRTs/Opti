@@ -40,7 +40,7 @@ declare global {
      * ```ts
      * ```
      */
-    function is<T>(val: T): ValueQueries<T>;
+    function is<T>(val: T): Is<T>;
 
     // eslint-disable-next-line jsdoc/require-returns
     /**
@@ -824,7 +824,7 @@ declare global {
          * @opti
          * @since 1.0.0
          */
-        val: HTMLInputElement.ValueAccessor;
+        val: InputValueAccessor;
     }
 
     interface NodeList {
@@ -897,30 +897,6 @@ declare global {
         toggleClass(elClass: string): void;
     }
 
-    interface DateConstructor {
-        /** 
-         * Returns an absolute number of time from January 1, 1970 
-         * @opti
-         * @since 1.0.0
-         * @param year The year to use
-         * @param monthIndex The month index to use
-         * @param date The date of the mont to use
-         * @param hours The hour to use
-         * @param minutes The minute to use
-         * @param seconds The second to use
-         * @param ms The millisecond to use
-         * @returns A number representing the amount of milliseconds between the specified date and January 1, 1970
-         * @example
-         * const dayInMs = Date.now()
-         * const dateInFuture = Date.at(2035, 6, 4);
-         * console.log(
-         *   dayInMs + " compared to " + dateInFuture + '.', 
-         *   "Gap between the two: " + (dateInFuture - dayInMs)
-         * );
-         */
-        at(year: number, monthIndex: number, date?: number, hours?: number, minutes?: number, seconds?: number, ms?: number): number;
-    }
-
     interface Math {
         /** 
          * Returns a pseudorandom number between 0 and `max`, inclusively.
@@ -974,57 +950,6 @@ declare global {
          * console.log(rand);
          */
         randomIntRange(min: number, max: number): number;
-    }
-
-    interface ObjectConstructor {
-        /**
-         * Clones an object
-         * @opti
-         * @since 1.0.0
-         * @param object The object to clone
-         * @param deep Whether the clone should be deep or not
-         * @returns A duplication of the object
-         * @example
-         * class Example {
-         *   exampleVal = 2;
-         *   run() { console.log("Running...") }
-         *   static walk() { console.log("Walking...") }
-         * }
-         * 
-         * const oldObj = new Example();
-         * const newObj = Object.clone(oldObj);
-         *
-         * newObj.exampleVal = 4;
-         * newObj.run(); // Running...
-         * console.log(oldObj.exampleVal); // 2
-         */
-        clone<T>(object: T, deep?: boolean): T;
-
-        /**
-         * Clones an object
-         * @opti
-         * @since 1.0.0
-         * @param object The object to clone
-         * @param deep Whether the clone should be deep or not
-         * @throws {CloneError} When the object specified is a symbol
-         * @example
-         * const symbol = Symbol("Example");
-         * const newSymbol = Object.clone(symbol); // Throws a CloneError
-         */
-        clone(object: symbol, deep?: boolean): never;
-
-        /**
-         * Performs the specified action for each element in an array.
-         * @opti
-         * @since 1.0.0
-         * @param object The object to iterate over
-         * @param iterator The function that runs on each iteration of the object. Gives the key: value pair for the current value in the object
-         * @example
-         * Object.forEach({ val1: 1, val2: "Yes" }, ([key, value]) => {
-         *  console.log(`Key: ${key}, Value: ${value}`);
-         * });
-         */
-        forEach<T extends object>(object: T, iterator: (key: keyof T, value: T[keyof T]) => void): void;
     }
 
     interface Number {
@@ -1288,6 +1213,7 @@ declare global {
         toCase(format: Str.Case): string;
     }
 
+    // Constructors
     interface FunctionConstructor {
         /**
          * Returns a function that caches the result of `func` every time it is called
@@ -1350,5 +1276,80 @@ declare global {
          * console.log(throttledClick(1)); // "Clicked 1" (Executed after 1000ms delay)
          */
         throttle<T, A extends unknown[], R>(func: Func<T, A, R>, ms: number): Func<T, A, R | null>;
+    }
+
+    interface ObjectConstructor {
+        /**
+         * Clones an object
+         * @opti
+         * @since 1.0.0
+         * @param object The object to clone
+         * @param deep Whether the clone should be deep or not
+         * @returns A duplication of the object
+         * @example
+         * class Example {
+         *   exampleVal = 2;
+         *   run() { console.log("Running...") }
+         *   static walk() { console.log("Walking...") }
+         * }
+         * 
+         * const oldObj = new Example();
+         * const newObj = Object.clone(oldObj);
+         *
+         * newObj.exampleVal = 4;
+         * newObj.run(); // Running...
+         * console.log(oldObj.exampleVal); // 2
+         */
+        clone<T>(object: T, deep?: boolean): T;
+
+        /**
+         * Clones an object
+         * @opti
+         * @since 1.0.0
+         * @param object The object to clone
+         * @param deep Whether the clone should be deep or not
+         * @throws {CloneError} When the object specified is a symbol
+         * @example
+         * const symbol = Symbol("Example");
+         * const newSymbol = Object.clone(symbol); // Throws a CloneError
+         */
+        clone(object: symbol, deep?: boolean): never;
+
+        /**
+         * Performs the specified action for each element in an array.
+         * @opti
+         * @since 1.0.0
+         * @param object The object to iterate over
+         * @param iterator The function that runs on each iteration of the object. Gives the key: value pair for the current value in the object
+         * @example
+         * Object.forEach({ val1: 1, val2: "Yes" }, ([key, value]) => {
+         *  console.log(`Key: ${key}, Value: ${value}`);
+         * });
+         */
+        forEach<T extends object>(object: T, iterator: (key: keyof T, value: T[keyof T]) => void): void;
+    }
+
+    interface DateConstructor {
+        /** 
+         * Returns an absolute number of time from January 1, 1970 
+         * @opti
+         * @since 1.0.0
+         * @param year The year to use
+         * @param monthIndex The month index to use
+         * @param date The date of the mont to use
+         * @param hours The hour to use
+         * @param minutes The minute to use
+         * @param seconds The second to use
+         * @param ms The millisecond to use
+         * @returns A number representing the amount of milliseconds between the specified date and January 1, 1970
+         * @example
+         * const dayInMs = Date.now()
+         * const dateInFuture = Date.at(2035, 6, 4);
+         * console.log(
+         *   dayInMs + " compared to " + dateInFuture + '.', 
+         *   "Gap between the two: " + (dateInFuture - dayInMs)
+         * );
+         */
+        at(year: number, monthIndex: number, date?: number, hours?: number, minutes?: number, seconds?: number, ms?: number): number;
     }
 }

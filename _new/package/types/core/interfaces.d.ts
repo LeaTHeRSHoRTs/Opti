@@ -35,85 +35,12 @@ interface Opti {
     flow: boolean;
 }
 
-declare namespace HTMLInputElement {
-    interface ValueAccessor {
-        /**
-         * Returns the input's value as a string.
-         * @opti
-         * @since 1.0.0
-         * @returns The input's value as a string
-         * @example
-         * const input = document.$("form > input#target");
-         * console.log(input.val.asString());
-         */
-        asString(): string;
-
-        /**
-         * Returns the input's value as a number, or `null` if it cannot be parsed as a valid number.
-         * @opti
-         * @since 1.0.0
-         * @returns The parsed number, or `null` if the value is invalid.
-         * @example
-         * const input = document.$("form > input#target");
-         * console.log(input.val.asString());
-         */
-        asNumber(): number | null;
-
-        /**
-         * Returns the input's value as a boolean using JavaScript truthiness.
-         * Every value is converted to either `true` or `false`; no value is considered invalid.
-         * @opti
-         * @since 1.0.0
-         * @returns The input's value converted to a boolean.
-         * @example
-         * const input = document.$("form > input#target");
-         * console.log(input.val.asString());
-         */
-        asBoolean(): boolean;
-
-        /**
-         * Returns the input's value as a `Date`, or `null` if  it cannot  be parsed as a valid date
-         * does not conform to a valid date string
-         * @opti
-         * @since 1.0.0
-         * @returns The parsed date, or `null` if the value is invalid.
-         * @example
-         * const input = document.$("form > input#target");
-         * console.log(input.val.asDate());
-         */
-        asDate(): Date | null;
-
-        /**
-         * Returns the input's value converted to the type inferred from its format.
-         * Falls back to a string if no other supported type can be inferred.
-         * @opti
-         * @since 1.0.0
-         * @returns The value converted to an inferred type.
-         * @example
-         * const input = document.$("form > input#target");
-         * console.log(input.val.inferred()); // If input.value is "3", returns the number 3
-         */
-        inferred(): string | number | boolean | Date;
-
-        /**
-         * Returns the inferred type of the input's value, using type names that differ from those returned by `typeof`.
-         * @opti
-         * @since 1.0.0
-         * @returns The input element's type.
-         * @example
-         * const input = document.$("form > input#target");
-         * console.log(input.val.type); // "text", "number", "date", etc.
-         */
-        get type(): 'string' | 'number' | 'date' | 'boolean';
-    }
-}
-
 /**
- * Common value queries for all values that have been used in a {@linkcode is} call
+ * The testing object returned by {@linkcode is}
  * @opti
  * @since 1.0.0
  */
-interface BaseValueQueries<T> {
+type Is<T> = {
     /**
      * Gets the value that is used in the verification
      * @opti
@@ -141,19 +68,22 @@ interface BaseValueQueries<T> {
      * @opti
      * @since 1.0.0
      * @returns A boolean representing whether the value is empty or not
+     * @example
      */
     empty(): boolean;
 
     /**
-     * 
+     * Tests if the 
      * @opti
      * @since 1.0.0
      * @param type 
+     * @returns
+     * @example
      */
-    type<U extends Primitive>(type: U): this is ValueQueries<T & TypeOf<U>>;
-}
+    type<U extends Primitive>(type: U): this is Is<T & TypeOf<U>>;
+} & IsForSized<T>;
 
-interface SizedObjectTesters<T> extends BaseValueQueries<T> {
+type IsForSized<T> = T extends Sized ? {
     length<U extends number>(length: U): this is ValueQueries<T extends unknown[] ? Tuple<T[number], U> : T & { length: U }>;
 
     /**
@@ -175,7 +105,7 @@ interface SizedObjectTesters<T> extends BaseValueQueries<T> {
     longer(length: number): boolean;
     shorter(length: number): boolean;
     shorter(object: Sized): boolean;
-}
+} : never;
 
 interface RegistryOf<K, V> { 
     get(key: K): V | undefined;
@@ -184,7 +114,12 @@ interface RegistryOf<K, V> {
     setMultiple(obj: [K, V][]): void;
 }
 
-declare interface ElementCopyOptions {
+/**
+ * The interface for all of the possible options for element copying
+ * @opti
+ * @since 1.0.0
+ */
+interface ElementCopyOptions {
     /**
      * Defines if the new element should have everything that the previous element had. Defaults to `false`.
      * @opti
@@ -228,4 +163,80 @@ declare interface ElementCopyOptions {
      * @since 1.0.0
      */
     fallbackId?: string;
+}
+
+/**
+ * The interface for the input element's `val` property
+ * @opti
+ * @since 1.0.0
+ */
+interface InputValueAccessor {
+    /**
+     * Returns the input's value as a string.
+     * @opti
+     * @since 1.0.0
+     * @returns The input's value as a string
+     * @example
+     * const input = document.$("form > input#target");
+     * console.log(input.val.asString());
+     */
+    asString(): string;
+
+    /**
+     * Returns the input's value as a number, or `null` if it cannot be parsed as a valid number.
+     * @opti
+     * @since 1.0.0
+     * @returns The parsed number, or `null` if the value is invalid.
+     * @example
+     * const input = document.$("form > input#target");
+     * console.log(input.val.asString());
+     */
+    asNumber(): number | null;
+
+    /**
+     * Returns the input's value as a boolean using JavaScript truthiness.
+     * Every value is converted to either `true` or `false`; no value is considered invalid.
+     * @opti
+     * @since 1.0.0
+     * @returns The input's value converted to a boolean.
+     * @example
+     * const input = document.$("form > input#target");
+     * console.log(input.val.asString());
+     */
+    asBoolean(): boolean;
+
+    /**
+     * Returns the input's value as a `Date`, or `null` if  it cannot  be parsed as a valid date
+     * does not conform to a valid date string
+     * @opti
+     * @since 1.0.0
+     * @returns The parsed date, or `null` if the value is invalid.
+     * @example
+     * const input = document.$("form > input#target");
+     * console.log(input.val.asDate());
+     */
+    asDate(): Date | null;
+
+    /**
+     * Returns the input's value converted to the type inferred from its format.
+     * Falls back to a string if no other supported type can be inferred.
+     * @opti
+     * @since 1.0.0
+     * @returns The value converted to an inferred type.
+     * @example
+     * const input = document.$("form > input#target");
+     * console.log(input.val.inferred()); // If input.value is "3", returns the number 3
+     */
+    inferred(): string | number | boolean | Date;
+
+    /**
+     * Returns the inferred type of the input's value, using type names that differ from those returned by `typeof`.
+     * @opti
+     * @since 1.0.0
+     * @returns The input element's type.
+     * @example
+     * const input = document.$("form > input#target");
+     * console.log(input.val.type); // "text", "number", "date", etc.
+     */
+    get type(): 'string' | 'number' | 'date' | 'boolean';
 }

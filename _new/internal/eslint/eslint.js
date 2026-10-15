@@ -52,19 +52,7 @@ export const definitionRules = {
             },
             "singleline": {
                 "delimiter": "semi",
-                "requireLast": true
-            },
-            "overrides": {
-                "typeLiteral": {
-                    "multiline": {
-                        "delimiter": "comma",
-                        "requireLast": false
-                    },
-                    "singleline": {
-                        "delimiter": "comma",
-                        "requireLast": false
-                    },
-                }
+                "requireLast": false
             }
         }
     ],
