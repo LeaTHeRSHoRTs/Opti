@@ -31,16 +31,15 @@ declare global {
     function f<T, R, P extends unknown[]>(iife: Func<T, P, R>, args?: P, thisArg?: T): R;
 
     /**
-     * Creates a matcher to test values
+     * Refines a value, returning null if the refinement failed or a backup value otherwise
      * @opti
      * @since 1.0.0
-     * @param val The value who's type is being tested
-     * @returns An object that has multiple testing functions and assertions functions
+     * @param val The value which is being refined
+     * @returns A refiner object that can be chained repeatedly
      * @example
-     * ```ts
-     * ```
+     * 
      */
-    function is<T>(val: T): Is<T>;
+    function when<T>(val: T): When<T>;
 
     // eslint-disable-next-line jsdoc/require-returns
     /**

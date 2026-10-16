@@ -1,22 +1,43 @@
 import { isNum } from '../helpers';
 
-export function is<T>(value: T): Is<T> {
-    function createChain(evaluate: Func.Supplier<boolean>): Is<T> {
-        const run = (() => evaluate()) as unknown as Is<T>;
+export function is<T>(value: T): When<T> {
+    let success = true;
 
-        run.get = () => value;
-        run.equal = (other: unknown) => {
-            if (!evaluate()) return false;
-            return value === other;
+    const setSuccess = (v: boolean) => success = success && v;
+
+    const run: When<T> & WhenForDate<Date> & WhenForNumber<number> & WhenForSized<Sized> = {
+        get ok(): boolean {
+            return success;
         },
-        run.empty = () => { return isEmpty(value); },
-        run.same = <U>(other: U): Is <U> => { return (value as _) === other; },
-        run.type = <U extends Primitive>(type: U): Is < TypeOf < U >> => { return typeof value === type; },
-        run.bigger = (size: Sized | number) => {
+
+        get(): T {
+            return value;
+        },
+
+        equal(other: unknown) {
+            setSuccess(value === other);
+            return run;
+        },
+
+        same<U>(other: U) {
+            setSuccess(isSame(value, other));
+            return run;
+        },
+
+        empty() {
+            setSuccess(isEmpty(value));
+            return run;
+        },
+
+        type<U extends Primitive>(type: U) {
+            setSuccess(typeof value === type);
+            return run;
+        },
+        
+        bigger(size: Sized | number) {
             if (value === null) {
-                return false;
-            }
-            if (typeof value === 'object') {
+                setSuccess(false);
+            } else if (typeof value === 'object') {
                 const obj = value as Record<string, unknown>;
                 const target = size as Record<string, unknown>;
 
@@ -26,61 +47,19 @@ export function is<T>(value: T): Is<T> {
 
                     // 3. Return your comparison (e.g., check if origin is bigger, smaller, or equal)
                     if (isNum(originSize) && isNum(sizeSize)) {
-                        return originSize > sizeSize;
+                        setSuccess(originSize > sizeSize);
                     }
                 }
-            }
-            return false;
-        },
-        run.smaller = (size: Sized | number) => {
-            if (value === null) {
-                return false;
-            }
-            if (typeof value === 'object') {
-                const obj = value as Record<string, unknown>;
-                const target = size as Record<string, unknown>;
-
-                if (("size" in obj || "length" in obj) && ("size" in target || "length" in target)) {
-                    const originSize = obj.size ?? obj.length;
-                    const sizeSize = target.size ?? target.length;
-
-                    // 3. Return your comparison (e.g., check if origin is bigger, smaller, or equal)
-                    if (isNum(originSize) && isNum(sizeSize)) {
-                        return originSize < sizeSize;
-                    }
-                }
-            }
-            return false;
-        },
-        run.after = (time: Date | number | 'now') => {
-            if (!(value instanceof Date)) {
-                return false;
-            }
-            if (time instanceof Date) {
-                return time.getTime() > value.getTime();
-            } else if (typeof time === 'number') {
-                return time > value.getTime();
             } else {
-                return Date.now() > value.getTime();
+                setSuccess(false);
             }
+            return run;
         },
-        run.before = (time: Date | number | 'now') => {
-            if (!(value instanceof Date)) {
-                return false;
-            }
-            if (time instanceof Date) {
-                return time.getTime() < value.getTime();
-            } else if (typeof time === 'number') {
-                return time < value.getTime();
-            } else {
-                return Date.now() < value.getTime();
-            }
-        },
-        run.length = (size: Sized | number) => {
+
+        smaller(size: Sized | number) {
             if (value === null) {
-                return false;
-            }
-            if (typeof value === 'object') {
+                setSuccess(false);
+            } else if (typeof value === 'object') {
                 const obj = value as Record<string, unknown>;
                 const target = size as Record<string, unknown>;
 
@@ -90,15 +69,65 @@ export function is<T>(value: T): Is<T> {
 
                     // 3. Return your comparison (e.g., check if origin is bigger, smaller, or equal)
                     if (isNum(originSize) && isNum(sizeSize)) {
-                        return originSize === sizeSize;
+                        setSuccess(originSize < sizeSize);
                     }
                 }
+            } else {
+                setSuccess(false);
             }
-            return false;
-        };
+            return run;
+        },
 
-        return run;
-    }
+        after(time: Date | number | 'now') {
+            if (!(value instanceof Date)) {
+                setSuccess(false);
+            } else if (time instanceof Date) {
+                setSuccess(time.getTime() > value.getTime());
+            } else if (typeof time === 'number') {
+                setSuccess(time > value.getTime());
+            } else {
+                setSuccess(Date.now() > value.getTime());
+            }
+            return run;
+        },
+
+        before(time: Date | number | 'now') {
+            if (!(value instanceof Date)) {
+                setSuccess(false);
+            } else if (time instanceof Date) {
+                setSuccess(time.getTime() < value.getTime());
+            } else if (typeof time === 'number') {
+                setSuccess(time < value.getTime());
+            } else {
+                setSuccess(Date.now() < value.getTime());
+            }
+            return run;
+        },
+
+        length(size: Sized | number) {
+            if (value === null) {
+                setSuccess(false);
+            } else if (typeof value === 'object') {
+                const obj = value as Record<string, unknown>;
+                const target = size as Record<string, unknown>;
+
+                if (("size" in obj || "length" in obj) && ("size" in target || "length" in target)) {
+                    const originSize = obj.size ?? obj.length;
+                    const sizeSize = target.size ?? target.length;
+
+                    // 3. Return your comparison (e.g., check if origin is bigger, smaller, or equal)
+                    if (isNum(originSize) && isNum(sizeSize)) {
+                        setSuccess(originSize === sizeSize);
+                    }
+                }
+            } else {
+                setSuccess(false);
+            }
+            return run;
+        }
+    } as _ as When<T>;
+
+    return run;
 }
 
 if (is("string")
