@@ -42,6 +42,13 @@ interface Opti {
  */
 type Is<T> = {
     /**
+     * Returns the status of the operation
+     * @opti
+     * @since 1.0.0
+     */
+    get ok(): boolean;
+
+    /**
      * Gets the value that is used in the verification
      * @opti
      * @since 1.0.0
@@ -65,7 +72,7 @@ type Is<T> = {
      *   console.log("The strings are not equal");
      * }
      */
-    equal(other: unknown): boolean;
+    equal(other: unknown): boolean & Is<T>;
 
     /**
      * Checks whether the value is equal to `other` using deep equality
@@ -76,7 +83,7 @@ type Is<T> = {
      * @example
      * 
      */
-    same<U>(other: U): this is Is<U>;
+    same<U>(other: U): boolean & Is<U>;
 
     /**
      * Checks whether the type T is empty (Emptiness is based off of the {@linkcode isEmpty} function)
@@ -90,18 +97,18 @@ type Is<T> = {
      *   console.log("The string is not empty");
      * }
      */
-    empty(): boolean;
+    empty(): boolean & Is<T>;
 
     /**
-     * Tests if the 
+     * Tests if the element is type `type`, where `type` is a value for the `typeof` check
      * @opti
      * @since 1.0.0
-     * @param type 
-     * @returns
+     * @param type The type to check. Must be a valid string that can be used in `typeof` checks
+     * @returns 
      * @example
      */
-    type<U extends Primitive>(type: U): this is Is<T & TypeOf<U>>;
-} & IsForSized<T> & IsForNumber<T>;
+    type<U extends Primitive>(type: U): Is<T & TypeOf<U>>;
+} & IsForSized<T> & IsForNumber<T> & IsForDate<T>;
 
 
 /**
@@ -118,7 +125,7 @@ type IsForSized<T> = T extends Sized ? {
      * @returns Whether the objects are the same size or not
      * @example
      */
-    length<U extends number>(size: U): this is Is<T extends unknown[] ? Tuple<T[number], U> : T>;
+    length<U extends number>(size: U): Is<T>;
 
     /**
      * Checks if the value is longer than the object provided
@@ -128,7 +135,7 @@ type IsForSized<T> = T extends Sized ? {
      * @returns Whether the value is shorter than `object`
      * @example
      */
-    bigger(object: Sized): boolean;
+    bigger(object: Sized): Is<T>;
 
     /**
      * Checks if the value is longer than `size`
@@ -138,7 +145,7 @@ type IsForSized<T> = T extends Sized ? {
      * @returns Whether the value is longer than `size`
      * @example
      */
-    bigger(size: number): boolean;
+    bigger(size: number): Is<T>;
 
     /**
      * Checks if the value is shorter than the object provided
@@ -148,7 +155,7 @@ type IsForSized<T> = T extends Sized ? {
      * @returns Whether the value is shorter than `object`
      * @example
      */
-    smaller(object: Sized): boolean;
+    smaller(object: Sized): Is<T>;
 
     /**
      * Checks if the value is shorter than `size`
@@ -158,8 +165,8 @@ type IsForSized<T> = T extends Sized ? {
      * @returns Whether the value is shorter than `size`
      * @example
      */
-    smaller(size: number): boolean;
-} : never;
+    smaller(size: number): Is<T>;
+} : {};
 
 /**
  * {@linkcode Is} checks for numbers
@@ -175,7 +182,7 @@ type IsForNumber<T> = T extends number ? {
      * @returns Whether the value is bigger than the specified number
      * @example
      */
-    bigger<U extends number>(num: U): boolean;
+    bigger<U extends number>(num: U): Is<T>;
 
     /**
      * Checks if the value is shorter than `value`
@@ -185,8 +192,75 @@ type IsForNumber<T> = T extends number ? {
      * @returns Whether the value is smaller than the specified number
      * @example
      */
-    smaller(num: number): boolean;
-} : never;
+    smaller(num: number): Is<T>;
+} : {};
+
+/**
+ * {@linkcode Is} checks for `Date` objects
+ * @opti
+ * @since 1.0.0
+ */
+type IsForDate<T> = T extends Date ? {
+    /**
+     * Checks if the value is before a `Date` object's timestamp
+     * @opti
+     * @since 1.0.0
+     * @param date The date object to check against the value
+     * @returns Whether the provided date is before the value
+     * @example
+     */
+    before(date: Date): Is<T>;
+
+    /**
+     * Checks if the value is before a number of milliseconds since January 1, 1970, UTC
+     * @opti
+     * @since 1.0.0
+     * @param time The time in ms to check against the value
+     * @returns Whether the provided time is before the value
+     * @example
+     */
+    before(time: number): Is<T>;
+    
+    /**
+     * Checks if the value is before the current time
+     * @opti
+     * @since 1.0.0
+     * @param now The string literal `'now'`
+     * @returns Whether the provided date is before the current time
+     * @example
+     */
+    before(now: 'now'): Is<T>;
+
+    /**
+     * Checks if the value is after a `Date` object's timestamp
+     * @opti
+     * @since 1.0.0
+     * @param date The date object to check against the value
+     * @returns Whether the provided date is after the value
+     * @example
+     */
+    after(date: Date): Is<T>;
+
+    /**
+     * Checks if the value is after a number of milliseconds since January 1, 1970, UTC
+     * @opti
+     * @since 1.0.0
+     * @param time The time in ms to check against the value
+     * @returns Whether the provided time is after the value
+     * @example
+     */
+    after(time: number): Is<T>;
+
+    /**
+     * Checks if the value is after the current time
+     * @opti
+     * @since 1.0.0
+     * @param now The string literal `'now'`
+     * @returns Whether the provided date is after the current time
+     * @example
+     */
+    after(now: 'now'): Is<T>;
+} : {};
 
 interface RegistryOf<K, V> {
     get(key: K): V | undefined;

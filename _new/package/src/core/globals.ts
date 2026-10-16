@@ -1,159 +1,113 @@
-function typeObject<T>(val: T, str: string): Is<T> {
-    const v: T = val;
-    let obj: Is<T> = Object.create({
-        get() { return val; },
-        equal(other: unknown): boolean {
-            switch (typeof other) {
-                case "string":
-                    if (other.startsWith("type:")) {
-                        return other.replace("type:", "") === str;
+import { isNum } from '../helpers';
+
+export function is<T>(value: T): Is<T> {
+    function createChain(evaluate: Func.Supplier<boolean>): Is<T> {
+        const run = (() => evaluate()) as unknown as Is<T>;
+
+        run.get = () => value;
+        run.equal = (other: unknown) => {
+            if (!evaluate()) return false;
+            return value === other;
+        },
+        run.empty = () => { return isEmpty(value); },
+        run.same = <U>(other: U): Is <U> => { return (value as _) === other; },
+        run.type = <U extends Primitive>(type: U): Is < TypeOf < U >> => { return typeof value === type; },
+        run.bigger = (size: Sized | number) => {
+            if (value === null) {
+                return false;
+            }
+            if (typeof value === 'object') {
+                const obj = value as Record<string, unknown>;
+                const target = size as Record<string, unknown>;
+
+                if (("size" in obj || "length" in obj) && ("size" in target || "length" in target)) {
+                    const originSize = obj.size ?? obj.length;
+                    const sizeSize = target.size ?? target.length;
+
+                    // 3. Return your comparison (e.g., check if origin is bigger, smaller, or equal)
+                    if (isNum(originSize) && isNum(sizeSize)) {
+                        return originSize > sizeSize;
                     }
-                case "number":
-                case "bigint":
-                case "boolean":
-                case "symbol":
-                    return v === other;
-                case "function":
-                    const regex = /<([\w$_0-9]+)>\((\d+)\)/;
-                    const match = str.match(regex);
+                }
+            }
+            return false;
+        },
+        run.smaller = (size: Sized | number) => {
+            if (value === null) {
+                return false;
+            }
+            if (typeof value === 'object') {
+                const obj = value as Record<string, unknown>;
+                const target = size as Record<string, unknown>;
 
-                    if (match) {
-                        const [, name, argsStr] = match;
-                        const args = Number(argsStr);
+                if (("size" in obj || "length" in obj) && ("size" in target || "length" in target)) {
+                    const originSize = obj.size ?? obj.length;
+                    const sizeSize = target.size ?? target.length;
 
-                        if (Number.isNaN(args)) {
-                            throw new TypeError(`Internal type matching error: ${argsStr} is not a number.`);
-                        } else if (!Number.isFinite(args)) {
-                            throw new TypeError(`Internal type matching error: ${argsStr} is infinite.`);
-                        }
-
-                        return name === (other.name || "anonymous") && args === other.length;
+                    // 3. Return your comparison (e.g., check if origin is bigger, smaller, or equal)
+                    if (isNum(originSize) && isNum(sizeSize)) {
+                        return originSize < sizeSize;
                     }
-                    throw new TypeError(`Internal type matching error: Incorrect format for type string ${str}`);
-                case "undefined":
-                    return v === undefined;
-                case "object":
-                    if (other === null) {
-                        return v === null;
-                    }
-                    const ctorName = other.constructor?.name;
-                    if (ctorName && str.includes(ctorName)) return true;
-
-                    if (typeof other.toString === 'function') {
-                        return str === other.toString();
-                    }
-
-                    return false;
+                }
+            }
+            return false;
+        },
+        run.after = (time: Date | number | 'now') => {
+            if (!(value instanceof Date)) {
+                return false;
+            }
+            if (time instanceof Date) {
+                return time.getTime() > value.getTime();
+            } else if (typeof time === 'number') {
+                return time > value.getTime();
+            } else {
+                return Date.now() > value.getTime();
             }
         },
+        run.before = (time: Date | number | 'now') => {
+            if (!(value instanceof Date)) {
+                return false;
+            }
+            if (time instanceof Date) {
+                return time.getTime() < value.getTime();
+            } else if (typeof time === 'number') {
+                return time < value.getTime();
+            } else {
+                return Date.now() < value.getTime();
+            }
+        },
+        run.length = (size: Sized | number) => {
+            if (value === null) {
+                return false;
+            }
+            if (typeof value === 'object') {
+                const obj = value as Record<string, unknown>;
+                const target = size as Record<string, unknown>;
 
-        same<U>(value: U): boolean {
-        }
-        type(type: Primitive): boolean {
-            return typeof val === type;
-        }
-    } satisfies Is<T>);
+                if (("size" in obj || "length" in obj) && ("size" in target || "length" in target)) {
+                    const originSize = obj.size ?? obj.length;
+                    const sizeSize = target.size ?? target.length;
 
-    function hasOwn<U extends string>(intVal: T, prop: U): intVal is typeof intVal & { [K in U]: number } {
-        if (intVal === null || intVal === undefined) {
+                    // 3. Return your comparison (e.g., check if origin is bigger, smaller, or equal)
+                    if (isNum(originSize) && isNum(sizeSize)) {
+                        return originSize === sizeSize;
+                    }
+                }
+            }
             return false;
-        }
+        };
 
-        if (typeof intVal === 'string') return true;
-        return Object.prototype.hasOwnProperty.call(intVal, prop);
+        return run;
     }
-
-    if (typeof v === 'string' || hasOwn(v, "size") || hasOwn(v, "length")) {
-        obj = Object.assign(obj, {
-            smaller(lengthOrObject: number | Sized): boolean {
-                const len = typeof lengthOrObject === 'number'
-                    ? lengthOrObject
-                    : ("size" in lengthOrObject
-                        ? lengthOrObject.size
-                        : lengthOrObject.length);
-
-                if (hasOwn(v, "size") && typeof v.size === 'number') {
-                    return v.size < len;
-                } else if (typeof v === 'string' || (hasOwn(v, "length") && typeof v.length === 'number')) {
-                    return v.length < len;
-                }
-
-                return false;
-            },
-            larger(lengthOrObject: number | Sized): boolean {
-                const len = typeof lengthOrObject === 'number'
-                    ? lengthOrObject
-                    : ("size" in lengthOrObject
-                        ? lengthOrObject.size
-                        : lengthOrObject.length);
-
-                if (hasOwn(v, "size") && typeof v.size === 'number') {
-                    return v.size > len;
-                } else if (hasOwn(v, "length") && typeof v.length === 'number') {
-                    return v.length > len;
-                }
-
-                return false;
-            },
-
-            length<U extends number>(length: U): this is Is<T extends unknown[] ? Tuple<T[number], U> : T & { length: U }> {
-                if (hasOwn(v, "size") && typeof v.size === 'number') {
-                    return v.size === length;
-                } else if (hasOwn(v, "length") && typeof v.length === 'number') {
-                    return v.length === length;
-                }
-                return false;
-            }
-        });
-    }
-
-    if (typeof v === 'function') {
-        const functionName = (v as Func).name; 
-        obj = Object.assign(obj, {
-            isName(name: string): boolean {
-                if (functionName === "") return name === "anonymous";
-                return functionName === name;
-            }
-        });
-    }
-
-    return obj;
 }
 
-export function is<T>(val: T): Is<T> {
-    if (val === null) return typeObject<T>(val, "null");
-    if (val === undefined) return typeObject<T>(val, "undefined");
-    if (typeof val === 'function') return typeObject(val, `Function:${val.name || "<anonymous>"}(${val.length})`);
-
-    let typeName = Object.prototype.toString.call(val).slice(8, -1);
-    typeName = (typeName[0]?.toUpperCase() ?? "") + typeName.slice(1);
-
-    const ctor = val.constructor.name;
-    if (ctor && ctor === "Object") {
-        typeName = ctor;
-    }
-
-    switch (typeof val) {
-        case "string":
-            typeName += `(${val.length})`;
-            break;
-        case "object":
-            if (val instanceof Map || val instanceof Set) {
-                typeName += `(${val.size})`;
-            } else if (val instanceof Date && !isNaN(val.getTime())) {
-                typeName += `:${val.toISOString().split('T')[0]}`;
-            } else if ("length" in val && Number.isFinite(val.length)) {
-                typeName += `(${val.length})`;
-            } else if (typeName === "Object") {
-                typeName += `(${Object.keys(val).length})`;
-            }
-            break;
-        case "symbol":
-            typeName += `(${val.description})`;
-    }
-
-    return typeObject<T>(val, typeName);
-};
+if (is("string")
+    .bigger(5)
+    .equal("other")
+) { }
+if (is(5).type('string')) { }
+if (is(new Date()).before('now')) { }
+if (is([1, 2, 3]).length(3)) { }
 
 export function assert(condition: boolean, reason?: string): asserts condition {
     if (!condition) {

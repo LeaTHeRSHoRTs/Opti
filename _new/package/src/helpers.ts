@@ -81,6 +81,10 @@ export function initializer<T extends object>(object: T, init: () => void): T {
     return object;
 }
 
+export function isNum(value: unknown): value is int {
+    return typeof value === 'number' || typeof value === 'bigint';
+}
+
 
 // Future
 export function mixin<T extends Func>(

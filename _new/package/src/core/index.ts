@@ -17,7 +17,7 @@ globalThis.Opti = {
     crafty: false,
     query: false,
     unsync: false,
-    requests: false,
+    request: false,
     flow: false
 };
 
