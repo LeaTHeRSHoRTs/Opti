@@ -2,12 +2,12 @@ import './query.js';
 import './classes.js';
 import './exceptions.js';
 
-interface Query {
-    $: Query.$;
-    $$: Query.$$;
-}
-
 declare global {
+    interface Query {
+        $: Query.$;
+        $$: Query.$$;
+    }
+    
     /**
      * The query export, used for accessing $ and $$
      * @opti

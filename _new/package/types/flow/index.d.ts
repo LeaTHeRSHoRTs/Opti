@@ -16,7 +16,16 @@ interface Flow {
      */
     always<T>(val: T, flowback: NonNullable<T>): [T, boolean];
 
-
+    /**
+     * Refines a value, returning null if the refinement failed or a backup value otherwise
+     * @opti
+     * @since 1.0.0
+     * @param val The value which is being refined
+     * @returns A refiner object that can be chained repeatedly
+     * @example
+     * 
+     */
+    when<T>(val: T): When<T>;
 }
 
 /**

@@ -145,6 +145,22 @@ type TypeOf<T extends string> =
                                 T extends 'object' ? object | null :
                                     never;
 
+/**
+ * Computes the empty version of `T`
+ * @opti
+ * @since 1.0.0
+ */
+type Empty<T> =
+    T extends string ? T & '' :
+        T extends number ? T :
+            T extends boolean ? T & false :
+                T extends null | undefined ? T :
+                    T extends unknown[] ? T & { length: 0 } :
+                        T extends Map<infer K, unknown> ? T & Map<K, never> :
+                            T extends Set<unknown> ? T & Set<never> :
+                                T extends Record<Key, unknown> ? T & Record<Key, never> :
+                                    T;
+
 // Elements
 /** 
  * Represents a HTML tag in string form

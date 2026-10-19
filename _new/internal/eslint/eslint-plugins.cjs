@@ -135,6 +135,29 @@ function quoteFix(fixer, node, text, quote) {
 }
 
 /**
+ * Checks if a string literal node is forced into a constrained literal type context
+ * @param {any} context 
+ * @param {any} node 
+ * @returns {boolean}
+ */
+function isConstrainedContext(context, node) {
+    const services = context.sourceCode.parserServices;
+    const checker = services?.program?.getTypeChecker();
+
+    if (!checker || !services) return false;
+
+    // Convert the ESLint AST literal node to the TypeScript AST node
+    const tsNode = services.esTreeNodeToTSNodeMap?.get(node);
+    if (!tsNode) return false;
+
+    // Get the expected type at this location (e.g. what the return statement expects)
+    const contextualType = checker.getContextualType(tsNode);
+    if (!contextualType) return false;
+
+    return isConstrainedString(contextualType, checker);
+}
+
+/**
  * Checked if a string is a constrained string (? extends string, but ? != string)
  * @param {import("typescript").Type} type
  * @param {import("typescript").TypeChecker} checker
@@ -232,9 +255,10 @@ function isConstrainedArgument(context, node) {
 const constrainedStrings = makePlugin('suggestion', true, {
     typeof: "Typeof values must use single quotes.",
     types: "String literal types must use single quotes.",
-    character: "Character literals must use single quotes.",
+    character: "String literals that are 1 character long must use single quotes.",
+    imports: "Import statements must use single quotes",
     multiCharacter: "String literals that are not 1 character long must use double quotes.",
-    constrained: "Parameters with constrained string arguments must use single quotes"
+    constrained: "A string literal that can only be a finite amount of possibilities must use single quotes"
 }, function (context) {
     const services = context.sourceCode.parserServices;
 
@@ -249,7 +273,7 @@ const constrainedStrings = makePlugin('suggestion', true, {
 
             const text = context.sourceCode.getText(node);
 
-            if (isConstrainedArgument(context, node)) {
+            if (isConstrainedContext(context, node)) {
                 if (text.startsWith('"')) {
                     context.report({
                         node,
@@ -278,7 +302,7 @@ const constrainedStrings = makePlugin('suggestion', true, {
                 if (text.startsWith('"')) {
                     context.report({
                         node,
-                        messageId: "multiCharacter",
+                        messageId: "imports",
                         fix(fixer) {
                             return quoteFix(fixer, node, context.sourceCode.getText(node), SQUOT)
                         }
@@ -458,6 +482,7 @@ const validatedThrows = makePlugin('problem', false, {
     };
 });
 //#endregion
+
 const plugin = {
     name: "eslint-multiline",
     /** @type {any} */// For compatibility

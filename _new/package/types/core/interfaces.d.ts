@@ -122,16 +122,16 @@ interface InputValueAccessor {
     asNumber(): number | null;
 
     /**
-     * Returns the input's value as a boolean using JavaScript truthiness.
-     * Every value is converted to either `true` or `false`; no value is considered invalid.
+     * Returns the input's value as a boolean using JavaScript truthiness, or null if the string can't be converted.
+     * Truthy values are considered to be 'true' and '1', and falsy values are considered to be 'false' and '0'
      * @opti
      * @since 1.0.0
-     * @returns The input's value converted to a boolean.
+     * @returns The input's value converted to a boolean, or null if it can't be converted.
      * @example
      * const input = document.$("form > input#target");
      * console.log(input.val.asString());
      */
-    asBoolean(): boolean;
+    asBoolean(): boolean | null;
 
     /**
      * Returns the input's value as a `Date`, or `null` if  it cannot  be parsed as a valid date
@@ -155,7 +155,7 @@ interface InputValueAccessor {
      * const input = document.$("form > input#target");
      * console.log(input.val.inferred()); // If input.value is "3", returns the number 3
      */
-    inferred(): string | number | boolean | Date;
+    inferred(): Date | number | boolean | string;
 
     /**
      * Returns the inferred type of the input's value, using type names that differ from those returned by `typeof`.
