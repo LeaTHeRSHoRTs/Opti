@@ -305,7 +305,7 @@ export function isVisible(this: HTMLElement): boolean {
     );
 }
 
-export function val(this: HTMLInputElement): HTMLInputElement.ValueAccessor {
+export function val(this: HTMLInputElement): InputValueAccessor {
     const self = this;
 
     return {
@@ -314,13 +314,11 @@ export function val(this: HTMLInputElement): HTMLInputElement.ValueAccessor {
                 case "checkbox":
                 case "radio":
                     return self.checked;
-
-                    // Other input types: only return boolean if value itself is explicitly "true" or "false"
                 default:
-                    if (self.value === "true") return true;
-                    if (self.value === "false") return false;
+                    if (self.value === "true" || self.value === '1') return true;
+                    if (self.value === "false" || self.value === '0') return false;
 
-                    // For anything else (text, number, etc.), it doesn’t represent a boolean meaningfully
+                    // For anything else (text, number, etc.), parse as truthy
                     return null;
             }
         },
@@ -330,19 +328,44 @@ export function val(this: HTMLInputElement): HTMLInputElement.ValueAccessor {
         },
         asDate() {
             let date = self.valueAsDate;
+
+            // Try recursively if the input type is time, because dates are important here
             if (!date && self.type === "time") {
                 date = parseTime(self.value);
             }
             return date;
         },
         asString() {
-            return self.value ?? "";
+            return self.value;
         },
         inferred() {
-            return this.asDate() || this.asBoolean() || this.asNumber() || this.asString();
+            const dateVal = this.asDate();
+            if (dateVal !== null) return dateVal;
+        
+            const numVal = this.asNumber();
+            if (numVal !== null && !isNaN(numVal)) return numVal;
+        
+            // Only attempt the wide boolean inference path if authorized by your flag
+            const boolVal = this.asBoolean();
+            if (boolVal !== null) return boolVal;
+        
+            return this.asString();
         },
-        get type() {
-            return self.type;
+        get type(): 'boolean' | 'date' | 'string' | 'number' {
+            if (self.valueAsDate && !isNaN(self.valueAsDate.getTime())) {
+                return 'date';
+            } else if (!isNaN(self.valueAsNumber)) {
+                return 'number';
+            } else if (
+                self.value === "true" ||
+                self.value === "false" ||
+                self.value === '1' ||
+                self.value === '0'
+            ) {
+                return 'boolean';
+            } else {
+                return 'string';
+            }
         }
     };
 };

@@ -7,18 +7,7 @@ export function sleep(ms: number): Future<void> {
     return new Future((res, _) => setTimeout(res, ms));
 }
 
-export function isEmpty(val: string): val is '';
-export function isEmpty(val: number): val is typeof NaN;
-export function isEmpty(val: boolean): val is false;
-export function isEmpty(val: null | undefined): true;
-export function isEmpty(val: unknown[]): val is [];
-export function isEmpty(val: Record<Key, unknown>): val is Record<Key, never>;
-export function isEmpty(val: Map<unknown, unknown>): val is Map<unknown, never>;
-export function isEmpty(val: Set<unknown>): val is Set<never>;
-export function isEmpty(val: WeakMap<object, unknown>): val is WeakMap<object, unknown>;
-export function isEmpty(val: WeakSet<object>): val is WeakSet<object>;
-export function isEmpty(val: unknown): boolean;
-export function isEmpty(val: unknown): boolean {
+export function isEmpty<T>(val: T): val is Empty<T> {
     // Generic type checking
     if (val === null || val === undefined || val === false || val === "") return true;
 

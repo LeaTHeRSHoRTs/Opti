@@ -56,12 +56,5 @@ export default defineConfig([
     },
     eslintConfiguration('**/*.{ts,tsx}', typescriptRules, false),
     eslintConfiguration('**/*.d.ts', definitionRules, false),
-    eslintConfiguration('**/*.{test.js,test.ts}', testRules, false/*, {
-        "opti": createTestResolutionPlugin("opti", "./package/types/Core/opti.lib.d.ts"),
-        "crafty": createTestResolutionPlugin("crafty", "./package/types/Crafty/crafty.lib.d.ts"),
-        "query": createTestResolutionPlugin("query", "./package/types/Query/query.lib.d.ts"),
-        "requests": createTestResolutionPlugin("request", "./package/types/Requests/requests.lib.d.ts"),
-        "unsync": createTestResolutionPlugin("unsync", "./package/types/Unsync/unsync.lib.d.ts"),
-        "flow": createTestResolutionPlugin("flow", "./package/types/Flow/flow.lib.d.ts"),
-    } */)
+    eslintConfiguration('**/*.{test.js,test.ts}', testRules, false)
 ]);

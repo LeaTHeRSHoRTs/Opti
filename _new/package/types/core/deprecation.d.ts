@@ -8,11 +8,9 @@ declare interface ParentNode extends Node {
     readonly parentNode: ParentNode | null;
 
     /** @deprecated Use {@link Node.$} instead. */
-    //@ts-expect-error
     querySelector: ParentNode['querySelector'];
 
     /** @deprecated Use {@link Node.$$} instead. */
-    //@ts-expect-error
     querySelectorAll: ParentNode['querySelectorAll'];
 
     /** @deprecated Use {@link Element.txt} instead. */

@@ -69,15 +69,7 @@ declare global {
      * isEmpty([1, 2]); // false
      * ```
      */
-    function isEmpty(val: string): val is '';
-    function isEmpty(val: number): boolean;
-    function isEmpty(val: boolean): val is false;
-    function isEmpty(val: null | undefined): true;
-    function isEmpty<T>(val: T[]): val is T[] & { length: 0 };
-    function isEmpty<K extends Key>(val: Record<K, unknown>): val is Record<K, never>;
-    function isEmpty<K extends Key>(val: Map<K, unknown>): val is Map<K, never>;
-    function isEmpty(val: Set<unknown>): val is Set<never>;
-    function isEmpty(val: unknown): boolean;
+    function isEmpty<T>(val: T): val is Empty<T>;
 
     /**
      * Waits the specified number of ms before returning control to the `then` block, or the main program when using `async` blocks with `await`
@@ -911,7 +903,6 @@ declare global {
          */
         randomRange(min: number, max: number): number;
 
-
         /**
          * Returns a pseudorandom whole number between 0 and `max`, inclusively.
          * @opti
@@ -947,10 +938,10 @@ declare global {
          * @since 1.0.0
          * @param iterator the function to run on each iteration
          * @example
-         * const times = 5;
-         * times.repeat(i => {
-         *   console.log("Time " + (i + 1));
+         * (5).repeat(i => {
+         *   console.log("Iteration " + (i + 1));
          * });
+         * // Logs "Iteration 1" to "Iteration 5
          */
         repeat(iterator: (i: number) => void): void;
     }
@@ -966,6 +957,7 @@ declare global {
          * console.log(newArr); // [1, 2, 3, 4]
          */
         unique(): T[];
+
         /**
          * Separates an array into an array of arrays, with each subarray of a defined size
          * @opti
@@ -1305,6 +1297,8 @@ declare global {
 
         /**
          * Performs the specified action for each element in an array.
+         * 
+         * Note that `key` and `value` may include non-enumerable properties that are not visited by the iterator.
          * @opti
          * @since 1.0.0
          * @param object The object to iterate over
@@ -1338,6 +1332,14 @@ declare global {
          *   "Gap between the two: " + (dateInFuture - dayInMs)
          * );
          */
-        at(year: number, monthIndex: number, date?: number, hours?: number, minutes?: number, seconds?: number, ms?: number): number;
+        at(
+            year: number,
+            monthIndex: number,
+            date?: number,
+            hours?: number,
+            minutes?: number,
+            seconds?: number,
+            ms?: number
+        ): number;
     }
 }
