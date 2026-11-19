@@ -9,9 +9,7 @@ import * as Arrays from './arrays';
 import * as Misc from './misc';
 import * as Reg from './registry';
 
-if (typeof window === 'undefined' || typeof document === 'undefined') {
-    throw new Error("Opti requires a browser environment.");
-}
+if (typeof window === 'undefined' || typeof document === 'undefined') throw new Error("Opti requires a browser environment.");
 
 globalThis.Opti = {
     crafty: false,
@@ -47,11 +45,9 @@ setReadOnly(globalThis, 'f', <T, P extends unknown[], R>(
     thisArg?: T
 ): R => iife.apply(thisArg as T, (args || []) as P));
 
-globalThis.when = Globals.is;
 globalThis.assert = Globals.assert;
 globalThis.sleep = Globals.sleep;
 globalThis.isEmpty = Globals.isEmpty;
-
 globalThis.Enum = Classes.Enum;
 globalThis.Tuple = Classes.Tuple;
 
@@ -64,7 +60,7 @@ Node.prototype.$$ = Elements.$$;
 Node.prototype.parent = Elements.getParent;
 Node.prototype.ancestor = Elements.getAncestor;
 Node.prototype.siblings = Elements.getSiblings;
-Node.prototype.getChildren = Elements.getChildren; // ParentNode
+Node.prototype.getChildren = Elements.getChildren;
 
 Element.prototype.copy = Elements.copy;
 Element.prototype.txt = Elements.text;

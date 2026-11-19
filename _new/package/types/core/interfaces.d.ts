@@ -35,13 +35,6 @@ interface Opti {
     flow: boolean;
 }
 
-interface RegistryOf<K, V> {
-    get(key: K): V | undefined;
-    set(key: K, value: V): void;
-    has(key: K): boolean;
-    setMultiple(obj: [K, V][]): void;
-}
-
 /**
  * The interface for all of the possible options for element copying
  * @opti
