@@ -1,2 +1,0 @@
-interface InvalidRegistrationError extends Error {}
-interface InvalidRegistrationErrorConstructor extends ErrorConstructorOf<InvalidRegistrationError> {}

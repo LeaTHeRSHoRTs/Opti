@@ -6,6 +6,7 @@
     "rootDir": "./",
     "incremental": true,
     "disableSizeLimit": true,
+
     // Type Checking
     "strict": true,
     "noImplicitThis": true,
@@ -13,16 +14,19 @@
     "useUnknownInCatchVariables": true,
     "noUncheckedIndexedAccess": true,
     "forceConsistentCasingInFileNames": true,
+
     // JS Interop
     "allowJs": true,
     "checkJs": true,
     "esModuleInterop": true,
+
     // Features and Emit
     "noEmit": true,
     "noEmitOnError": true,
     "emitDecoratorMetadata": false,
     "useDefineForClassFields": true,
     "experimentalDecorators": true,
+    
     // Libs
     "lib": [
       "DOM",

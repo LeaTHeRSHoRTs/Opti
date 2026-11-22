@@ -1,7 +1,7 @@
 // This module uses Object.assign to assign to globalThis. 
 // Do NOT add any exported members that are not in the documentation
 export class RuntimeError {
-    name: 'RuntimeError' = "RuntimeError";
+    name: 'RuntimeError' = 'RuntimeError';
     message: string;
     cause: unknown;
     stack: string;
