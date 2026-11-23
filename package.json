@@ -1,0 +1,64 @@
+{
+  "name": "optijs",
+  "type": "module",
+  "version": "0.0.4",
+  "author": "LeaTHeR_SHoRTs",
+  "license": "CC-BY-NC-SA-4.0",
+  "private": false,
+  "description": "Lightweight DOM manipulation, styling, and utility extension for native JavaScript objects — without wrappers.",
+  "exports": {
+    "opti": {
+      "types": "./types/index.d.ts"
+    }
+  },
+  "homepage": "https://github.com/LeaTHeRSHoRTs/Opti",
+  "bugs": "https://github.com/LeaTHeRSHoRTs/Opti/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LeaTHeRSHoRTs/Opti.git"
+  },
+  "keywords": [
+    "dom",
+    "javascript",
+    "opti",
+    "optijs",
+    "utility",
+    "dom manipulation",
+    "library",
+    "web",
+    "frontend"
+  ],
+  "files": [
+    "types",
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "babel": { "presets": ["@babel/preset-env"] },
+  "sideEffects": true,
+  "scripts": {
+    "build": "vite build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "npm run typecheck:src && npm run typecheck:types && npm run typecheck:tests",
+    "typecheck:src": "tsc -p src",
+    "typecheck:tests": "tsc -p tests",
+    "typecheck:types": "tsc -p types",
+    "check": "npm run lint && npm run typecheck"
+  },
+  "engines": {
+    "node": ">=23.0.0"
+  },
+  "devDependencies": {
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "@types/node": "^26.6.3",
+    "eslint": "^10.11.0",
+    "eslint-plugin-jsdoc": "^65.1.0",
+    "globals": "^17.12.0",
+    "jsdom": "^27.4.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.71.1",
+    "vite": "^8.3.1",
+    "vitest": "^5.0.2"
+  }
+}
