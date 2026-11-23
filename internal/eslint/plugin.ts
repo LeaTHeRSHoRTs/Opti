@@ -1,34 +1,18 @@
-//@ts-check
-/**
- * @template {string} MessageIds
- * @template {readonly unknown[]} Options
- * @typedef {import("@typescript-eslint/utils").TSESLint.RuleModule<MessageIds, Options>} RuleModule
- */
+// Types
+import type { RuleContext, RuleModule } from "@typescript-eslint/utils/ts-eslint";
+import type { TSESLint, TSESTree } from "@typescript-eslint/utils";
 
-/**
- * @template {string} MessageIds
- * @template {readonly unknown[]} Options
- * @typedef {import("@typescript-eslint/utils").TSESLint.RuleContext<MessageIds, Options>} RuleContext
- */
-
-/**
- * @typedef {import("@typescript-eslint/utils").TSESTree.Statement} Statement
- * @typedef {import("@typescript-eslint/utils").TSESTree.Literal} Literal
- */
-
+// Values
 import { AST_NODE_TYPES as AstNodeTypes, ESLintUtils } from "@typescript-eslint/utils";
 import ts from "typescript";
 
-/**
- * @template {string} MessageIds
- * @param {import("@typescript-eslint/utils").TSESLint.RuleMetaData<MessageIds>["type"]} type
- * @param {boolean} fixable
- * @param {Record<MessageIds, string>} messages
- * @param {((context: RuleContext<MessageIds, []>) => import("@typescript-eslint/utils").TSESLint.RuleListener) | import("@typescript-eslint/utils").TSESLint.RuleListener} create
- * @param {Partial<import("@typescript-eslint/utils").TSESLint.RuleMetaData<MessageIds>>} [extraMeta={}]
- * @returns {RuleModule<MessageIds, []>}
- */
-function makePlugin(type, fixable, messages, create, extraMeta = {}) {
+function makePlugin<T extends string>(
+    type: TSESLint.RuleMetaData<T>["type"], 
+    fixable: boolean, 
+    messages: Record<T, string>,
+    create: ((context: RuleContext<T, []>) => TSESLint.RuleListener) | TSESLint.RuleListener,
+    extraMeta = {}
+): RuleModule<T> {
     return {
         meta: {
             type,
@@ -54,12 +38,7 @@ const allowed = new Set([
     "ThrowStatement"
 ]);
 
-/**
- * Check single-line control flow
- * @param {RuleContext<string, []>} context
- * @param {Statement} node
- */
-function check(context, node) {
+function check(context: RuleContext<string, []>, node: TSESTree.Statement) {
     if (node.type === AstNodeTypes.BlockStatement) return;
 
     if (!allowed.has(node.type)) {
@@ -76,8 +55,7 @@ function check(context, node) {
     }
 }
 
-/** @type {RuleModule<"quote", []>} */
-const singleLineControlFlow = {
+const singleLineControlFlow: RuleModule<"quote"> = {
     meta: {
         type: "layout",
         messages: {
@@ -124,13 +102,8 @@ const singleLineControlFlow = {
 //#region ConstrainedStrings
 /**
  * Creates a quote fixer for the 
- * @param {import("@typescript-eslint/utils").TSESLint.RuleFixer} fixer 
- * @param {Literal} node
- * @param {string} text 
- * @param {string} quote 
- * @returns 
  */
-function quoteFix(fixer, node, text, quote) {
+function quoteFix(fixer: TSESLint.RuleFixer, node: TSESTree.Literal, text: string, quote: string) {
     return fixer.replaceText(node, `${quote}${text.slice(1, -1)}${quote}`);
 }
 
@@ -140,7 +113,7 @@ function quoteFix(fixer, node, text, quote) {
  * @param {any} node 
  * @returns {boolean}
  */
-function isConstrainedContext(context, node) {
+function isConstrainedContext(context: RuleContext<string, []>, node: TSESTree.Node): boolean {
     const services = context.sourceCode.parserServices;
     const checker = services?.program?.getTypeChecker();
 
@@ -159,10 +132,8 @@ function isConstrainedContext(context, node) {
 
 /**
  * Checked if a string is a constrained string (? extends string, but ? != string)
- * @param {import("typescript").Type} type
- * @returns {boolean}
  */
-function isConstrainedString(type) {
+function isConstrainedString(type: ts.Type): boolean {
     if (type.flags & ts.TypeFlags.StringLiteral) return true;
     if (type.isUnion()) return type.types.every(t => isConstrainedString(t));
 
@@ -184,7 +155,7 @@ const constrainedStrings = makePlugin('suggestion', true, {
     imports: "Import statements must use single quotes",
     multiCharacter: "String literals that are not 1 character long must use double quotes.",
     constrained: "A string literal that can only be a finite amount of possibilities must use single quotes"
-}, function (context) {
+}, (context) => {
     const services = context.sourceCode.parserServices;
 
     if (!services?.program) {
@@ -256,10 +227,7 @@ const constrainedStrings = makePlugin('suggestion', true, {
             }
         },
 
-        /**
-         * @param {any} node
-         */
-        TSLiteralType(node) {
+        TSLiteralType(node: TSESTree.Literal) {
             if (node.literal.type !== "Literal") return;
             if (typeof node.literal.value !== "string") return;
 
@@ -288,12 +256,9 @@ const validatedThrows = makePlugin('problem', false, {
     const checker = services.program.getTypeChecker();
 
     /**
-     * Gets the documented @throws types from a declaration.
-     *
-     * @param {import("typescript").Node} declaration
-     * @returns {string[]}
+     * Gets the documented throws types from a declaration.
      */
-    function getThrowsTypes(declaration) {
+    function getThrowsTypes(declaration: ts.Node): string[] {
         return ts.getJSDocTags(declaration)
             .filter(tag => tag.tagName.text === "throws" || tag.tagName.text === "exception")
             .map(tag => {
@@ -307,18 +272,13 @@ const validatedThrows = makePlugin('problem', false, {
 
     /**
      * Gets the types of values thrown by an implementation.
-     *
-     * @param {import("typescript").Node} declaration
      * @returns {string[]}
      */
-    function getActualThrowsTypes(declaration) {
+    function getActualThrowsTypes(declaration: ts.Node): string[] {
         /** @type {Set<string>} */
-        const types = new Set();
+        const types: Set<string> = new Set();
 
-        /**
-         * @param {import("typescript").Node} node
-         */
-        function visit(node) {
+        function visit(node: ts.Node) {
             if (
                 node !== declaration &&
                 (
@@ -344,11 +304,8 @@ const validatedThrows = makePlugin('problem', false, {
 
     /**
      * Gets all declarations belonging to a symbol.
-     *
-     * @param {import("typescript").Symbol} symbol
-     * @returns {import("typescript").Declaration[]}
      */
-    function getDeclarations(symbol) {
+    function getDeclarations(symbol: ts.Symbol): ts.Declaration[] {
         return [...(symbol.getDeclarations() ?? [])];
     }
 

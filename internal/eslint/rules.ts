@@ -1,4 +1,6 @@
-/** @type {string[]} */
+import type { Linter } from 'eslint';
+
+// 
 const jsdocPluginContexts = [
     "TSDeclareFunction",
     "TSMethodSignature",
@@ -8,9 +10,9 @@ const jsdocPluginContexts = [
     "VariableDeclaration"
 ];
 
-//#region Rules
-/** @type {import('eslint').Linter.RulesRecord} */
-const baseRules = {
+
+// Rules
+const baseRules: Linter.RulesRecord = {
     'no-unreachable': 'error',
     'no-self-assign': 'error',
     'no-constant-condition': 'warn',
@@ -30,12 +32,10 @@ const baseRules = {
     'no-useless-catch': 'warn',
     'no-useless-constructor': 'warn',
     'no-useless-escape': 'warn',
-
-    "import/no-unresolved": "error",
+    
     "import/no-duplicates": "error",
     "import/no-cycle": "error",
     "import/no-self-import": "error",
-    "import/order": "error",
 
     // "stylistic/indent": ["error", 4],
     // 'stylistic/semi': ['error', 'always'],
@@ -45,8 +45,7 @@ const baseRules = {
     // "custom-rules/validated-throws": "error"
 };
 
-/** @type {import('eslint').Linter.RulesRecord} */
-export const definitionRules = {
+export const definitionRules: Linter.RulesRecord = {
     'no-var': 'off',
     'no-undef': 'off',
 
@@ -114,8 +113,7 @@ export const definitionRules = {
     ]
 };
 
-/** @type {import('eslint').Linter.RulesRecord} */
-export const typescriptRules = {
+export const typescriptRules: Linter.RulesRecord = {
     ...baseRules,
     ...definitionRules,
 
@@ -131,8 +129,7 @@ export const typescriptRules = {
     'typescript/explicit-module-boundary-types': 'error'
 };
 
-/** @type {import('eslint').Linter.RulesRecord} */
-export const testRules = {
+export const testRules: Linter.RulesRecord = {
     ...typescriptRules,
 
     "typescript/no-explicit-any": "off",
@@ -145,4 +142,3 @@ export const testRules = {
     "vitest/no-conditional-expect": 'error',
     "vitest/no-standalone-expect": 'error'
 };
-//#endregion

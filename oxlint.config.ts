@@ -1,5 +1,5 @@
 import { defineConfig } from 'oxlint';
-import { typescriptRules, definitionRules, testRules } from './internal/eslint/rules.js';
+import { typescriptRules, definitionRules, testRules } from './internal/eslint/rules.ts';
 
 export default defineConfig({
     plugins: [
@@ -24,12 +24,15 @@ export default defineConfig({
     },
     overrides: [
         {
-            files: ["**/*.ts", "**/*.tsx"],
-            rules: typescriptRules
+            files: ["**/*.ts", "**/*.tsx", "!**/*.d.ts"],
+            rules: {
+                ...typescriptRules,
+                "esdoc/require-tags": 'off'
+            }
         },
         {
             // Must go after ts files so they have a higher priority
-            files: ["**/*.d.ts"],
+            files: ["**/*.d.ts", "!**/*.ts"],
             rules: definitionRules
         },
         {
