@@ -15,7 +15,7 @@ export default class _InternalElement<
     P extends Crafty.Props<T> = Crafty.Props<T>,
 > extends _InternalNode implements Crafty.Element<N, T, P> {
     public readonly namespaceURI: N;
-    public readonly kind: 'element' | HTMLTag = "element";
+    public readonly kind: 'element' | HTMLTag = 'element';
     public readonly tag: T;
     public id: P['id'] | undefined;
     public classList: P['classes'] | [];

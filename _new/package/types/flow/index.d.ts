@@ -5,6 +5,7 @@ interface Flow {
      * Checks whether a value is unusable
      * @opti
      * @param val The value to check
+     * @example
      */
     flows(val: unknown): boolean;
 
@@ -13,6 +14,7 @@ interface Flow {
      * @opti
      * @param val The value to check
      * @param flowback The fallback to use if the check fails
+     * @example
      */
     always<T>(val: T, flowback: NonNullable<T>): [T, boolean];
 
@@ -252,4 +254,7 @@ type WhenForDate<T> = T extends Date ? {
     after(now: 'now'): When<T>;
 } : {};
 
-export const Flow: Flow;
+export /**
+ *
+ */
+const Flow: Flow;

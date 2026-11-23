@@ -2,7 +2,7 @@ import _InternalException from './exceptions';
 import _InternalNode from './node';
 
 export default class _InternalHTML extends _InternalNode implements Crafty.Html {
-    override kind: 'html' = "html";
+    override kind: 'html' = 'html';
     readonly _children: [] = [];
     #content: string;
 

@@ -1,3 +1,6 @@
+/**
+ *
+ */
 type RequestType = 'GET' | 'POST';
 
 

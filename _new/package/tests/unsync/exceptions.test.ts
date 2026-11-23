@@ -3,7 +3,7 @@ import { Unsync } from 'opti';
 describe("Unsync.Exception", () => {
     it("should throw");
 
-    const exceptions: { name: string, instance: DynErrorCtor }[] = [{
+    const exceptions: { name: string; instance: DynErrorCtor }[] = [{
         name: "InvalidRegistrationException",
         instance: Unsync.InvalidRegistrationException
     }];

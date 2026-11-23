@@ -42,7 +42,7 @@ describe("Number.repeat", () => {
 describe("Object.clone", () => {
     it("should make a clone of primitive objects", () => {
         expect(Object.clone(42)).toBe(42);
-        expect(Object.clone("hello")).toBe("hello");
+        expect(Object.clone('hello')).toBe("hello");
         expect(Object.clone(null)).toBe(null);
         expect(Object.clone(undefined)).toBe(undefined);
     });

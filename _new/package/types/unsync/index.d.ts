@@ -4,8 +4,19 @@ import './exceptions.js';
 
 declare global {
 
+    /**
+     *
+     */
     var Emitter: Unsync.EmitterConstructor;
+    /**
+     *
+     * @opti
+     * @since 1.0.0
+     */
     var SetEmitter: Unsync.SetEmitterConstructor;
+    /**
+     *
+     */
     var Unsync: UnsyncStatic;
 
     interface UnsyncStatic {
@@ -103,6 +114,7 @@ declare global {
          * @param type The event to listen form
          * @param listener The listener to apply
          * @param options The options for the event listener
+         * @example
          */
         addEventController<T extends EventTarget, K extends keyof EventMapOf<T>>(
             this: T,
@@ -157,4 +169,7 @@ declare global {
     }
 }
 
-export const Unsync: placeholder;
+export /**
+ *
+ */
+const Unsync: placeholder;

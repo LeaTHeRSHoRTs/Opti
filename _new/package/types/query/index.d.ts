@@ -16,4 +16,9 @@ declare global {
     var Query: Query;
 }
 
+/**
+ * The query namespace
+ * @opti
+ * @since 1.0.0
+ */
 export const Query: Query;

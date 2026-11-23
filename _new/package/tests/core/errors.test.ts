@@ -1,7 +1,7 @@
 import 'opti';
 
 describe("Errors", () => {
-    const Errors: { name: string, instance: DynErrorCtor }[] = [{
+    const Errors: { name: string; instance: DynErrorCtor }[] = [{
         name: "CloneError",
         instance: CloneError
     }, {

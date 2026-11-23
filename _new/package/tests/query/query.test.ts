@@ -22,7 +22,7 @@ beforeAll(() => {
 
 describe('$', () => {
     it("should select an element that exists", () => {
-        expect($('div')).toBe(document.querySelector('div'));
+        expect($("div")).toBe(document.querySelector('div'));
         expect($("#first")).toBe(document.querySelector("#first"));
         expect($("#last")).toBe(document.querySelector("#last"));
         expect($("#middle")).toBeNull();
@@ -31,7 +31,7 @@ describe('$', () => {
 
 describe("$$", () => {
     it("should select elements that exists", () => {
-        expect($$('div').length).toBe(document.querySelectorAll('div')?.length);
+        expect($$("div").length).toBe(document.querySelectorAll('div')?.length);
         expect($$("#first").length).toBe(document.querySelectorAll("#first")?.length);
         expect($$(".divs").length).toBe(document.querySelectorAll(".divs")?.length);
         expect($$("#middle").length).toBe(0);

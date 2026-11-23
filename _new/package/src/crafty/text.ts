@@ -2,7 +2,7 @@ import _InternalHTML from './html';
 import _InternalNode from './node';
 
 export default class _InternalText extends _InternalHTML implements Crafty.Text {
-    public override readonly kind: 'text' = "text";
+    public override readonly kind: 'text' = 'text';
     public get length(): number {
         return this._textContent.length;
     };

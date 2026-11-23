@@ -79,9 +79,9 @@ HTMLElement.prototype.css = Elements.css;
 HTMLElement.prototype.show = Elements.show;
 HTMLElement.prototype.hide = Elements.hide;
 HTMLElement.prototype.toggle = Elements.toggle;
-setGetter(HTMLElement.prototype, "isVisible", Elements.isVisible);
+setGetter(HTMLElement.prototype, 'isVisible', Elements.isVisible);
 
-setGetter(HTMLInputElement.prototype, "val", Elements.val);
+setGetter(HTMLInputElement.prototype, 'val', Elements.val);
 HTMLFormElement.prototype.serialize = Elements.serialize;
 
 NodeList.prototype.addClass = Lists.addClassList;

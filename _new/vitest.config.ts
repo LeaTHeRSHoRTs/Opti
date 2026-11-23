@@ -5,7 +5,7 @@ export default defineConfig({
     test: {
         root: import.meta.dirname,
         coverage: {
-            provider: "v8",
+            provider: 'v8',
             reporter: ["lcov"],
             include: ["src/**/*.ts"],
             exclude: [

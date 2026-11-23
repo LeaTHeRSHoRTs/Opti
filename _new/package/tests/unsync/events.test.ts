@@ -7,7 +7,7 @@ describe("EventTarget.addConditionalListener", () => {
 
         let count = 0;
 
-        div.addConditionalListener("click", () => {
+        div.addConditionalListener('click', () => {
             count++;
         }, 2); // Only allow the listener to run twice
 
@@ -24,7 +24,7 @@ describe("EventTarget.addConditionalListener", () => {
 
         let ran = false;
 
-        div.addConditionalListener("click", () => {
+        div.addConditionalListener('click', () => {
             ran = true;
         }, () => ran);
     });
@@ -55,7 +55,7 @@ describe("EventTarget.addEventListeners", () => {
         document.body.appendChild(single);
 
         let flag = 0;
-        single.addEventListeners(["mouseover", "click"], () => {
+        single.addEventListeners(['mouseover', 'click'], () => {
             flag++;
         });
 
@@ -78,7 +78,7 @@ describe("EventTarget.addEventController", () => {
 
     it("should attach an event listener to the EventTarget", () => {
         let flag = false;
-        el.addEventController("click", () => flag = true);
+        el.addEventController('click', () => flag = true);
         el.click();
 
         expect(flag).toBeTruthy();
@@ -87,7 +87,7 @@ describe("EventTarget.addEventController", () => {
     it("should be abe to be turned off", () => {
         let flag = 1;
 
-        const controller = el.addEventController("click", () => flag++);
+        const controller = el.addEventController('click', () => flag++);
         el.click();
 
         expect(flag).toBe(2);
@@ -100,7 +100,7 @@ describe("EventTarget.addEventController", () => {
     it("should be able to return the status of the listener", () => {
         let flag = 1;
 
-        const controller = el.addEventController("click", () => flag++);
+        const controller = el.addEventController('click', () => flag++);
         expect(controller.applied).toBeTruthy();
         controller.off();
         expect(controller.applied).toBeFalsy();
@@ -110,7 +110,7 @@ describe("EventTarget.addEventController", () => {
 
     it("should be able to handle an already true status", () => {
         expect(() => {
-            const controller = el.addEventController("click", () => {});
+            const controller = el.addEventController('click', () => {});
             expect(controller.applied).toBeTruthy();
             controller.off();
             controller.off();
@@ -131,7 +131,7 @@ describe("EventTarget.addConditionalListener", () => {
 
     it("should attach an event listener to the EventTarget", () => {
         let flag = false;
-        el.addConditionalListener("click", () => flag = true, 2);
+        el.addConditionalListener('click', () => flag = true, 2);
         el.click();
 
         expect(flag).toBeTruthy();
@@ -140,7 +140,7 @@ describe("EventTarget.addConditionalListener", () => {
     it("should be removed after a certain amount of activations", () => {
         let flag = 0;
 
-        el.addConditionalListener("click", () => flag++, 3);
+        el.addConditionalListener('click', () => flag++, 3);
 
         el.click();
         expect(flag).toBe(1);
@@ -159,7 +159,7 @@ describe("EventTarget.addConditionalListener", () => {
         let flag = false;
         let incr = 0;
 
-        el.addConditionalListener("click", () => incr++, () => flag === true);
+        el.addConditionalListener('click', () => incr++, () => flag === true);
 
         el.click();
         expect(incr).toBe(1);

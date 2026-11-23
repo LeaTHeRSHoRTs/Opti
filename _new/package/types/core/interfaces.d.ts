@@ -36,9 +36,30 @@ interface Opti {
 }
 
 interface RegistryOf<K, V> {
+    /**
+     *
+     * @param key
+     * @example
+     */
     get(key: K): V | undefined;
+    /**
+     *
+     * @param key
+     * @param value
+     * @example
+     */
     set(key: K, value: V): void;
+    /**
+     *
+     * @param key
+     * @example
+     */
     has(key: K): boolean;
+    /**
+     *
+     * @param obj
+     * @example
+     */
     setMultiple(obj: [K, V][]): void;
 }
 

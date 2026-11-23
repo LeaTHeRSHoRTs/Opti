@@ -32,7 +32,7 @@ describe("Enum", () => {
 
     it("should throw when the wrong characters are added", () => {
         try {
-            Enum("A_", "$B", "{}");
+            Enum('A_', '$B', '{}');
             expect.fail("Enum did not throw for invalid characters");
         } catch (e: any) {
             expect(e).toBeInstanceOf(SyntaxError);

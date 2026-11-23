@@ -11,7 +11,7 @@ describe("is", () => {
     let emptyStringVal: ValueQueries<string>;
     let helloStringVal: ValueQueries<string>;
     let numberArrayVal: ValueQueries<number[]>;
-    let objectLiteralVal: ValueQueries<{ name: string, age: number }>;
+    let objectLiteralVal: ValueQueries<{ name: string; age: number }>;
     let emptyObjectVal: ValueQueries<object>;
     let emptyArrayVal: ValueQueries<any[]>;
     let anonymousFuncVal: ValueQueries<() => void>;

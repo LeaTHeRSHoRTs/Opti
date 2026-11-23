@@ -2,7 +2,7 @@ import _InternalNode from './node';
 import { isHTMLTag } from './helpers';
 
 export default class _InternalFragment extends _InternalNode implements Crafty.Fragment {
-    public kind: 'fragment' = "fragment";
+    public kind: 'fragment' = 'fragment';
 
     isEmpty(): this is Crafty.Fragment & { children: [] } {
         return this._children.length <= 0;

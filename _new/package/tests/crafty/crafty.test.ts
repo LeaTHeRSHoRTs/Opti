@@ -21,9 +21,9 @@ describe("Crafty", () => {
 
         it("should be able to make a HTMLElement", () => {
             expect(Crafty.craft('div')).toBeInstanceOf(_InternalHTMLElement);
-            expect(Crafty.craft('div', { id: "div1" })).toBeInstanceOf(_InternalHTMLElement);
+            expect(Crafty.craft('div', { id: 'div1' })).toBeInstanceOf(_InternalHTMLElement);
             expect(Crafty.craft('div', { classes: ["divs"] })).toBeInstanceOf(_InternalHTMLElement);
-            expect(Crafty.craft('div', { classes: ["divs"], id: "div3" }, [Crafty.craft(Crafty.TEXT, "Text node")])).toBeInstanceOf(_InternalHTMLElement);
+            expect(Crafty.craft('div', { classes: ["divs"], id: 'div3' }, [Crafty.craft(Crafty.TEXT, "Text node")])).toBeInstanceOf(_InternalHTMLElement);
         });
 
         it("should be able to make a Text", () => {

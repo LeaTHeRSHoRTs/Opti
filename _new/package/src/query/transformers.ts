@@ -9,12 +9,12 @@ export function hasText(el: Element | null, text: string): Element | null {
 
 export function before(el: Element | null): Query.PseudoElement | null {
     if (!el) return null;
-    return new _InternalQueryPseudoElement(el, "::before");
+    return new _InternalQueryPseudoElement(el, '::before');
 }
 
 export function after(el: Element | null): Query.PseudoElement | null {
     if (!el) return null;
-    return new _InternalQueryPseudoElement(el, "::after");
+    return new _InternalQueryPseudoElement(el, '::after');
 }
 
 //* Transformers

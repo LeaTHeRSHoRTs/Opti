@@ -18,6 +18,7 @@
   "scripts": {
     "build": "vite build",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "typecheck": "npm run typecheck:src && npm run typecheck:types && npm run typecheck:tests",
     "typecheck:src": "tsc -p package/src",
     "typecheck:tests": "tsc -p package/tests",
