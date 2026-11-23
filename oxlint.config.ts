@@ -5,7 +5,6 @@ export default defineConfig({
     plugins: [
         'eslint',
         'typescript',
-        'unicorn',
         'vitest',
         'promise',
         'node'

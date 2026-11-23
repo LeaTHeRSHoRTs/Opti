@@ -31,13 +31,6 @@ const baseRules = {
     'no-useless-constructor': 'warn',
     'no-useless-escape': 'warn',
 
-    "unicorn/no-array-reverse": 'off',
-    "unicorn/no-array-sort": 'off',
-    "unicorn/no-useless-undefined": "error",
-    "unicorn/no-useless-spread": "error",
-    "unicorn/prefer-includes": "error",
-    "unicorn/prefer-array-find": "error",
-
     "import/no-unresolved": "error",
     "import/no-duplicates": "error",
     "import/no-cycle": "error",

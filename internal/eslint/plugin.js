@@ -16,8 +16,8 @@
  * @typedef {import("@typescript-eslint/utils").TSESTree.Literal} Literal
  */
 
-const { AST_NODE_TYPES } = await import("@typescript-eslint/utils");
-const ts = import("typescript");
+import { AST_NODE_TYPES as AstNodeTypes, ESLintUtils } from "@typescript-eslint/utils";
+import ts from "typescript";
 
 /**
  * @template {string} MessageIds
@@ -60,7 +60,7 @@ const allowed = new Set([
  * @param {Statement} node
  */
 function check(context, node) {
-    if (node.type === AST_NODE_TYPES.BlockStatement) return;
+    if (node.type === AstNodeTypes.BlockStatement) return;
 
     if (!allowed.has(node.type)) {
         context.report({
@@ -92,7 +92,7 @@ const singleLineControlFlow = {
             IfStatement(node) {
                 check(context, node.consequent);
 
-                if (node.alternate && node.alternate.type !== AST_NODE_TYPES.IfStatement) {
+                if (node.alternate && node.alternate.type !== AstNodeTypes.IfStatement) {
                     check(context, node.alternate);
                 }
             },
@@ -164,7 +164,7 @@ function isConstrainedContext(context, node) {
  */
 function isConstrainedString(type) {
     if (type.flags & ts.TypeFlags.StringLiteral) return true;
-    if (type.isUnion()) return type.types.every(type => isConstrainedString(type));
+    if (type.isUnion()) return type.types.every(t => isConstrainedString(t));
 
     if (type.flags & ts.TypeFlags.TypeParameter) {
         const constraint = type.getConstraint();
@@ -194,7 +194,7 @@ const constrainedStrings = makePlugin('suggestion', true, {
     return {
         Literal(node) {
             if (typeof node.value !== "string") return;
-            if (node.parent?.type === "TSLiteralType") return;
+            if (node.parent?.type === AstNodeTypes.TSLiteralType) return;
 
             const text = context.sourceCode.getText(node);
 
@@ -209,9 +209,9 @@ const constrainedStrings = makePlugin('suggestion', true, {
                     });
                 }
             } else if (
-                node.parent?.type === "BinaryExpression" &&
+                node.parent?.type === AstNodeTypes.BinaryExpression &&
                 node.parent.right === node &&
-                node.parent.left.type === "UnaryExpression" &&
+                node.parent.left.type === AstNodeTypes.UnaryExpression &&
                 node.parent.left.operator === "typeof"
             ) {
                 if (text.startsWith('"')) {
@@ -223,7 +223,7 @@ const constrainedStrings = makePlugin('suggestion', true, {
                         }
                     });
                 }
-            } else if (node.parent?.type === "ImportDeclaration") {
+            } else if (node.parent?.type === AstNodeTypes.ImportDeclaration) {
                 if (text.startsWith('"')) {
                     context.report({
                         node,
@@ -284,9 +284,7 @@ const constrainedStrings = makePlugin('suggestion', true, {
 const validatedThrows = makePlugin('problem', false, {
     mismatchedThrows: `Expected implementation to be able to throw '{{expected}}'. Implementation actually throws '{{actual}}'.`
 }, context => {
-    const services = require("@typescript-eslint/utils")
-        .ESLintUtils.getParserServices(context);
-
+    const services = ESLintUtils.getParserServices(context);
     const checker = services.program.getTypeChecker();
 
     /**
@@ -356,9 +354,8 @@ const validatedThrows = makePlugin('problem', false, {
 
     return {
         AssignmentExpression(node) {
-            if (node.left.type !== "MemberExpression") return;
-            if (node.right.type !== "MemberExpression") return;
-
+            if (node.left.type !== AstNodeTypes.MemberExpression) return;
+            if (node.right.type !== AstNodeTypes.MemberExpression) return;
             if (node.left.computed || node.right.computed) return;
 
             const assignment = services.esTreeNodeToTSNodeMap.get(node);
