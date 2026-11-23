@@ -1,8 +1,8 @@
 # Opti
 
-[![npm version](https://img.shields.io/npm/v/optijs)](https://www.npmjs.com/package/optijs)
-![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)
-![issues](https://img.shields.io/github/issues/LeaTHeRSHoRTs/Opti)
+[![npm version](https://img.shields.io/npm/v/opti)](https://www.npmjs.com/package/optijs)
+[![bundlephobia](https://img.shields.io/bundlephobia/minzip/optijs)](https://bundlephobia.com/result?p=optijs)
+[![issues](https://img.shields.io/github/issues/NTH931/opti)](https://github.com/NTH931/opti/issues)
 
 _Desc pending_
 

@@ -1,3 +1,5 @@
+///<reference types="../types/index.d.ts" />
+
 type EventListenerInfo<T, K extends keyof EventMapOf<T> = keyof EventMapOf<T>> =
   | {
       type: K, 

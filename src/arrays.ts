@@ -1,4 +1,4 @@
-import { arrType } from '../helpers';
+import { arrType } from './helpers';
 
 export function asArr<T extends readonly _[]>(this: T): Arr.Safe<T> {
     return (this.length >= 1 ? this : null) as Arr.Safe<T>;
