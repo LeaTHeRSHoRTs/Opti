@@ -16,8 +16,8 @@
  * @typedef {import("@typescript-eslint/utils").TSESTree.Literal} Literal
  */
 
-const { AST_NODE_TYPES } = require("@typescript-eslint/utils");
-const ts = require("typescript");
+const { AST_NODE_TYPES } = await import("@typescript-eslint/utils");
+const ts = import("typescript");
 
 /**
  * @template {string} MessageIds
@@ -154,102 +154,27 @@ function isConstrainedContext(context, node) {
     const contextualType = checker.getContextualType(tsNode);
     if (!contextualType) return false;
 
-    return isConstrainedString(contextualType, checker);
+    return isConstrainedString(contextualType);
 }
 
 /**
  * Checked if a string is a constrained string (? extends string, but ? != string)
  * @param {import("typescript").Type} type
- * @param {import("typescript").TypeChecker} checker
  * @returns {boolean}
  */
-function isConstrainedString(type, checker) {
+function isConstrainedString(type) {
     if (type.flags & ts.TypeFlags.StringLiteral) return true;
-    if (type.isUnion()) return type.types.every(type => isConstrainedString(type, checker));
+    if (type.isUnion()) return type.types.every(type => isConstrainedString(type));
 
     if (type.flags & ts.TypeFlags.TypeParameter) {
         const constraint = type.getConstraint();
 
         if (!constraint) return false;
 
-        return isConstrainedString(constraint, checker);
+        return isConstrainedString(constraint);
     }
 
     return false;
-}
-
-/**
- * Checks if the argument of a function is a constrained string (? extends string, but ? != string)
- * @param {RuleContext<string, []>} context 
- * @param {Literal} node 
- * @returns 
- */
-function isConstrainedArgument(context, node) {
-    const services = context.sourceCode.parserServices;
-    const checker = services?.program?.getTypeChecker();
-
-    if (!checker || !services) return false;
-
-    if (node.parent?.type !== "CallExpression") return false;
-
-    const call = node.parent;
-    const index = call.arguments.indexOf(node);
-
-    if (index === -1) return false;
-
-    const tsCall = services.esTreeNodeToTSNodeMap?.get(call);
-
-    if (!tsCall) return false;
-
-    const signature = checker.getResolvedSignature(tsCall);
-
-    if (!signature) return false;
-
-    const parameter = signature.parameters[index];
-
-    if (!parameter) return false;
-
-    const declaration = parameter.valueDeclaration;
-
-    if (!declaration) return false;
-
-    const parameterType = checker.getTypeAtLocation(declaration);
-
-    if (parameterType.flags & ts.TypeFlags.TypeParameter) {
-        const signatureDeclaration = signature.getDeclaration();
-
-        if (signatureDeclaration) {
-            const typeParameter = signatureDeclaration.typeParameters?.find(
-                typeParameter =>
-                    typeParameter.name.escapedText ===
-                    parameterType.symbol?.escapedName
-            );
-
-            if (!typeParameter) return;
-
-            const constraint = typeParameter.constraint;
-
-            if (
-                constraint &&
-                ts.isUnionTypeNode(constraint)
-            ) {
-                for (const member of constraint.types) {
-                    if (
-                        ts.isTypeReferenceNode(member) &&
-                        ts.isIdentifier(member.typeName) &&
-                        (
-                            member.typeName.text === "Classes" ||
-                            member.typeName.text === "Methods"
-                        )
-                    ) {
-                        return true;
-                    }
-                }
-            }
-        }
-    }
-
-    return isConstrainedString(parameterType, checker);
 }
 
 const constrainedStrings = makePlugin('suggestion', true, {
@@ -453,15 +378,13 @@ const validatedThrows = makePlugin('problem', false, {
             if (!targetSymbol || !implementationSymbol) return;
 
             // The .d.ts declaration is the source of truth.
-            const declarations = getDeclarations(targetSymbol)
-                .filter(declaration =>
-                    declaration.getSourceFile().isDeclarationFile
-                );
+            const declarations = getDeclarations(targetSymbol).filter(declaration =>
+                declaration.getSourceFile().isDeclarationFile
+            );
 
-            const implementations = getDeclarations(implementationSymbol)
-                .filter(declaration =>
-                    !declaration.getSourceFile().isDeclarationFile
-                );
+            const implementations = getDeclarations(implementationSymbol).filter(declaration =>
+                !declaration.getSourceFile().isDeclarationFile
+            );
 
             if (!declarations.length || !implementations.length) return;
 
@@ -493,4 +416,4 @@ const plugin = {
     }
 };
 
-module.exports = plugin;
+export default plugin;

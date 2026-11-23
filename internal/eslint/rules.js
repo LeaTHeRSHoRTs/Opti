@@ -11,54 +11,60 @@ const jsdocPluginContexts = [
 //#region Rules
 /** @type {import('eslint').Linter.RulesRecord} */
 const baseRules = {
-    'no-undef': 'error',
     'no-unreachable': 'error',
     'no-self-assign': 'error',
     'no-constant-condition': 'warn',
     'no-dupe-else-if': 'error',
     'no-unused-vars': 'off',
+    'no-shadow': 'error',
+    'no-setter-return': 'error',
+    'no-var': 'error',
     'getter-return': 'error',
     'use-isnan': 'warn',
-    'no-setter-return': 'error',
     'eqeqeq': 'error',
-    'no-var': 'error',
     'prefer-const': 'warn',
     'prefer-exponentiation-operator': 'warn',
-    'require-await': 'error',
     'require-yield': 'error',
-    'semi': ['error', 'always'],
     'func-style': ['warn', 'declaration', { allowArrowFunctions: true }],
     'prefer-arrow-callback': ['warn', { allowNamedFunctions: true }],
     'no-useless-catch': 'warn',
     'no-useless-constructor': 'warn',
     'no-useless-escape': 'warn',
-    "@stylistic/indent": ["error", 4],
-    "custom-rules/single-line-control-flow": "error",
-    "custom-rules/conditional-single": "error",
-    "custom-rules/validated-throws": "error"
+
+    "unicorn/no-array-reverse": 'off',
+    "unicorn/no-array-sort": 'off',
+    "unicorn/no-useless-undefined": "error",
+    "unicorn/no-useless-spread": "error",
+    "unicorn/prefer-includes": "error",
+    "unicorn/prefer-array-find": "error",
+
+    "import/no-unresolved": "error",
+    "import/no-duplicates": "error",
+    "import/no-cycle": "error",
+    "import/no-self-import": "error",
+    "import/order": "error",
+
+    // "stylistic/indent": ["error", 4],
+    // 'stylistic/semi': ['error', 'always'],
+
+    // "custom-rules/single-line-control-flow": "error",
+    // "custom-rules/conditional-single": "error",
+    // "custom-rules/validated-throws": "error"
 };
 
 /** @type {import('eslint').Linter.RulesRecord} */
 export const definitionRules = {
     'no-var': 'off',
     'no-undef': 'off',
-    'camelcase': 'warn',
-    '@stylistic/semi': 'error',
-    "@stylistic/member-delimiter-style": [
-        "error", {
-            "multiline": {
-                "delimiter": "semi",
-                "requireLast": true
-            },
-            "singleline": {
-                "delimiter": "semi",
-                "requireLast": false
-            }
-        }
+
+    "eslint/id-match": [
+        "error",
+        "^[A-Z][a-zA-Z0-9]*$|^[a-z][a-zA-Z0-9]*$|^[A-Z0-9_]+$"
     ],
-    "@typescript-eslint/no-explicit-any": 'warn',
-    "@typescript-eslint/no-empty-object-type": "off",
-    "@typescript-eslint/no-restricted-types": [
+
+    "typescript/no-explicit-any": 'warn',
+    "typescript/no-empty-object-type": "off",
+    "typescript/no-restricted-types": [
         "error",
         {
             types: {
@@ -67,18 +73,19 @@ export const definitionRules = {
             },
         },
     ],
-    "jsdoc/require-jsdoc": [
+
+    "esdoc/require-jsdoc": [
         "error",
         {
             skipInterveningOverloadedDeclarations: true,
             contexts: jsdocPluginContexts
         }
     ],
-    "jsdoc/require-tags": ["error", { tags: ["since","opti"] }],
-    "jsdoc/require-param": ["error", { contexts: jsdocPluginContexts }],
-    "jsdoc/check-param-names": "error",
-    "jsdoc/require-description": "error",
-    "jsdoc/require-example": [
+    "esdoc/require-tags": ["error", { tags: ["since","opti"] }],
+    "esdoc/require-param": ["error", { contexts: jsdocPluginContexts }],
+    "esdoc/check-param-names": "error",
+    "esdoc/require-description": "error",
+    "esdoc/require-example": [
         "error",
         {
             contexts: [
@@ -88,11 +95,11 @@ export const definitionRules = {
             ]
         }
     ],
-    "jsdoc/require-returns": ["error", {
+    "esdoc/require-returns": ["error", {
         forceRequireReturn: false,
         contexts: jsdocPluginContexts 
     }],
-    "jsdoc/sort-tags": [
+    "esdoc/sort-tags": [
         "error",
         {
             reportIntraTagGroupSpacing: false,
@@ -118,22 +125,31 @@ export const definitionRules = {
 export const typescriptRules = {
     ...baseRules,
     ...definitionRules,
-    'camelcase': 'off',
+
     'no-compare-neg-zero': 'error',
-    "jsdoc/require-jsdoc": "off",
-    "@typescript-eslint/no-explicit-any": 'error',
-    '@typescript-eslint/no-shadow': 'error',
-    '@typescript-eslint/no-non-null-assertion': 'warn',
-    '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
-    '@typescript-eslint/typedef': 'warn',
-    '@typescript-eslint/array-type': ['error', { default: 'array' }],
-    '@typescript-eslint/no-floating-promises': 'error',
-    '@typescript-eslint/explicit-module-boundary-types': 'error'
+
+    "esdoc/require-jsdoc": "off",
+
+    "typescript/no-explicit-any": 'error',
+    'typescript/no-non-null-assertion': 'warn',
+    'typescript/no-unnecessary-type-assertion': 'warn',
+    'typescript/array-type': ['error', { default: 'array' }],
+    'typescript/no-floating-promises': 'error',
+    'typescript/explicit-module-boundary-types': 'error'
 };
 
 /** @type {import('eslint').Linter.RulesRecord} */
 export const testRules = {
     ...typescriptRules,
-    '@typescript-eslint/no-explicit-any': 'off',
+
+    "typescript/no-explicit-any": "off",
+
+    "vitest/expect-expect": "error",
+    "vitest/max-nested-describe": ["error", { max: 1 }],
+    "vitest/no-focused-tests": 'error',
+    "vitest/no-disabled-tests": 'error',
+    "vitest/valid-expect": 'error',
+    "vitest/no-conditional-expect": 'error',
+    "vitest/no-standalone-expect": 'error'
 };
 //#endregion

@@ -1,6 +1,7 @@
 import { arrType } from './helpers';
 
 export function asArr<T extends readonly _[]>(this: T): Arr.Safe<T> {
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     return (this.length >= 1 ? this : null) as Arr.Safe<T>;
 }
 
@@ -37,7 +38,7 @@ export function pluckLast<T>(this: T[], finder: (v: T) => boolean): T | null {
     return item ?? null;
 }
 
-export function relocate<T>(this: T[], index: number, offset: number): number | null {
+export function relocate(this: unknown[], index: number, offset: number): number | null {
     // Grab the value
     const value = this.splice(index, 1)[0];
 
@@ -50,7 +51,7 @@ export function relocate<T>(this: T[], index: number, offset: number): number | 
     }
 }
 
-export function relocateTo<T>(this: T[], index: number, location: number): number | null {
+export function relocateTo(this: unknown[], index: number, location: number): number | null {
     // Grab the value
     const value = this.splice(index, 1)[0];
 
@@ -84,6 +85,7 @@ export function sortBy<T>(this: T[], order?: Arr.SortMode<T> | ((a: T, b: T) => 
         }
     }
 
+    // oxlint-disable-next-line typescript/require-array-sort-compare
     return copy.sort();
 }
 

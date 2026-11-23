@@ -34,11 +34,15 @@
     "LICENSE",
     "README.md"
   ],
-  "babel": { "presets": ["@babel/preset-env"] },
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ]
+  },
   "sideEffects": true,
   "scripts": {
     "build": "vite build",
-    "lint": "eslint .",
+    "lint": "oxlint .",
     "typecheck": "npm run typecheck:src && npm run typecheck:types && npm run typecheck:tests",
     "typecheck:src": "tsc -p src",
     "typecheck:tests": "tsc -p tests",
@@ -55,6 +59,8 @@
     "eslint-plugin-jsdoc": "^65.1.0",
     "globals": "^17.12.0",
     "jsdom": "^27.4.0",
+    "oxlint": "^1.94.0",
+    "oxlint-tsgolint": "^7.0.2008",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.71.1",
     "vite": "^8.3.1",
