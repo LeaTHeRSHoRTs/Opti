@@ -47,7 +47,9 @@
     "typecheck:src": "tsc -p src",
     "typecheck:tests": "tsc -p tests",
     "typecheck:types": "tsc -p types",
-    "check": "npm run lint && npm run typecheck"
+    "check": "npm run lint && npm run typecheck",
+    "test": "vitest",
+    "test:watch": "vitest watch"
   },
   "engines": {
     "node": ">=23.0.0"
@@ -55,12 +57,13 @@
   "devDependencies": {
     "@stylistic/eslint-plugin": "^5.10.0",
     "@types/node": "^26.6.3",
+    "@vitest/browser-playwright": "^5.1.1",
     "eslint": "^10.11.0",
     "eslint-plugin-jsdoc": "^65.1.0",
     "globals": "^17.12.0",
-    "jsdom": "^27.4.0",
     "oxlint": "^1.94.0",
     "oxlint-tsgolint": "^7.0.2008",
+    "playwright": "^1.65.1",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.71.1",
     "vite": "^8.3.1",

@@ -24,9 +24,9 @@ describe("Enum", () => {
         try {
             Enum('A', 'A', 'B', 'Q', 'Q');
             expect.fail("Enum did not throw for duplicate properties");
-        } catch (e: any) {
+        } catch (e) {
             expect(e).toBeInstanceOf(SyntaxError);
-            expect(e.getMessage()).toBe("Enum members may only be unique");
+            expect((e as SyntaxError).message).toBe("Enum members may only be unique");
         }
     });
 
@@ -34,9 +34,9 @@ describe("Enum", () => {
         try {
             Enum("A_", "$B", "{}");
             expect.fail("Enum did not throw for invalid characters");
-        } catch (e: any) {
+        } catch (e) {
             expect(e).toBeInstanceOf(SyntaxError);
-            expect(e.getMessage()).toBe("Enum values must be defined and may only be the characters A-Z, a-z, 0-9, _ and $");
+            expect((e as SyntaxError).message).toBe("Enum values must be defined and may only be the characters A-Z, a-z, 0-9, _ and $");
         }
     });
 

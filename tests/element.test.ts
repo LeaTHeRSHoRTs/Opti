@@ -157,8 +157,8 @@ describe("HTMLElement.css", () => {
         element.css('accentColor', "nothing");
         element.css('color', 12);
         const computed = window.getComputedStyle(element);
-        expect(computed.accentColor).toBeEither(original.accentColor, "rgba(0, 0, 0, 0)");
-        expect(computed.color).toBeEither(original.color, "rgba(0, 0, 0, 0)");
+        expect(computed.accentColor).toBeOneOf([original.accentColor, "rgba(0, 0, 0, 0)"]);
+        expect(computed.color).toBeOneOf([original.color, "rgba(0, 0, 0, 0)"]);
     });
 
     it("should be able to reset the css value when null is provided", () => {

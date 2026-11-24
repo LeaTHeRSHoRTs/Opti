@@ -1,12 +1,9 @@
 import 'opti';
 
 describe("Errors", () => {
-    const Errors: { name: string, instance: DynErrorCtor }[] = [{
+    const Errors: { name: string, instance: ErrorConstructorOf<Error> }[] = [{
         name: "CloneError",
         instance: CloneError
-    }, {
-        name: "NumberTooSmallError",
-        instance: NumberTooSmallError
     }, {
         name: "AssertionError",
         instance: AssertionError
@@ -27,8 +24,8 @@ describe("Errors", () => {
     describe.each(Errors)("$name", ({ name, instance }) => {
         const normalInstance = new instance;
         const instanceWithMessage = new instance("myMessage");
-        const instanceWithCause = new instance(undefined, "throwing");
-        const instanceWithAll = new instance("myMessage", "throwing");
+        const instanceWithCause = new instance(undefined, { cause: "throwing" });
+        const instanceWithAll = new instance("myMessage", { cause: "throwing" });
 
         it("should be a subclass of Error", () => {
             expect(normalInstance).toBeInstanceOf(Error);

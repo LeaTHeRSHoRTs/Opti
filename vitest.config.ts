@@ -1,7 +1,13 @@
 import { defineConfig } from 'vitest/config';
+import { playwright } from "@vitest/browser-playwright";
 import path from 'path';
 
 export default defineConfig({
+    resolve: {
+        alias: {
+            opti: path.resolve(import.meta.dirname, "src", "index.ts")
+        }
+    },
     test: {
         root: import.meta.dirname,
         coverage: {
@@ -17,9 +23,15 @@ export default defineConfig({
         },
         globals: true,
         isolate: true,
-        environment: "jsdom",
         include: ["tests/**/*.test.ts"],
-        setupFiles: [path.resolve(import.meta.dirname, "../vitest.setup.ts")]
+        browser: {
+            enabled: true,
+            provider: playwright(),
+            instances: [
+                { browser: "chromium" }
+            ],
+            headless: true
+        }
     },
     server: { fs: { allow: ["../"] } }
 });

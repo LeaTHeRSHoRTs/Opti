@@ -308,16 +308,22 @@ describe("sleep", () => {
         expect(callback).toHaveBeenCalledTimes(1);
     });
 
-    it("should reject immediately if the sleep length is 0 or lower", async () => {
-        await sleep(0).catch(err => {
-            expect(err).toBeInstanceOf(NumberTooSmallError);
-            expect(err.message).toBe("Invalid timeout value (must be greater than 0)");
-        });
+    it("should throw immediately if the sleep length is 0 or lower", async () => {
+        try {
+            await sleep(0);
+            expect.fail("sleep function did not throw for 0");
+        } catch (e) {
+            expect(e).toBeInstanceOf(RangeError);
+            expect((e as RangeError).message).toBe("Invalid timeout value (must be greater than 0)");
+        }
     
-        await sleep(-10).catch(err => {
-            expect(err).toBeInstanceOf(NumberTooSmallError);
-            expect(err.message).toBe("Invalid timeout value (must be greater than 0)");
-        });
+        try {
+            await sleep(-10);
+            expect.fail("sleep did not throw for negative values");
+        } catch (e) {
+            expect(e).toBeInstanceOf(RangeError);
+            expect((e as RangeError)).toBe("Invalid timeout value (must be greater than 0)");
+        }
     });
 });
 

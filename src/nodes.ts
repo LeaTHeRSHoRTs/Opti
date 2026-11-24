@@ -1,4 +1,4 @@
-import { camelToDash, dashToCamel, isEventTarget, parseUnit, parseTime } from '../helpers';
+import { camelToDash, dashToCamel, isEventTarget, parseUnit, parseTime } from './helpers';
 
 export function addClass(this: Element, elClass: string): void {
     this.classList.add(elClass);

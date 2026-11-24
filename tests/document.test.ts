@@ -76,7 +76,7 @@ describe("Document.css", () => {
         const sheet = document.styleSheets[0];
         const rule = Array.from(sheet?.cssRules ?? []).find(r => 
             r instanceof CSSStyleRule && r.selectorText === "div.target"
-        ) as CSSStyleRule | undefined;
+        ) as CSSStyleRule | null;
 
         expect(rule).toBeDefined();
         expect(rule?.style.color).toBe("red");

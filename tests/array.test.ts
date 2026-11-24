@@ -17,12 +17,12 @@ describe("Array.chunk", () => {
         expect(() => {
             const arr = [1, 2, 3, 4, 5];
             arr.chunk(0);
-        }).toThrow(NumberTooSmallError);
+        }).toThrow(RangeError);
 
         expect(() => {
             const arr = [1, 2, 3, 4, 5];
             arr.chunk(-2);
-        }).toThrow(NumberTooSmallError);
+        }).toThrow(RangeError);
     });
 
     it("should turn a normal array into a multidimensional array", () => {
@@ -163,7 +163,7 @@ describe("Array.replace", () => {
     });
 });
 
-describe("Array.sort", () => {
+describe("Array.sortBy", () => {
     it("should be able to work normally", () => {
         expect(['A', 'D', 'C', 'B'].sort()).toStrictEqual(['A', 'B', 'C', 'D']);
         expect([1, 4, 3, 2].sort()).toStrictEqual([1, 2, 3, 4]);
@@ -172,26 +172,26 @@ describe("Array.sort", () => {
 
     it("should fallback for mixed type arrays", () => {
         const arr = [1, '2', 3];
-        const result = [...arr].sort("increasing");
+        const result = [...arr].sortBy("increasing");
         expect(result).toEqual([1,'2',3]);
     });
 
     it("should be able to sort numbers my numerical order", () => {
-        expect([1, 7, 2, 3, 5, 4, 6].sort("increasing")).toStrictEqual([1, 2, 3, 4, 5, 6, 7]);
-        expect([1, 7, 2, 3, 5, 4, 6].sort("decreasing")).toStrictEqual([7, 6, 5, 4, 3, 2, 1]);
+        expect([1, 7, 2, 3, 5, 4, 6].sortBy("increasing")).toStrictEqual([1, 2, 3, 4, 5, 6, 7]);
+        expect([1, 7, 2, 3, 5, 4, 6].sortBy("decreasing")).toStrictEqual([7, 6, 5, 4, 3, 2, 1]);
     });
 
     it("should be able to sort alphabetically", () => {
-        expect(['E', 'B', 'A', 'C', 'D'].sort("alpha")).toStrictEqual(['A', 'B', 'C', 'D', 'E']);
-        expect(['E', 'B', 'A', 'C', 'D'].sort("alpha-reverse")).toStrictEqual(['E', 'D', 'C', 'B', 'A']);
+        expect(['E', 'B', 'A', 'C', 'D'].sortBy("alpha")).toStrictEqual(['A', 'B', 'C', 'D', 'E']);
+        expect(['E', 'B', 'A', 'C', 'D'].sortBy("alpha-reverse")).toStrictEqual(['E', 'D', 'C', 'B', 'A']);
     });
 
     it("should be able to sort dates", () => {
         const now = new Date();
         const earlier = new Date(0);
         const later = new Date(Date.now() + 100);
-        expect([now, earlier, later].sort("earlier")).toStrictEqual([earlier, now, later]);
-        expect([now, earlier, later].sort("later")).toStrictEqual([later, now, earlier]);
+        expect([now, earlier, later].sortBy("earlier")).toStrictEqual([earlier, now, later]);
+        expect([now, earlier, later].sortBy("later")).toStrictEqual([later, now, earlier]);
     });
 
     it("should be able to sort normally still", () => {
@@ -199,17 +199,3 @@ describe("Array.sort", () => {
         expect([1, 4, 5, 3, 2].sort((a, b) => a - b)).toStrictEqual([1, 2, 3, 4, 5]);
     });
 });
-
-// describe("Array.type", () => {
-//   it("should be able to return the type of array", () => {
-//     expect([1, 2, 3].type).toEqual(["number"]);
-//     expect(["A", "B", "C"].type).toEqual(["string"]);
-//     expect([true, false, false].type).toEqual(["boolean"]);
-//     expect([String, String, String].type).toEqual(["StringConstructor"]);
-//     expect([() => undefined, (a: unknown, b: unknown) => undefined, (x: unknown, y: unknown, z: unknown) => undefined].type).toEqual(["Function"]);
-//   });
-
-//   it("should be able to handle arrays with multiple different types", () => {
-//     expect([1, "B", new Date()].type).toEqual(["Date", "number", "string"]);
-//   });
-// });

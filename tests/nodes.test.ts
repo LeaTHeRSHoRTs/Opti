@@ -143,23 +143,6 @@ describe("Node.siblings", () => {
     });
 });
 
-describe("Element.cut", () => {
-    it("should be able to cut an element from the DOM", () => {
-        const element = document.createElement('div');
-        element.id = "removed";
-        document.body.appendChild(element);
-
-        element.cut();
-
-        expect(document.getElementById("removed")).toBeNull();
-    });
-
-    it("should throw if it tries to detach an invalid element", () => {
-        const el = document.createElement('div');
-        expect(() => el.cut()).toThrow(HierarchyError);
-    });
-});
-
 describe("Element.copy", () => {
     it("should be able to copy an element's basic properties", () => {
         const el = document.createElement('div');

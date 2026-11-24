@@ -198,17 +198,17 @@ describe("String.toCase", () => {
     });
 });
 
-describe("String.matches", () => {
-    it("should be able to match a value in a string", () => {
-        expect("word".matches("word")).toBeTruthy();
-        expect("word".matches(/word/)).toBeTruthy();
-        expect("word".matches(/\w+/)).toBeTruthy();
+describe("String.contains", () => {
+    it("should be able to find a value in a string", () => {
+        expect("word".contains("word")).toBeTruthy();
+        expect("word".contains(/word/)).toBeTruthy();
+        expect("word".contains(/\w+/)).toBeTruthy();
     });
 
-    it("should not match wrong values in a string", () => {
-        expect("word".matches("notWord")).toBeFalsy();
-        expect("word".matches(/\d+\w+/)).toBeFalsy();
-        expect("word".matches(/\d\d\w{2,}/)).toBeFalsy();
+    it("should not find the wrong values in a string", () => {
+        expect("word".contains("notWord")).toBeFalsy();
+        expect("word".contains(/\d+\w+/)).toBeFalsy();
+        expect("word".contains(/\d\d\w{2,}/)).toBeFalsy();
     });
 });
 

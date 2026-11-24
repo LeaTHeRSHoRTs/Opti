@@ -1,15 +1,22 @@
-import { setGetter, setReadOnly, throwPlaceholder, registerErrors } from '../helpers';
-import * as Classes from './constructableobjects';
-import * as Doc from './document';
-import * as Elements from './nodes';
-import * as Errors from './errors';
-import * as Globals from './globals';
-import * as Lists from './collections';
-import * as Arrays from './arrays';
-import * as Misc from './misc';
-import * as Reg from './registry';
+console.log("window:", typeof window);
+console.log("SVGAElement:", typeof globalThis.SVGAElement);
+console.log("SVGElement:", typeof globalThis.SVGElement);
 
-if (typeof window === 'undefined' || typeof document === 'undefined') throw new Error("Opti requires a browser environment.");
+if (
+    typeof window === 'undefined' || 
+    typeof document === 'undefined'
+) throw new Error("Opti requires a browser environment.");
+
+const { setGetter, setReadOnly, throwPlaceholder, registerErrors } = await import('./helpers');
+const Classes =  await import('./classes');
+const Doc =      await import('./document');
+const Elements = await import('./nodes');
+const Errors =   await import('./errors');
+const Globals =  await import('./globals');
+const Lists =    await import('./collections');
+const Arrays =   await import('./arrays');
+const Misc =     await import('./misc');
+const Reg =      await import('./registry');
 
 globalThis.Opti = {
     crafty: false,
@@ -22,6 +29,7 @@ globalThis.Opti = {
 //! Others may depend on these
 globalThis.RegistryError = Errors.RegistryError;
 globalThis.Future = Promise;
+//@ts-expect-error
 globalThis.InternalRegistries = Reg.InternalRegistries;
 globalThis.Registries = Reg.Registries;
 Array.prototype.asArr = Arrays.asArr;
@@ -89,7 +97,7 @@ HTMLCollection.prototype.removeClass = Lists.removeClassList;
 HTMLCollection.prototype.toggleClass = Lists.toggleClassList;
 
 String.prototype.remove = Misc.remove;
-String.prototype.contains = Misc.matches;
+String.prototype.contains = Misc.contains;
 String.prototype.capitalize = Misc.capitalize;
 String.prototype.toCase = Misc.toCase;
 
@@ -116,3 +124,5 @@ Object.clone = Misc.clone;
 Object.forEach = Misc.forEach;
 
 Date.at = Misc.atDate;
+
+export {}
