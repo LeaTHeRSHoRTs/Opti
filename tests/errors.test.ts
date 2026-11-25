@@ -10,7 +10,7 @@ const Errors: { name: string, instance: ErrorConstructorOf }[] = [
 ];
 
 describe.each(Errors)("$name", ({ name, instance }) => {
-    const normalInstance = new instance;
+    const normalInstance = new instance();
     const instanceWithMessage = new instance("myMessage");
     const instanceWithCause = new instance(undefined, { cause: "throwing" });
     const instanceWithAll = new instance("myMessage", { cause: "throwing" });
@@ -38,20 +38,15 @@ describe.each(Errors)("$name", ({ name, instance }) => {
     });
 
     it("should give the right stack trace", () => {
-        Error.prototype.stack = "MOCK_STACK";
-
-        try {
-            throw new instance;
-        } catch (e) {
-            if (e instanceof instance) {
-                expect(e.stack).toBe("MOCK_STACK");
-            }
-        }
+        const error = new instance("Test error");
+        
+        expect(error.stack).toBeDefined();
+        expect(error.stack).toContain(instance.name);
     });
 });
 
 describe("RuntimeError", () => {
-    const normalInstance = new RuntimeError;
+    const normalInstance = new RuntimeError();
     const instanceWithMessage = new RuntimeError("myMessage");
     const instanceWithCause = new RuntimeError(undefined, "throwing");
     const instanceWithAll = new RuntimeError("myMessage", "throwing");
@@ -81,31 +76,20 @@ describe("RuntimeError", () => {
     });
 
     it("should give the right stack trace", () => {
-        Error.prototype.stack = "MOCK_STACK";
-
-        try {
-            throw new RuntimeError;
-        } catch (e) {
-            if (e instanceof RuntimeError) {
-                e.stack = "MOCK_STACK";
-                expect(e.stack).toBe("MOCK_STACK");
-            } else {
-                expect.fail("Error was not a RuntimeError");
-            }
-        }
-
-        expect.fail("RuntimeError was not caught");
+        expect(normalInstance.stack).toBeDefined();
+        expect(normalInstance.stack).toContain(normalInstance.name);
     });
 
     it("should not be catch-able using the Error class or Error class", () => {
+        let caught: unknown;
+
         try {
             throw new RuntimeError();
         } catch (e) {
-            if (e instanceof Error || e instanceof Error) {
-                expect.fail("Error was not instance of Error or Error");
-            } else if (!(e instanceof RuntimeError)) {
-                expect.fail("Error was not a runtime Error");
-            }
+            caught = e;
         }
+
+        expect(caught).toBeInstanceOf(RuntimeError);
+        expect(caught).not.toBeInstanceOf(Error);
     });
 });

@@ -1,13 +1,9 @@
-console.log("window:", typeof window);
-console.log("SVGAElement:", typeof globalThis.SVGAElement);
-console.log("SVGElement:", typeof globalThis.SVGElement);
-
 if (
     typeof window === 'undefined' || 
     typeof document === 'undefined'
 ) throw new Error("Opti requires a browser environment.");
 
-const { setGetter, setReadOnly, throwPlaceholder, registerErrors } = await import('./helpers');
+const { setGetter, setReadOnly, throwPlaceholder } = await import('./helpers');
 const Classes =  await import('./classes');
 const Doc =      await import('./document');
 const Elements = await import('./nodes');

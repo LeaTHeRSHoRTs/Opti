@@ -2,11 +2,12 @@ export function ready(callback: (this: Document, ev: Event) => unknown): void {
     document.addEventListener('DOMContentLoaded', callback);
 }
 
-let called = false;
 export function leaving(callback: (this: Document, ev: Event) => unknown): void {
-    if (called) return;
-
+    let called = false;
+    
     function handler(e: Event) {
+        if (called) return;
+        
         try { callback.call(document, e); }
         finally { called = true; }
     }
@@ -84,7 +85,7 @@ export function documentCss(
     const newStyles: StringRecord<string> = {};
     for (const [prop, val] of Object.entries(object)) {
         if (val !== null && val !== undefined) {
-            const kebab = prop.toString().replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
+            const kebab = prop.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
             newStyles[kebab] = val.toString();
         }
     }

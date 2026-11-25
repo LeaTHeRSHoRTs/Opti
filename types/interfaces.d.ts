@@ -47,12 +47,7 @@ interface ElementCopyOptions {
      * @since 1.0.0
      */
     copyAll?: boolean;
-    /**
-     * Defines if the new element should have the same event listeners. Defaults to `false`.
-     * @opti
-     * @since 1.0.0
-     */
-    copyEvents?: boolean;
+
     /**
      * Defines if the new element should have the same children. Defaults to `false`.
      * 
@@ -62,12 +57,14 @@ interface ElementCopyOptions {
      * @since 1.0.0
      */
     copyChildren?: boolean;
+
     /**
      * Defines if the new element should have the same attributes. Defaults to `true`.
      * @opti
      * @since 1.0.0
      */
     copyAttributes?: boolean;
+    
     /**
      * Defines if the new element should have the same styles. Defaults to `true`.
      * 

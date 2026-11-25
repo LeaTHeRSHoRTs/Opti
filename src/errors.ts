@@ -4,12 +4,16 @@ export class RuntimeError {
     name = 'RuntimeError' as const;
     message: string;
     cause: unknown;
-    stack: string;
+    stack: string | undefined;
 
     public constructor(message: string = "", cause: unknown = "") {
         this.message = message;
         this.cause = cause;
-        this.stack = new Error().stack ?? "";
+        this.stack = new Error(message).stack?.replace(/^Error/, this.name);
+    }
+
+    toString(): string {
+        return Error.prototype.toString.call(this);
     }
 }
 

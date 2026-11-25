@@ -20,22 +20,17 @@ describe("Document.ready", () => {
 });
 
 describe("Document.leaving", () => {
-    it("should run when the user attempts to leave using beforeunload", async () => {
-        const promise = new Promise<void>((resolve) => {
-            document.leaving(() => {
-                expect(true).toBeTruthy();
-                resolve();
-            });
-        });
-
-        // Simulate leaving the document
+    it("should run when the user attempts to leave using beforeunload", () => {
+        const callback = vi.fn();
+    
+        document.leaving(callback);
         window.dispatchEvent(new Event("beforeunload"));
-
-        await promise;
-    }, 10_000);
-
+    
+        expect(callback).toHaveBeenCalledOnce();
+    });
+    
     it("should run when the user attempts to leave using pagehide", () => {
-        const callback = vi.fn<() => void>();
+        const callback = vi.fn();
     
         document.leaving(callback);
         window.dispatchEvent(new Event("pagehide"));
@@ -44,10 +39,14 @@ describe("Document.leaving", () => {
     });
     
     it("should run when the user attempts to leave using visibilitychange", () => {
-        const callback = vi.fn<() => void>();
+        const callback = vi.fn();
+    
+        Object.defineProperty(document, "visibilityState", {
+            configurable: true,
+            value: "hidden"
+        });
     
         document.leaving(callback);
-    
         document.dispatchEvent(new Event("visibilitychange"));
     
         expect(callback).toHaveBeenCalledOnce();
@@ -64,14 +63,16 @@ describe("Document.css", () => {
             color: "red"
         });
 
-        const sheet = document.styleSheets[0];
+        const sheet = document.querySelector<HTMLStyleElement>("style[js-styles]")?.sheet;
+
+        expect(sheet).toBeDefined();
+
         const rule = Array.from(sheet?.cssRules ?? []).find(r => 
             r instanceof CSSStyleRule && r.selectorText === "div.target"
         ) as CSSStyleRule | null;
 
         expect(rule).toBeDefined();
-        // oxlint-disable-next-line typescript/no-non-null-assertion
-        expect(rule!.style.color).toBe("red");
+        expect(rule?.style.color).toBe("red");
     });
 
     it("should be able to get the css for an element", () => {

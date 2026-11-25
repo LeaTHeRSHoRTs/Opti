@@ -32,10 +32,14 @@ const baseRules: Linter.RulesRecord = {
     'no-useless-catch': 'warn',
     'no-useless-constructor': 'warn',
     'no-useless-escape': 'warn',
+
     
     "import/no-duplicates": "error",
     "import/no-cycle": "error",
     "import/no-self-import": "error",
+
+    "eslint/no-extend-native": 'off',
+    "eslint/no-underscore-dangle": 'off',
 
     // "stylistic/indent": ["error", 4],
     // 'stylistic/semi': ['error', 'always'],
@@ -51,7 +55,7 @@ export const definitionRules: Linter.RulesRecord = {
 
     "eslint/id-match": [
         "error",
-        "^[A-Z][a-zA-Z0-9]*$|^[a-z][a-zA-Z0-9]*$|^[A-Z0-9_]+$"
+        "^[A-Z_$][a-zA-Z0-9]*$|^[a-z_$][a-zA-Z0-9]*$|^[A-Z0-9_]+$"
     ],
 
     "typescript/no-explicit-any": 'warn',
@@ -121,6 +125,7 @@ export const typescriptRules: Linter.RulesRecord = {
 
     "esdoc/require-jsdoc": "off",
 
+    "typescript/consistent-return": 'off',
     "typescript/no-unsafe-type-assertion": 'off',
     "typescript/no-explicit-any": 'error',
     'typescript/no-non-null-assertion': 'warn',

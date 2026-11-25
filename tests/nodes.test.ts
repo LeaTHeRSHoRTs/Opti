@@ -144,21 +144,28 @@ describe("Node.siblings", () => {
 });
 
 describe("Element.copy", () => {
-    it("should be able to copy an element's basic properties", () => {
-        const el = document.createElement('div');
+    const el = document.createElement('div');
+    const child1 = document.createElement('p');
+    const child2 = document.createElement('p');
+
+    beforeAll(() => {
+        child1.className = "child1";
+        child2.className = "child2";
         el.innerHTML = "<p>Text</p>";
         el.title = "My Title";
-        el.role = "text",
-        el.ariaChecked = "true",
-        el.hidden = true,
-        el.tabIndex = 1,
-        el.id = "one";
+        el.role = "text";
+        el.ariaChecked = "true";
+        el.hidden = true;
+        el.tabIndex = 1;
         el.className = "two";
         el.style.display = "none";
-        el.style.color = "red",
+        el.style.color = "red";
         el.dataset["id"] = "one";
         el.dataset["name"] = "MyName";
+        el.append(child1, child2);
+    });
 
+    it("should be able to copy an element's basic properties", () => {
         const copy = el.copy();
 
         expect(copy).toMatchObject<Partial<HTMLElement>>({
@@ -167,7 +174,6 @@ describe("Element.copy", () => {
             title: "My Title",
             role: "text",
             ariaChecked: "true",
-            id: "",
             hidden: true,
             tabIndex: 1,
             className: "two",
@@ -196,11 +202,11 @@ describe("Element.copy", () => {
         link.href = "https://example.org";
         img.src = "https://example.org/image";
 
-        select.innerHTML = `
-      <option value="a">A</option>
-      <option value="b" selected>B</option>
-    `;
         select.value = 'b';
+        select.innerHTML = `
+            <option value="a">A</option>
+            <option value="b" selected>B</option>
+        `;
 
         option.value = 'c';
         option.text = "Option";
@@ -226,75 +232,41 @@ describe("Element.copy", () => {
         });
     });
 
-    it("should support the boolean options", () => {
-        const spy = vi.fn();
-
-        const el = document.createElement('div');
-        const child1 = document.createElement('p');
-        const child2 = document.createElement('p');
-        child1.className = "child1";
-        child2.className = "child2";
-        el.innerHTML = "<p>Text</p>";
-        el.title = "My Title";
-        el.role = "text",
-        el.ariaChecked = "true",
-        el.hidden = true,
-        el.tabIndex = 1,
-        el.id = "one";
-        el.className = "two";
-        el.style.display = "none";
-        el.style.color = "red",
-        el.dataset["id"] = "one";
-        el.dataset["name"] = "MyName";
-        el.append(child1, child2);
-        el.addEventListener('click', spy);
-
-        const copy = el.copy(true, true);
+    it("should be able to copy over children", () => {
+        const copy = el.copy(true);
 
         el.click();
         copy.click();
 
-        expect(spy).toHaveBeenCalledTimes(2);
-        expect(copy.children).toContain(child1);
-        expect(copy.children).toContain(child2);
+        expect(copy.children).toContainElement(child1);
+        expect(copy.children).toContainElement(child2);
     });
 
     it("should support the object options", () => {
-        const spy = vi.fn();
-
-        const el = document.createElement('div');
-        const child1 = document.createElement('p');
-        const child2 = document.createElement('p');
-        child1.className = "child1";
-        child2.className = "child2";
-        el.innerHTML = "<p>Text</p>";
-        el.title = "My Title";
-        el.role = "text",
-        el.ariaChecked = "true",
-        el.hidden = true,
-        el.tabIndex = 1,
-        el.id = "one";
-        el.className = "two";
-        el.style.display = "none";
-        el.style.color = "red",
-        el.dataset["id"] = "one";
-        el.dataset["name"] = "MyName";
-        el.append(child1, child2);
-        el.addEventListener('click', spy);
-
         const copy = el.copy({
             fallbackId: "fallback",
             copyAttributes: true,
-            copyEvents: true,
             copyChildren: true
         });
 
         el.click();
         copy.click();
 
-        expect(spy).toHaveBeenCalledTimes(2);
-        expect(copy.children).toContain(child1);
-        expect(copy.children).toContain(child2);
+        expect(copy).toContainElement(child1);
+        expect(copy).toContainElement(child2);
+        expect(copy.attributes).toEqual(el.attributes);
+    });
+
+    it("should complain when an element with a ID is copied without a fallback ID", () => {
+        let error: unknown;
+        try {
+            const copy = el.copy(true);
+        } catch (e) {
+            error = e;
+        }
+
+        expect(error).toBeInstanceOf(DuplicateIDError);
+
     });
 });
 
@@ -333,7 +305,7 @@ describe("Node.$", () => {
 
     it("should error out and tell users that commas are not allowed", () => {
         expect(() => document.$("div, p"))
-            .toThrow(new SyntaxError("Invalid query: commas are not allowed in query selectors that can only select 1 element"));
+            .toThrow(new InvalidSelectorError("Invalid query selector: commas are not allowed in query selectors that can only select 1 element"));
     });
 });
 
@@ -348,18 +320,18 @@ describe("Node.$$", () => {
         document.body.appendChild(root);
 
         const found = root.$$('em');
+        expect(found).toBeDefined();
         expect(found).toContain(em1);
         expect(found).toContain(em2);
-        expect(found.length).toBe(2);
+        expect(found?.length).toBe(2);
     });
 
-    it("should return an empty array if no matches", () => {
+    it("should return null if no elements match", () => {
         const root = document.createElement('div');
         document.body.appendChild(root);
 
         const found = root.$$('footer');
-        expect(found).toBeInTheDocument();
-        expect(found).toHaveLength(0);
+        expect(found).toBeNull();
     });
 
     it("should support more advanced selectors", () => {
@@ -379,8 +351,10 @@ describe("Node.$$", () => {
         document.body.appendChild(root);
 
         const found = root.$$(".target#child1[data-test=testing], .target#child2[data-test=testing]");
+
+        expect(found).toBeDefined();
         expect(found).toContain(em1);
         expect(found).toContain(em2);
-        expect(found.length).toBe(2);
+        expect(found?.length).toBe(2);
     });
 });

@@ -76,7 +76,7 @@ export function css(
     // Set multiple
         for (const [prop, ival] of Object.entries(key)) {
             if (ival !== null && ival !== undefined) {
-                icss.setProperty(camelToDash(prop.toString()), ival.toString());
+                icss.setProperty(camelToDash(prop), ival.toString());
             }
         }
     }
@@ -86,13 +86,13 @@ export function getParent(this: ChildNode): ParentNode | null {
     return this.parentElement;
 };
 
-export function getAncestor<T extends Element>(this: ChildNode, arg: string | number): T | Node | null {
+export function getAncestor(this: ChildNode, arg: string | number): Element | Node | null {
     // Case 1: numeric level
     if (typeof arg === 'number') {
         let node: Node | null = this;
         for (let i = 0; i < arg; i++) {
-            if (!node?.parentNode) return null;
-            node = node.parentNode;
+            if (!this?.parentNode) return null;
+            node = this.parentNode;
         }
         return node;
     }
@@ -147,9 +147,10 @@ export function toggle(this: HTMLElement): void {
     }
 };
 
+// oxlint-disable-next-line id-match
 export function $(this: ParentNode, selector: string): Element | null {
     try {
-        if (selector.includes(',')) throw new InvalidSelectorError("Invalid query: commas are not allowed in query selectors that can only select 1 element");
+        if (selector.includes(',')) throw new InvalidSelectorError("commas are not allowed in query selectors that can only select 1 element");
         return this.querySelector(selector);
     } catch (e) {
         throw new InvalidSelectorError(
@@ -161,6 +162,7 @@ export function $(this: ParentNode, selector: string): Element | null {
     }
 };
 
+// oxlint-disable-next-line id-match
 export function $$(this: ParentNode, selector: string): Arr<Element> {
     try {
         return Array.from(this.querySelectorAll(selector)).asArr();
@@ -209,22 +211,19 @@ const defaultCopy: Required<Omit<ElementCopyOptions, 'fallbackId'>> = {
     copyAll: false,
     copyAttributes: true,
     copyChildren: false,
-    copyEvents: false,
     copyStyles: true
 };
 
-type _EventsRecord<T extends EventTarget> = { [K in keyof EventMapOf<T>]?: EventListenerInfo<T, K>[] };
 
 export function copy<T extends Element>(this: T, object: ElementCopyOptions): T;
-export function copy<T extends Element>(this: T, children?: boolean, events?: boolean): T;
-export function copy<T extends Element>(this: T, childrenOrObject?: boolean | ElementCopyOptions, events?: boolean): T;
-export function copy<T extends Element>(this: T, childrenOrObject: boolean | ElementCopyOptions = true, events: boolean = false): T {
+export function copy<T extends Element>(this: T, children?: boolean): T;
+export function copy<T extends Element>(this: T, childrenOrObject?: boolean | ElementCopyOptions): T;
+export function copy<T extends Element>(this: T, childrenOrObject: boolean | ElementCopyOptions = true): T {
     let options: ElementCopyOptions;
     if (typeof childrenOrObject === 'boolean') {
         options = { 
             ...defaultCopy, 
-            copyChildren: childrenOrObject, 
-            copyEvents: events 
+            copyChildren: childrenOrObject
         };
     } else {
         options = { 
@@ -268,25 +267,6 @@ export function copy<T extends Element>(this: T, childrenOrObject: boolean | Ele
     if (options.copyStyles || options.copyAll) {
         if (this instanceof HTMLElement && clone instanceof HTMLElement) {
             clone.style.cssText = this.style.cssText;
-        }
-    }
-
-    if ((options.copyEvents || options.copyAll) && isEventTarget(this)) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        for (const [event, funcs] of Object.entries((this as any)._events) as [keyof EventMapOf<T>, _EventsRecord<T>[keyof EventMapOf<T>]][]) {
-            funcs?.forEach(prop => {
-                if (Opti.unsync /* Unsync is active */) {
-                    switch (prop.listener) {
-                        case "default": break;
-                        case "conditional":
-                            return this.addConditionalListener(event, prop.func, prop.special, prop.options);
-                        case "controller":
-                            return this.addEventController(event, prop.func, prop.options);
-                    }
-                }
-
-                this.addEventListener(event as string, prop.func as EventListener, prop.options);
-            });
         }
     }
 

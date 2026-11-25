@@ -1,5 +1,5 @@
 import { defineConfig } from 'oxlint';
-import { typescriptRules, definitionRules, testRules } from './internal/eslint/rules.ts';
+import { typescriptRules, definitionRules, testRules } from './internal/oxlint.rules.ts';
 
 export default defineConfig({
     plugins: [
