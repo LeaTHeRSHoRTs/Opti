@@ -80,7 +80,7 @@ describe("RuntimeError", () => {
         expect(instanceWithAll.cause).toBe("throwing");
     });
 
-    it.skip("should give the right stack trace", () => {
+    it("should give the right stack trace", () => {
         Error.prototype.stack = "MOCK_STACK";
 
         try {

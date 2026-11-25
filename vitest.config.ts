@@ -32,7 +32,7 @@ export default defineConfig({
             ],
             headless: true
         },
-        setupFiles: ["@testing-library/jest-dom/vitest"]
+        setupFiles: ["./internal/vitest.setup.ts"]
     },
     server: { fs: { allow: ["../"] } }
 });
