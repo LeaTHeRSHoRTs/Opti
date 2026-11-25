@@ -1,12 +1,22 @@
 # Dev-only
-
+.vitest/
 .vscode/
+.idea/*
+*.iml
+*.log
+oxlint.config.ts
+
+# Code directories
 test/
-scripts/
 cli/
 src/
-.env
-*.log
-eslint.config.cjs
 
-_future.*
+# Node
+**/node_modules
+.env
+
+# Generated
+**/coverage
+
+# Logs
+**/*.log

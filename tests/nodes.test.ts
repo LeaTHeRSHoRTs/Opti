@@ -358,6 +358,7 @@ describe("Node.$$", () => {
         document.body.appendChild(root);
 
         const found = root.$$('footer');
+        expect(found).toBeInTheDocument();
         expect(found).toHaveLength(0);
     });
 

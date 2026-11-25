@@ -34,33 +34,24 @@ describe("Document.leaving", () => {
         await promise;
     }, 10_000);
 
-    it("should run when the user attempts to leave using pagehide", async () => {
-        const promise = new Promise<void>((resolve) => {
-            document.leaving(() => {
-                expect(true).toBeTruthy();
-                resolve();
-            });
-        });
-
-        // Simulate leaving the document
+    it("should run when the user attempts to leave using pagehide", () => {
+        const callback = vi.fn<() => void>();
+    
+        document.leaving(callback);
         window.dispatchEvent(new Event("pagehide"));
-
-        await promise;
-    }, 10_000);
-
-    it("should run when the user attempts to leave using visibilitychange", async () => {
-        const promise = new Promise<void>((resolve) => {
-            document.leaving(() => {
-                expect(true).toBeTruthy();
-                resolve();
-            });
-        });
-
-        // Simulate leaving the document
+    
+        expect(callback).toHaveBeenCalledOnce();
+    });
+    
+    it("should run when the user attempts to leave using visibilitychange", () => {
+        const callback = vi.fn<() => void>();
+    
+        document.leaving(callback);
+    
         document.dispatchEvent(new Event("visibilitychange"));
-
-        await promise;
-    }, 10_000);
+    
+        expect(callback).toHaveBeenCalledOnce();
+    });
 });
 
 describe("Document.css", () => {
@@ -79,7 +70,8 @@ describe("Document.css", () => {
         ) as CSSStyleRule | null;
 
         expect(rule).toBeDefined();
-        expect(rule?.style.color).toBe("red");
+        // oxlint-disable-next-line typescript/no-non-null-assertion
+        expect(rule!.style.color).toBe("red");
     });
 
     it("should be able to get the css for an element", () => {
@@ -90,7 +82,10 @@ describe("Document.css", () => {
         const styleSheet = document.createElement('style');
         document.head.appendChild(styleSheet);
 
-        styleSheet.sheet?.insertRule("div.target { color: red; font-size: 20px }");
+        expect(styleSheet.sheet).toBeDefined();
+
+        // oxlint-disable-next-line typescript/no-non-null-assertion
+        styleSheet.sheet!.insertRule("div.target { color: red; font-size: 20px }");
 
         expect(document.css("div.target")).toHaveProperty("color");
         expect(document.css("div.target").color).toBe("red");

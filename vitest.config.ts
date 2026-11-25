@@ -31,7 +31,8 @@ export default defineConfig({
                 { browser: "chromium" }
             ],
             headless: true
-        }
+        },
+        setupFiles: ["@testing-library/jest-dom/vitest"]
     },
     server: { fs: { allow: ["../"] } }
 });

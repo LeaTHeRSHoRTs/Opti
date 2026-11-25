@@ -121,6 +121,7 @@ export const typescriptRules: Linter.RulesRecord = {
 
     "esdoc/require-jsdoc": "off",
 
+    "typescript/no-unsafe-type-assertion": 'off',
     "typescript/no-explicit-any": 'error',
     'typescript/no-non-null-assertion': 'warn',
     'typescript/no-unnecessary-type-assertion': 'warn',

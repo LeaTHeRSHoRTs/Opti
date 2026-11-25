@@ -1,65 +1,52 @@
 import 'opti';
 
-describe("Errors", () => {
-    const Errors: { name: string, instance: ErrorConstructorOf<Error> }[] = [{
-        name: "CloneError",
-        instance: CloneError
-    }, {
-        name: "AssertionError",
-        instance: AssertionError
-    }, {
-        name: "NotImplementedError",
-        instance: NotImplementedError
-    }, {
-        name: "AccessError",
-        instance: AccessError
-    }, {
-        name: "UnknownError",
-        instance: UnknownError
-    }, {
-        name: "DebouncedError",
-        instance: DebouncedError
-    }];
+const Errors: { name: string, instance: ErrorConstructorOf }[] = [
+    { name: "CloneError",          instance: CloneError }, 
+    { name: "AssertionError",      instance: AssertionError }, 
+    { name: "NotImplementedError", instance: NotImplementedError }, 
+    { name: "AccessError",         instance: AccessError }, 
+    { name: "UnknownError",        instance: UnknownError }, 
+    { name: "DebouncedError",      instance: DebouncedError }
+];
 
-    describe.each(Errors)("$name", ({ name, instance }) => {
-        const normalInstance = new instance;
-        const instanceWithMessage = new instance("myMessage");
-        const instanceWithCause = new instance(undefined, { cause: "throwing" });
-        const instanceWithAll = new instance("myMessage", { cause: "throwing" });
+describe.each(Errors)("$name", ({ name, instance }) => {
+    const normalInstance = new instance;
+    const instanceWithMessage = new instance("myMessage");
+    const instanceWithCause = new instance(undefined, { cause: "throwing" });
+    const instanceWithAll = new instance("myMessage", { cause: "throwing" });
 
-        it("should be a subclass of Error", () => {
-            expect(normalInstance).toBeInstanceOf(Error);
-        });
+    it("should be a subclass of Error", () => {
+        expect(normalInstance).toBeInstanceOf(Error);
+    });
 
-        it("should have the right name", () => {
-            expect(normalInstance.name).toBe(name);
-        });
+    it("should have the right name", () => {
+        expect(normalInstance.name).toBe(name);
+    });
 
-        it("should have the right message", () => {
-            expect(normalInstance.message).toBe("");
-            expect(instanceWithMessage.message).toBe("myMessage");
-        });
+    it("should have the right message", () => {
+        expect(normalInstance.message).toBe("");
+        expect(instanceWithMessage.message).toBe("myMessage");
+    });
 
-        it("should be have the right cause", () => {
-            expect(instanceWithCause.cause).toBe("throwing");
-        });
+    it("should be have the right cause", () => {
+        expect(instanceWithCause.cause).toBe("throwing");
+    });
 
-        it("should be have the right message and cause", () => {
-            expect(instanceWithAll.message).toBe("myMessage");
-            expect(instanceWithAll.cause).toBe("throwing");
-        });
+    it("should be have the right message and cause", () => {
+        expect(instanceWithAll.message).toBe("myMessage");
+        expect(instanceWithAll.cause).toBe("throwing");
+    });
 
-        it("should give the right stack trace", () => {
-            Error.prototype.stack = "MOCK_STACK";
+    it("should give the right stack trace", () => {
+        Error.prototype.stack = "MOCK_STACK";
 
-            try {
-                throw new instance;
-            } catch (e) {
-                if (e instanceof instance) {
-                    expect(e.stack).toBe("MOCK_STACK");
-                }
+        try {
+            throw new instance;
+        } catch (e) {
+            if (e instanceof instance) {
+                expect(e.stack).toBe("MOCK_STACK");
             }
-        });
+        }
     });
 });
 
