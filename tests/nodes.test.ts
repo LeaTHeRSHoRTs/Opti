@@ -154,7 +154,7 @@ describe("Element.copy", () => {
         el.innerHTML = "<p>Text</p>";
         el.title = "My Title";
         el.role = "text";
-        el.ariaChecked = "true";
+        el.aria-checked = "true";
         el.hidden = true;
         el.tabIndex = 1;
         el.className = "two";
@@ -168,15 +168,15 @@ describe("Element.copy", () => {
     it("should be able to copy an element's basic properties", () => {
         const copy = el.copy();
 
-        expect(copy).toMatchObject<Partial<HTMLElement>>({
+        expect(copy).toMatchObject({
             tagName: "DIV",
             innerHTML: "<p>Text</p>",
             title: "My Title",
             role: "text",
-            ariaChecked: "true",
+            "aria-checked": "true",
             hidden: true,
-            tabIndex: 1,
-            className: "two",
+            "tab-index": 1,
+            "class": "two",
             style: expect.objectContaining({ 
                 display: "none",
                 color: "red"

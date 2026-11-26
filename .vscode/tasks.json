@@ -5,7 +5,7 @@
       "label": "TypeScript: Check",
       "type": "shell",
       "command": "npx",
-      "args": ["tsc", "-p", "${workspaceFolder}/_new/tsconfig.json"],
+      "args": ["tsc", "-p", "${workspaceFolder}/tsconfig.json"],
       "problemMatcher": "$tsc"
     },
     {
@@ -13,8 +13,14 @@
       "type": "shell",
       "command": "npm",
       "args": ["run", "lint"],
-      "options": { "cwd": "${workspaceFolder}/_new/package" },
+      "options": { "cwd": "${workspaceFolder}" },
       "problemMatcher": "$eslint-stylish"
+    },
+    {
+      "label": "build",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "build"]
     }
   ]
 }
