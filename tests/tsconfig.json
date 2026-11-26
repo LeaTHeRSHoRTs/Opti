@@ -1,7 +1,10 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "types": ["vitest/globals", "@testing-library/jest-dom"],
+    "types": [
+      "vitest/globals",
+      "@testing-library/jest-dom/vitest"
+    ],
     "paths": {
       "opti": ["../types/index.d.ts"]
     }
@@ -11,7 +14,6 @@
     "**/coverage"
   ],
   "include": [
-    "**/*.test.ts",
-    "./vitest.d.ts"
+    "**/*.test.ts"
   ]
 }

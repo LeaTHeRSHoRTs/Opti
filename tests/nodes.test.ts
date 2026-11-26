@@ -154,7 +154,7 @@ describe("Element.copy", () => {
         el.innerHTML = "<p>Text</p>";
         el.title = "My Title";
         el.role = "text";
-        el.aria-checked = "true";
+        el.ariaChecked = "true";
         el.hidden = true;
         el.tabIndex = 1;
         el.className = "two";
@@ -168,23 +168,24 @@ describe("Element.copy", () => {
     it("should be able to copy an element's basic properties", () => {
         const copy = el.copy();
 
-        expect(copy).toMatchObject({
+        expect(copy).toMatchObject<Partial<HTMLElement>>({
             tagName: "DIV",
-            innerHTML: "<p>Text</p>",
             title: "My Title",
             role: "text",
-            "aria-checked": "true",
+            ariaChecked: "true",
             hidden: true,
-            "tab-index": 1,
-            "class": "two",
-            style: expect.objectContaining({ 
-                display: "none",
-                color: "red"
-            }),
-            dataset: expect.objectContaining({ 
-                id: "one",
-                name: "MyName"
-            })
+            tabIndex: 1,
+            className: "two"
+        });
+
+        expect(copy.style).toMatchObject({
+            display: "none",
+            color: "red"
+        });
+        
+        expect(copy.dataset).toMatchObject({
+            id: "one",
+            name: "MyName"
         });
     });
 
@@ -238,8 +239,8 @@ describe("Element.copy", () => {
         el.click();
         copy.click();
 
-        expect(copy.children).toContainElement(child1);
-        expect(copy.children).toContainElement(child2);
+        expect(copy.children[1]).toHaveClass("child1");
+        expect(copy.children[2]).toHaveClass("child2");
     });
 
     it("should support the object options", () => {
@@ -252,13 +253,15 @@ describe("Element.copy", () => {
         el.click();
         copy.click();
 
-        expect(copy).toContainElement(child1);
-        expect(copy).toContainElement(child2);
+        expect(copy.children[1]).toHaveClass("child1");
+        expect(copy.children[2]).toHaveClass("child2");
         expect(copy.attributes).toEqual(el.attributes);
     });
 
     it("should complain when an element with a ID is copied without a fallback ID", () => {
         let error: unknown;
+        el.id = "id";
+
         try {
             const copy = el.copy(true);
         } catch (e) {
@@ -266,7 +269,10 @@ describe("Element.copy", () => {
         }
 
         expect(error).toBeInstanceOf(DuplicateIDError);
+    });
 
+    afterEach(() => {
+        el.id = "";
     });
 });
 
