@@ -5,12 +5,13 @@
  * @version 1.0.0
  * All definition files use the `@opti` tag to represent things that were added by Opti
  */
-import './types.js';
-import './deprecation.js';
-import './namespaces.js';
-import './alterations.js';
-import './classes.js';
-import './interfaces.js';
+import './types.d.ts';
+import './deprecation.d.ts';
+import './namespaces.d.ts';
+import './alterations.d.ts';
+import './classes.d.ts';
+import './interfaces.d.ts';
+import './struct.d.ts';
 
 declare global {
     //------------------------------------- Global Functions  -------------------------------------
@@ -191,6 +192,8 @@ declare global {
      * @extends Error
      */
     var AssertionError: AssertionErrorConstructor;
+
+    var CastError: CastErrorConstructor;
 
     /**
      * Error for starting a new debounce

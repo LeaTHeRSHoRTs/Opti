@@ -41,8 +41,8 @@ const baseRules: Linter.RulesRecord = {
     "eslint/no-extend-native": 'off',
     "eslint/no-underscore-dangle": 'off',
 
-    // "stylistic/indent": ["error", 4],
-    // 'stylistic/semi': ['error', 'always'],
+    "stylistic/indent": ["error", 4],
+    "stylistic/semi": ['error', 'always'],
 
     // "custom-rules/single-line-control-flow": "error",
     // "custom-rules/conditional-single": "error",
@@ -123,7 +123,8 @@ export const typescriptRules: Linter.RulesRecord = {
 
     'no-compare-neg-zero': 'error',
 
-    "esdoc/require-jsdoc": "off",
+    "esdoc/require-jsdoc": 'off',
+    "esdoc/require-tags": 'off',
 
     "typescript/consistent-return": 'off',
     "typescript/no-unsafe-type-assertion": 'off',

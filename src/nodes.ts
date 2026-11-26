@@ -91,8 +91,8 @@ export function getAncestor(this: ChildNode, arg: string | number): Element | No
     if (typeof arg === 'number') {
         let node: Node | null = this;
         for (let i = 0; i < arg; i++) {
-            if (!this?.parentNode) return null;
-            node = this.parentNode;
+            if (!node?.parentNode) return null;
+            node = node.parentNode;
         }
         return node;
     }

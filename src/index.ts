@@ -49,6 +49,7 @@ setReadOnly(globalThis, 'f', <T, P extends unknown[], R>(
     thisArg?: T
 ): R => iife.apply(thisArg as T, (args || []) as P));
 
+globalThis.cast = Globals.cast;
 globalThis.assert = Globals.assert;
 globalThis.sleep = Globals.sleep;
 globalThis.isEmpty = Globals.isEmpty;

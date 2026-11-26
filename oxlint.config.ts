@@ -13,6 +13,10 @@ export default defineConfig({
         {
             name: "esdoc",
             specifier: "eslint-plugin-jsdoc"
+        },
+        {
+            name: "stylistic",
+            specifier: "@stylistic/eslint-plugin"
         }
     ],
     settings: { jsdoc: { mode: "typescript" } },
@@ -25,10 +29,7 @@ export default defineConfig({
     overrides: [
         {
             files: ["**/*.ts", "**/*.tsx", "!**/*.d.ts"],
-            rules: {
-                ...typescriptRules,
-                "esdoc/require-tags": 'off'
-            }
+            rules: typescriptRules
         },
         {
             // Must go after ts files so they have a higher priority

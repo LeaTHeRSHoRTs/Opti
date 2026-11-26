@@ -143,6 +143,9 @@ interface AccessErrorConstructor extends ErrorConstructorOf<AccessError> {}
 interface AssertionError extends Error {}
 interface AssertionErrorConstructor extends ErrorConstructorOf<AssertionError> {}
 
+interface CastError extends Error {}
+interface CastErrorConstructor extends ErrorConstructorOf<CastError> {}
+
 interface FetchError extends Error {}
 interface FetchErrorConstructor extends ErrorConstructorOf<FetchError> {}
 

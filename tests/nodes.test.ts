@@ -107,9 +107,10 @@ describe("Node.getChildren", () => {
         document.body.appendChild(parent);
 
         const children = parent.getChildren();
+        expect(children).toBeDefined();
         expect(children).toContain(child1);
         expect(children).toContain(child2);
-        expect(children.length).toBe(2);
+        expect(children?.length).toBe(2);
     });
 });
 

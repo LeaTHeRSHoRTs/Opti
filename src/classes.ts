@@ -6,16 +6,14 @@ export function Enum<T extends readonly string[]>(...values: T): EnumInstance<T>
     const obj = {} as EnumInstance<T>;
 
     values.forEach((val) => {
-        const key = String(val);
-
-        if (!/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(key)) {
+        if (!/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(val)) {
             throw new SyntaxError("Enum values must be defined and may only be the characters A-Z, a-z, 0-9, _ and $");
-        } else if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        } else if (Object.prototype.hasOwnProperty.call(obj, val)) {
             throw new SyntaxError("Enum members may only be unique");
         }
 
-        Object.defineProperty(obj, key, {
-            value: Symbol(key),
+        Object.defineProperty(obj, val, {
+            value: Symbol(val),
             enumerable: true,
             configurable: false,
             writable: false,
