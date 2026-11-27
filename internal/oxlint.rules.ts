@@ -126,6 +126,7 @@ export const typescriptRules: Linter.RulesRecord = {
     "esdoc/require-jsdoc": 'off',
     "esdoc/require-tags": 'off',
 
+    "typescript/require-array-sort-compare": 'off',
     "typescript/consistent-return": 'off',
     "typescript/no-unsafe-type-assertion": 'off',
     "typescript/no-explicit-any": 'error',

@@ -14,7 +14,7 @@ export function pluck<T>(this: T[], finder: ((v: T) => boolean) | number): T | n
     if (typeof finder === 'number') {
         // Don't allow negative indices
         if (finder < 0) throw new RangeError("The parameter for pluck cannot be negative");
-        if (finder > this.length) throw new RangeError("The parameter for pluck cannot exceed the array's length");
+        if (finder >= this.length) throw new RangeError("The parameter for pluck cannot exceed the array's length");
         return this[finder] ?? null;
     } else {
         // Find the index of the item

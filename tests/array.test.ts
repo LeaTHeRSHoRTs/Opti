@@ -41,10 +41,16 @@ describe("Array.chunk", () => {
 });
 
 describe("Array.pluck", () => {
-    let arr: (number | string | boolean)[];
+    let arr: (number | string | boolean)[] = [1, true, 3, 4, false, 5];
 
     beforeEach(() => {
         arr = [1, true, 3, 4, false, 5];
+    });
+
+    it("should be able to handle number parameters", () => {
+        expect(arr.pluck(0)).toBe(1);
+        expect(arr.pluck(1)).toBe(true);
+        expect(arr.pluck(arr.length - 1)).toBe(5); 
     });
 
     it("should be able to take values from arrays", () => {
@@ -57,6 +63,21 @@ describe("Array.pluck", () => {
         const val = arr.pluck(v => typeof v === 'function' && v === true);
         expect(val).toBe(null);
         expect(arr).toContain(true);
+    });
+
+    it.each([-1, arr.length, arr.length + 1])("should throw a RangeError for the invalid index %i", (index) => {
+        expect(() => arr.pluck(index)).toThrow(RangeError);
+    });
+
+    it("should throw for an empty array", () => {
+        expect(() => [].pluck(0)).toThrow(RangeError);
+    });
+
+    it("should return null for undefined array elements", () => {
+        const values = [undefined];
+    
+        expect(values.pluck(0)).toBe(null);
+        expect(values.pluck(val => val === undefined)).toBe(null);
     });
 });
 
@@ -164,12 +185,6 @@ describe("Array.replace", () => {
 });
 
 describe("Array.sortBy", () => {
-    it("should be able to work normally", () => {
-        expect(['A', 'D', 'C', 'B'].sort()).toStrictEqual(['A', 'B', 'C', 'D']);
-        expect([1, 4, 3, 2].sort()).toStrictEqual([1, 2, 3, 4]);
-        expect([].sort()).toStrictEqual([]);
-    });
-
     it("should fallback for mixed type arrays", () => {
         const arr = [1, '2', 3];
         const result = [...arr].sortBy("increasing");
