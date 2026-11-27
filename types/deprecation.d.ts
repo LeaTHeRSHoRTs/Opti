@@ -1,4 +1,4 @@
-/* eslint-disable jsdoc/require-tags, jsdoc/require-param, jsdoc/require-example */
+// oxlint-disable esdoc/require-tags, esdoc/require-param, esdoc/require-example
 
 declare interface ParentNode extends Node {
     /** @deprecated Use {@link Node.parent} instead. */

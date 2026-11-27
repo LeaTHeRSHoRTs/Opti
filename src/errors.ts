@@ -44,9 +44,6 @@ export class AccessError extends Error {
 export class AssertionError extends Error {
     name = "AssertionError";
 }
-export class CastError extends Error {
-    name = "CastError";
-}
 export class FetchError extends Error {
     name = "FetchError";
 }

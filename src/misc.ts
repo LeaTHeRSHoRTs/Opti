@@ -7,6 +7,7 @@ export function throttle<T, A extends unknown[], R>(func: Func<T, A, R>, ms: num
     return function (this: T, ...rest: A): R | null {
         if (timer) {
             storedArgs = rest;
+            // eslint-disable-next-line typescript/no-this-alias
             context = this;
             return null;
         }
@@ -45,13 +46,12 @@ export function debounce<T, A extends unknown[], R>(func: Func<T, A, R>, ms: num
             }
         }
 
-        const self = this;
         return new Future<R, DebouncedError>((resolve, reject) => {
             currentReject = reject;
             timer = setTimeout(() => {
                 currentReject = null;
                 timer = null;
-                resolve(func.apply(self, rest));
+                resolve(func.apply(this, rest));
             }, ms);
         });
     };
@@ -59,14 +59,14 @@ export function debounce<T, A extends unknown[], R>(func: Func<T, A, R>, ms: num
 
 export function memo<T extends Func>(func: T): T {
     // Always check the registry first for persistent state
-    let cache = InternalRegistries.MEMO.get(func) as Map<string, Func.Return<T>>;
+    let cache = InternalRegistries.MEMO.get(func) as Map<string, Func.Ret<T>>;
 
     if (!cache) {
-        cache = new Map<string, Func.Return<T>>();
+        cache = new Map<string, Func.Ret<T>>();
         InternalRegistries.MEMO.set(func, cache);
     }
 
-    return function (this: Func.This<T>, ...rest: Func.Arguments<T>): Func.Return<T> {
+    return function (this: Func.This<T>, ...rest: Func.Arguments<T>): Func.Ret<T> {
         const cacheKey = JSON.stringify(rest);
         const cachedResult = cache.get(cacheKey);
         if (cachedResult !== undefined) {
@@ -174,7 +174,7 @@ export function capitalize(this: string): string {
     return m[1] + m[2].toUpperCase() + this.slice(m[0].length);
 };
 
-export function contains(this: String, regexp: string | RegExp): boolean {
+export function contains(this: string, regexp: string | RegExp): boolean {
     return this.search(regexp) !== -1;
 };
 

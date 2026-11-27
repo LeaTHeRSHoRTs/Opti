@@ -111,7 +111,6 @@ describe("HTMLElement.css", () => {
 
     afterAll(() => {
         element.remove();
-        void element;
     });
 
     it("should be able to apply CSS styles to the element", () => {

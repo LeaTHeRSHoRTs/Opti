@@ -1,4 +1,4 @@
-// eslint-disable-next-line jsdoc/require-tags
+// eslint-disable-next-line esdoc/require-tags
 /**
  * @file opti.lib.d.ts
  * @description Main type declarations for the Opti library
@@ -11,7 +11,7 @@ import './namespaces.d.ts';
 import './alterations.d.ts';
 import './classes.d.ts';
 import './interfaces.d.ts';
-import './struct.d.ts';
+import './struct.d.ts.ignore';
 
 declare global {
     //------------------------------------- Global Functions  -------------------------------------
@@ -192,8 +192,6 @@ declare global {
      * @extends Error
      */
     var AssertionError: AssertionErrorConstructor;
-
-    var CastError: CastErrorConstructor;
 
     /**
      * Error for starting a new debounce
@@ -417,7 +415,7 @@ declare global {
          * const text = document.createTextNode("Element Text");
          * const text = el.getAncestor(1);
          */
-        ancestor(this: Node, level: number): ParentNode | null;
+        ancestor(level: number): ParentNode | null;
         /** 
          * Gets the element's ancestor based on a css selector
          * @opti
@@ -471,13 +469,13 @@ declare global {
          * el.$(".hidden").removeClass("hidden");
          */
         $<K extends keyof HTMLElementTagNameMap>(selector: K): HTMLElementTagNameMap[K] | null;
-        /* eslint-disable jsdoc/require-jsdoc, jsdoc/require-tags, jsdoc/require-param, jsdoc/require-example,jsdoc/require-returns */
+        /* eslint-disable esdoc/require-jsdoc, esdoc/require-tags, esdoc/require-param, esdoc/require-example, esdoc/require-returns */
         $<K extends keyof SVGElementTagNameMap>(selector: K): SVGElementTagNameMap[K] | null;
         $<K extends keyof MathMLElementTagNameMap>(selector: K): MathMLElementTagNameMap[K] | null;
         /** @deprecated */
         $<K extends keyof HTMLElementDeprecatedTagNameMap>(selector: K): HTMLElementDeprecatedTagNameMap[K] | null;
         $<E extends Element = HTMLElement>(selector: string): E | null;
-        /* eslint-enable jsdoc/require-jsdoc, jsdoc/require-tags, jsdoc/require-param, jsdoc/require-example, jsdoc/require-returns */
+        /* eslint-enable esdoc/require-jsdoc, esdoc/require-tags, esdoc/require-param, esdoc/require-example, esdoc/require-returns */
 
         /**
          * Finds children based on the selector specified
@@ -493,13 +491,13 @@ declare global {
          * el.$$(".hidden", true).removeClass("hidden");
          */
         $$<K extends keyof HTMLElementTagNameMap>(selector: K): Arr<HTMLElementOf<K>>;
-        /* eslint-disable jsdoc/require-jsdoc, jsdoc/require-tags, jsdoc/require-param, jsdoc/require-example, jsdoc/require-returns */
+        /* eslint-disable esdoc/require-jsdoc, esdoc/require-tags, esdoc/require-param, esdoc/require-example, esdoc/require-returns */
         $$<K extends keyof SVGElementTagNameMap>(selector: K): Arr<HTMLElementOf<K>>;
         $$<K extends keyof MathMLElementTagNameMap>(selector: K): Arr<MathMLElementOf<K>>;
         /** @deprecated */
         $$<K extends keyof HTMLElementDeprecatedTagNameMap>(selector: K): Arr<HTMLElementDeprecatedTagNameMap[K]>;
         $$<E extends Element = HTMLElement>(selector: string): Arr<E>;
-        /* eslint-enable jsdoc/require-jsdoc, jsdoc/require-tags, jsdoc/require-param, jsdoc/require-example, jsdoc/require-returns */
+        /* eslint-enable esdoc/require-jsdoc, esdoc/require-tags, esdoc/require-param, esdoc/require-example, esdoc/require-returns */
     }
 
     interface Element {

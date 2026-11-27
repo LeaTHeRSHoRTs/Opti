@@ -8,7 +8,7 @@ type Func<T = any, A extends _[] = any[], R = any> = (this: T, ...args: A) => R;
 
 /** 
  * The type-only `Func` namespace holds Function-related utility types, such as `Func.Arguments`, 
- * `Func.Return`, and `Func.This`
+ * `Func.Ret`, and `Func.This`
  * @opti
  * @since 1.0.0
  */
@@ -34,7 +34,7 @@ declare namespace Func {
      * @opti
      * @since 1.0.0
      */
-    type Return<T extends Func> = ReturnType<T>;
+    type Ret<T extends Func> = ReturnType<T>;
 
     /** 
      * Gets a function's `this` argument type
@@ -224,14 +224,7 @@ declare namespace Boolean {
      * @opti
      * @since 1.0.0
      */
-    type Falsy<T> =
-        T extends false ? false :
-            T extends '' ? '' :
-                T extends 0 ? 0 | -0 :
-                    T extends 0n ? 0n :
-                        T extends null ? null :
-                            T extends undefined ? undefined :
-                                never;
+    type Falsy<T> = T extends false | '' | 0 | 0n | null | undefined ? T : never;
 
     /**
      * Extracts all the truthy values from `T`

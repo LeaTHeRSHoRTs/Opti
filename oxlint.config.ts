@@ -26,6 +26,7 @@ export default defineConfig({
         suspicious: 'warn',
         perf: 'warn'
     },
+    ignorePatterns: ["**/_.*"],
     overrides: [
         {
             files: ["**/*.ts", "**/*.tsx", "!**/*.d.ts"],

@@ -94,10 +94,10 @@ type Unboxed<T> =
         ? [Unboxed<First>, ...Unboxed<Rest>]
         : T extends new (...args: unknown[]) => infer R
             ? Unboxed<R>
-            : T extends StringConstructor | typeof String ? string
-                : T extends NumberConstructor | typeof Number ? number
-                    : T extends BooleanConstructor | typeof Boolean ? boolean
-                        : T extends SymbolConstructor | typeof Symbol ? symbol
+            : T extends StringConstructor ? string
+                : T extends NumberConstructor ? number
+                    : T extends BooleanConstructor ? boolean
+                        : T extends SymbolConstructor ? symbol
                             : T;
 
 /** 

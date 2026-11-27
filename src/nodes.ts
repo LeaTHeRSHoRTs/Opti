@@ -54,8 +54,8 @@ export function css(
                 const style = computed.getPropertyValue(prop).trim();
                 computedObj[camelProp as keyof CSSStyleDeclaration] = parseUnit(style);
             }
-      
-            return { ...result, ...computedObj };
+
+            return Object.assign({}, result, computedObj);
         }
 
         return result;
@@ -86,12 +86,12 @@ export function getParent(this: ChildNode): ParentNode | null {
     return this.parentElement;
 };
 
-export function getAncestor(this: ChildNode, arg: string | number): Element | Node | null {
+export function getAncestor(this: Node, arg: string | number): ParentNode | Element | null {
     // Case 1: numeric level
     if (typeof arg === 'number') {
-        let node: Node | null = this;
+        let node: Func.Ret<typeof getAncestor> = this.parentElement;
         for (let i = 0; i < arg; i++) {
-            if (!node?.parentNode) return null;
+            if (!node) return null;
             node = node.parentNode;
         }
         return node;
@@ -197,7 +197,7 @@ export function serialize(this: HTMLFormElement): string {
     const entries: [string, string][] = [];
 
     formData.forEach((value, key) => {
-        entries.push([key, value.toString()]);
+        entries.push([key, value instanceof File ? value.name : value]);
     });
 
     return entries
@@ -286,6 +286,7 @@ export function isVisible(this: HTMLElement): boolean {
 }
 
 export function val(this: HTMLInputElement): InputValueAccessor {
+    // oxlint-disable-next-line typescript/no-this-alias
     const self = this;
 
     return {

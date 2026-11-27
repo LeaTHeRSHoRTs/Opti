@@ -14,6 +14,7 @@
     "**/coverage"
   ],
   "include": [
-    "**/*.test.ts"
+    "**/*.test.ts",
+    "../internal/secrets.d.ts"
   ]
 }

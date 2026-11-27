@@ -55,9 +55,10 @@ export const definitionRules: Linter.RulesRecord = {
 
     "eslint/id-match": [
         "error",
-        "^[A-Z_$][a-zA-Z0-9]*$|^[a-z_$][a-zA-Z0-9]*$|^[A-Z0-9_]+$"
+        "^[A-Z_$]\\$?[a-zA-Z0-9]*$|^[a-z_$][a-zA-Z0-9]*$|^[A-Z0-9_]+$"
     ],
 
+    "typescript/no-unnecessary-type-parameters": 'off',
     "typescript/no-explicit-any": 'warn',
     "typescript/no-empty-object-type": "off",
     "typescript/no-restricted-types": [

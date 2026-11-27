@@ -97,7 +97,7 @@ export function mixin<T extends Func, This = ThisParameterType<T>, Ret = ReturnT
     location: 'TAIL',
     mixinFn: (this: This & { mixin: { value: Ret } }, ...args: Parameters<T>) => Ret
 ): T;
-export function mixin<T extends Func, This = Func.This<T>, Ret = Func.Return<T>>(
+export function mixin<T extends Func, This = Func.This<T>, Ret = Func.Ret<T>>(
     fn: T,
     location: 'HEAD' | 'TAIL',
     mixinFn: Func

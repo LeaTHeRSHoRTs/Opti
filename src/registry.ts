@@ -1,5 +1,5 @@
-export class Registries {
-    public static readonly HTML_TAGS: Record<HTMLTag, Class<HTMLElement>> = {
+export const Registries = {
+    HTML_TAGS: {
         a: HTMLAnchorElement,
         abbr: HTMLElement,
         address: HTMLElement,
@@ -112,13 +112,13 @@ export class Registries {
         var: HTMLElement,
         video: HTMLVideoElement,
         wbr: HTMLElement,
-    };
+    } as const,
 
-    public static readonly SVG_TAGS: Record<SVGTag, Class<SVGElement>> = {
+    SVG_TAGS: {
         a: SVGAElement,
-        animate: SVGElement,
-        animateMotion: SVGElement,
-        animateTransform: SVGElement,
+        animate: SVGAnimateElement,
+        animateMotion: SVGAnimateMotionElement,
+        animateTransform: SVGAnimateTransformElement,
         circle: SVGCircleElement,
         clipPath: SVGClipPathElement,
         defs: SVGDefsElement,
@@ -158,7 +158,7 @@ export class Registries {
         marker: SVGMarkerElement,
         mask: SVGMaskElement,
         metadata: SVGMetadataElement,
-        mpath: SVGElement,
+        mpath: SVGMPathElement,
         path: SVGPathElement,
         pattern: SVGPatternElement,
         polygon: SVGPolygonElement,
@@ -166,7 +166,7 @@ export class Registries {
         radialGradient: SVGRadialGradientElement,
         rect: SVGRectElement,
         script: SVGScriptElement,
-        set: SVGElement,
+        set: SVGSetElement,
         stop: SVGStopElement,
         style: SVGStyleElement,
         svg: SVGSVGElement,
@@ -178,9 +178,9 @@ export class Registries {
         tspan: SVGTSpanElement,
         use: SVGUseElement,
         view: SVGViewElement,
-    };
+    }as const,
 
-    public static readonly MATHML_TAGS: Record<MathMLTag, Class<MathMLElement>> = {
+    MATHML_TAGS: {
         a: MathMLElement,
         annotation: MathMLElement,
         "annotation-xml": MathMLElement,
@@ -212,12 +212,9 @@ export class Registries {
         munder: MathMLElement,
         munderover: MathMLElement,
         semantics: MathMLElement,
-    };
-}
+    } as const
+};
 
-export class InternalRegistries {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public static readonly MEMO: WeakMap<Func, Map<string, any>> = new Map();
-    public static readonly THROTTLE: WeakMap<Func, Func> = new Map();
-    public static readonly DEBOUNCE: WeakMap<Func, Func> = new Map();
-}
+export const InternalRegistries = {
+    MEMO: new WeakMap<Func, Map<string, unknown>>()
+};

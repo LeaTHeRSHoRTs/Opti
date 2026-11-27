@@ -80,7 +80,7 @@ describe("Object.clone", () => {
     });
   
     it("should throw when it tries to clone symbols", () => {
-        expect(() => Object.clone(Symbol("Hello"))).toThrow();
+        expect(() => Object.clone(Symbol("Hello"))).toThrow(CloneError);
     });
 
     it("should be able to make shallow copies", () => {
@@ -217,7 +217,7 @@ describe("Function.memo", () => {
         let callTimes = 0;
         const func = (a: number, b: number) => a + b + callTimes++;
 
-        const newFn = vi.fn(Function.memo(func));
+        const newFn = vi.fn<(a: number, b: number) => number>(Function.memo(func));
         newFn(2, 3);
 
         expect(newFn(4, 5)).toBe(10);
@@ -238,7 +238,7 @@ describe("Function.throttle", () => {
     });
 
     it("should stall if the time hasn't elapsed", () => {
-        const fn = vi.fn();
+        const fn = vi.fn<() => void>();
         const throttled = Function.throttle(fn, 1000);
 
         throttled();
@@ -259,7 +259,7 @@ describe("Function.debounce", () => {
     });
 
     it("should execute the function after the delay", () => {
-        const fn = vi.fn();
+        const fn = vi.fn<() => void>();
         const debounced = Function.debounce(fn, 1000);
 
         void debounced(); // call once
@@ -270,26 +270,26 @@ describe("Function.debounce", () => {
         expect(fn).toHaveBeenCalledTimes(1);
     });
 
-    // it("should only execute once after multiple rapid calls", () => {
-    //   const fn = vi.fn();
-    //   const debounced = Function.debounce(fn, 1000);
+    it("should only execute once after multiple rapid calls", async () => {
+        const fn = vi.fn<() => void>();
+        const debounced = Function.debounce(fn, 1000);
 
-    //   const p1 = debounced(); // should resolve
-    //   const p2 = debounced(); // should reject
-    //   const p3 = debounced(); // should reject
+        const p1 = debounced(); // should resolve
+        const p2 = debounced(); // should reject
+        const p3 = debounced(); // should reject
 
-    //     // Fast-forward time to trigger the actual execution
-    //   vi.advanceTimersByTime(1000);
+        // Fast-forward time to trigger the actual execution
+        vi.advanceTimersByTime(1000);
 
-    //   //expect(p1).resolves.toBeUndefined();
-    //   expect(p2).rejects.toBeInstanceOf(DebouncedException);
-    //   expect(p3).rejects.toBeInstanceOf(DebouncedException);
+        //expect(p1).resolves.toBeUndefined();
+        await expect(p2).rejects.toBeInstanceOf(DebouncedError);
+        await expect(p3).rejects.toBeInstanceOf(DebouncedError);
 
-    //   expect(fn).toHaveBeenCalledTimes(3);
-    // }, 10_000);
+        expect(fn).toHaveBeenCalledTimes(3);
+    }, 10_000);
 
     it("should allow new calls after previous delay", () => {
-        const fn = vi.fn();
+        const fn = vi.fn<() => void>();
         const debounced = Function.debounce(fn, 1000);
 
         void debounced();

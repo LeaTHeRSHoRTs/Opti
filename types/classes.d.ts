@@ -7,11 +7,12 @@
 type EnumInstance<T extends readonly string[]> = {
     readonly [K in T[number]]: symbol;
 } & {
-    // eslint-disable-next-line jsdoc/require-example
+    // eslint-disable-next-line esdoc/require-example
     /**
      * Provides iteration over each element in the enum
      * @opti
      * @since 1.0.0
+     * @returns An IterableIterator
      */
     [Symbol.iterator](): IterableIterator<T[number]>;
 };
@@ -26,7 +27,9 @@ interface FutureConstructor extends PromiseConstructor {
 }
 
 interface RegistryManifest {
-    readonly HTML_TAGS: RegistryOf<HTMLTag, Class<HTMLElement>>;
+    readonly HTML_TAGS: { [T in HTMLTag]: Class<HTMLElementOf<T>> };
+    readonly SVG_TAGS: { [T in SVGTag]: Class<SVGElementOf<T>> };
+    readonly MATHML_TAGS: { [T in MathMLTag]: Class<MathMLElementOf<T>> };
 }
 
 /**
@@ -53,8 +56,8 @@ interface Future<T, R extends Error = Error> extends Promise<T> {
      * });
      */
     then<TResult1 = T, TResult2 = never>(
-        onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null,
-        onrejected?: ((reason: R) => TResult2 | PromiseLike<TResult2>) | undefined | null
+        onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | null,
+        onrejected?: ((reason: R) => TResult2 | PromiseLike<TResult2>) | null
     ): Future<TResult1 | TResult2, R>;
 
     /**
@@ -75,7 +78,7 @@ interface Future<T, R extends Error = Error> extends Promise<T> {
      * });
      */
     catch<TResult = never>(
-        onrejected?: ((reason: R) => TResult | PromiseLike<TResult>) | undefined | null
+        onrejected?: ((reason: R) => TResult | PromiseLike<TResult>) | null
     ): Future<T | TResult, R>;
 
     /**
@@ -94,7 +97,7 @@ interface Future<T, R extends Error = Error> extends Promise<T> {
      *   console.log("Future settled");
      * });
      */
-    finally(onfinally?: (() => void) | undefined | null): Future<T, R>;
+    finally(onfinally?: (() => void) | null): Future<T, R>;
 }
 
 //* Errors
@@ -142,9 +145,6 @@ interface AccessErrorConstructor extends ErrorConstructorOf<AccessError> {}
 
 interface AssertionError extends Error {}
 interface AssertionErrorConstructor extends ErrorConstructorOf<AssertionError> {}
-
-interface CastError extends Error {}
-interface CastErrorConstructor extends ErrorConstructorOf<CastError> {}
 
 interface FetchError extends Error {}
 interface FetchErrorConstructor extends ErrorConstructorOf<FetchError> {}

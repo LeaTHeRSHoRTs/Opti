@@ -13,6 +13,6 @@
   "include": [
     "**/*.ts",
     "../types/index.d.ts",
-    "../../internal/secrets.d.ts"
+    "../internal/secrets.d.ts"
   ]
 }

@@ -3,6 +3,7 @@ if (
     typeof document === 'undefined'
 ) throw new Error("Opti requires a browser environment.");
 
+// Import helpers and rest of code
 const { setGetter, setReadOnly, throwPlaceholder } = await import('./helpers');
 const Classes =  await import('./classes');
 const Doc =      await import('./document');
@@ -22,12 +23,11 @@ globalThis.Opti = {
     flow: false
 };
 
-//! Others may depend on these
+// Others may depend on these
 globalThis.RegistryError = Errors.RegistryError;
-globalThis.Future = Promise;
-//@ts-expect-error
-globalThis.InternalRegistries = Reg.InternalRegistries;
 globalThis.Registries = Reg.Registries;
+globalThis.InternalRegistries = Reg.InternalRegistries;
+globalThis.Future = Promise;
 Array.prototype.asArr = Arrays.asArr;
 Object.assign(globalThis, Errors);
 
@@ -49,7 +49,6 @@ setReadOnly(globalThis, 'f', <T, P extends unknown[], R>(
     thisArg?: T
 ): R => iife.apply(thisArg as T, (args || []) as P));
 
-globalThis.cast = Globals.cast;
 globalThis.assert = Globals.assert;
 globalThis.sleep = Globals.sleep;
 globalThis.isEmpty = Globals.isEmpty;
@@ -122,4 +121,4 @@ Object.forEach = Misc.forEach;
 
 Date.at = Misc.atDate;
 
-export {}
+export {};
